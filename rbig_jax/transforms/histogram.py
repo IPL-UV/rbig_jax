@@ -13,7 +13,7 @@ Params = collections.namedtuple(
 
 
 # @partial(jax.jit, static_argnums=(1, 2, 3))
-def get_params(
+def get_hist_params(
     X: np.ndarray,
     support_extension: Union[int, float] = 10,
     precision: int = 1_000,

@@ -14,7 +14,7 @@ from rbig_jax.information.reduction import information_reduction
 from rbig_jax.plots.info import plot_total_corr
 from rbig_jax.plots.joint import plot_joint
 from rbig_jax.plots.prob import plot_joint_prob
-from rbig_jax.transforms.gaussian import init_params_hist
+from rbig_jax.transforms.gaussian import init_params
 from rbig_jax.transforms.rbig import get_rbig_params
 
 config.update("jax_enable_x64", True)
@@ -31,10 +31,11 @@ def main():
     wandb.init(project="rbigjax-demo-2d", entity="emanjohnson91")
 
     # config parameters
-    wandb.config.n_samples = 10_000
+    wandb.config.n_samples = 100_000
     wandb.config.dataset = "classic"
+    wandb.config.method = "kde"
     wandb.config.support_extension = 10
-    wandb.config.precision = 100
+    wandb.config.precision = 50
     wandb.config.alpha = 0.0
     wandb.config.n_layers = 20
 
@@ -54,8 +55,11 @@ def main():
     # ========================
 
     # initialize parameters getter function
-    init_func = init_params_hist(
-        wandb.config.support_extension, wandb.config.precision, wandb.config.alpha,
+    init_func = init_params(
+        support_extension=wandb.config.support_extension,
+        precision=wandb.config.precision,
+        alpha=wandb.config.alpha,
+        method=wandb.config.method,
     )
 
     # define step function (updates the parameters)

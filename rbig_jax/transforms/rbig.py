@@ -3,7 +3,7 @@ from functools import partial
 import jax
 import jax.numpy as np
 
-from rbig_jax.transforms.gaussian import get_gauss_params, init_params_hist
+from rbig_jax.transforms.gaussian import get_gauss_params, init_params
 from rbig_jax.transforms.linear import init_pca_params
 
 
