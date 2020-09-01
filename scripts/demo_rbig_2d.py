@@ -31,7 +31,7 @@ def main():
     wandb.init(project="rbigjax-demo-2d", entity="emanjohnson91")
 
     # config parameters
-    wandb.config.n_samples = 100_000
+    wandb.config.n_samples = 10_000
     wandb.config.dataset = "classic"
     wandb.config.method = "kde"
     wandb.config.support_extension = 10
@@ -102,7 +102,7 @@ def main():
 
                 # calculate negative log likelihood
                 nll = jax.scipy.stats.norm.logpdf(data) + X_ldj
-                nll = nll.sum(axis=1).mean()
+                nll = -nll.sum(axis=1).mean()
                 wandb.log({"Negative Log-Likelihood": onp.array(nll)})
 
                 # plot the transformation (SLOW)
@@ -173,7 +173,7 @@ def main():
     log_probs = log_probs.sum(axis=1)
 
     # clip probabilities
-    log_probs_clipped = np.clip(log_probs, -20, 0)
+    log_probs_clipped = np.clip(log_probs, -20, 1)
     plot_joint_prob(
         data, log_probs_clipped, "Reds", title="Log Probability", logger=True
     )

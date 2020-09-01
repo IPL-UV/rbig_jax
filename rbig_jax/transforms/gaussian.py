@@ -45,7 +45,6 @@ def init_params(support_extension=10, precision=100, alpha=1e-5, method="histogr
                     get_kde_params,
                     support_extension=support_extension,
                     precision=precision,
-                    alpha=alpha,
                 )
             )
         )
@@ -58,7 +57,7 @@ def get_gauss_params(X, apply_func):
     X, ldX, params = apply_func(X)
 
     # clip boundaries
-    X = np.clip(X, 1e-10, 1.0 - 1e-10)
+    X = np.clip(X, 1e-5, 1.0 - 1e-5)
 
     X = forward_inversecdf(X)
 

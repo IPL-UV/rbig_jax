@@ -14,10 +14,7 @@ Params = collections.namedtuple(
 
 
 def get_kde_params(
-    X: np.ndarray,
-    support_extension: Union[int, float] = 10,
-    precision: int = 1_000,
-    alpha: float = 1e-5,
+    X: np.ndarray, support_extension: Union[int, float] = 10, precision: int = 1_000,
 ):
     # generate support points
     lb, ub = get_domain_extension(X, support_extension)
