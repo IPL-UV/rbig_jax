@@ -102,7 +102,7 @@ def main():
                 wandb.log({"Negative Log-Likelihood": onp.array(nll)})
 
                 # plot the transformation (SLOW)
-                # plot_joint(data, "blue", f"Transform, Layer: {i}", True)
+                # plot_140.joint(data, "blue", f"Transform, Layer: {i}", True)
 
         return X_transform, X_ldj, forward_funcs, inverse_funcs, it_red
 
