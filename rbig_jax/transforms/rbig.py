@@ -23,6 +23,17 @@ def get_rbig_params(data, init_func):
         X_transform.T
     )
 
+    def forward_transform(X, apply_mg, params, apply_rot):
+        X, X_ldj = apply_mg(X.T, params)
+        X, _ = apply_rot(X.T)
+
+    return X, X_ldj
+
+    def inverse_transform(X, apply_inv_mg, params, apply_inv_rot):
+        X = apply_inv_rot(X)
+        X = apply_inv_mg(X.T, params)
+        X = X.T
+
     # forward transform
     return (
         X_transform,
