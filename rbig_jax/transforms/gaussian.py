@@ -5,12 +5,9 @@ import jax.numpy as np
 
 from rbig_jax.transforms.histogram import get_hist_params
 from rbig_jax.transforms.kde import get_kde_params
-from rbig_jax.transforms.marginal import (
-    forward_gaussianization,
-    forward_inversecdf,
-    inverse_gaussianization,
-)
-
+from rbig_jax.transforms.marginal import (forward_gaussianization,
+                                          forward_inversecdf,
+                                          inverse_gaussianization)
 
 # def init_params_hist_1d(support_extension=10, precision=100, alpha=1e-5):
 

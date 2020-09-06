@@ -55,8 +55,10 @@ def information_reduction(X: np.ndarray, Y: np.ndarray, p: float = 0.25) -> floa
     n_samples, n_dimensions = X.shape
 
     tol_dimensions = get_tolerance_dimensions(n_samples)
+    cond = np.logical_or(
+        tol_info < np.sqrt(n_dimensions * p * tol_dimensions ** 2), delta_info < 0
+    )
+    return np.where(cond, 0.0, delta_info)
+    #     delta_info = 0.0
 
-    if tol_info < np.sqrt(n_dimensions * p * tol_dimensions ** 2) or delta_info < 0:
-        delta_info = 0.0
-
-    return delta_info
+    # return delta_info

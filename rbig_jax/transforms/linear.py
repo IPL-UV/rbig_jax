@@ -52,11 +52,9 @@ def init_pca_params(X):
     )
 
 
-@jax.jit
 def forward_transform(X, R):
     return np.dot(X, R), np.zeros(X.shape)
 
 
-@jax.jit
 def inverse_transform(X, R):
     return np.dot(X, R.T)

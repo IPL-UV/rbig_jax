@@ -2,7 +2,6 @@ import jax
 import jax.numpy as np
 
 
-@jax.jit
 def forward_uniformization(X, params):
     return (
         np.interp(X, params.support, params.quantiles),
@@ -10,22 +9,18 @@ def forward_uniformization(X, params):
     )
 
 
-@jax.jit
 def inverse_uniformization(X, params):
     return np.interp(X, params.quantiles, params.support)
 
 
-@jax.jit
 def forward_inversecdf(X):
     return jax.scipy.stats.norm.ppf(X)
 
 
-@jax.jit
 def inverse_inversecdf(X):
     return jax.scipy.stats.norm.cdf(X)
 
 
-@jax.jit
 def forward_gaussianization(X, params):
 
     # transform to uniform domain
@@ -42,10 +37,7 @@ def forward_gaussianization(X, params):
     return X, log_prob
 
 
-@jax.jit
 def inverse_gaussianization(X, params):
-
-    print(X.min(), X.max())
 
     # transform to uniform domain
     X = inverse_inversecdf(X)
