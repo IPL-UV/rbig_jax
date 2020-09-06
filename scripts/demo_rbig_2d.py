@@ -14,7 +14,7 @@ from rbig_jax.information.reduction import information_reduction
 from rbig_jax.plots.info import plot_total_corr
 from rbig_jax.plots.joint import plot_joint
 from rbig_jax.plots.prob import plot_joint_prob
-from rbig_jax.transforms.gaussian import init_params_hist
+from rbig_jax.transforms.gaussian import init_params
 from rbig_jax.transforms.rbig import get_rbig_params
 
 config.update("jax_enable_x64", True)
@@ -33,8 +33,9 @@ def main():
     # config parameters
     wandb.config.n_samples = 10_000
     wandb.config.dataset = "classic"
+    wandb.config.method = "kde"
     wandb.config.support_extension = 10
-    wandb.config.precision = 100
+    wandb.config.precision = 50
     wandb.config.alpha = 0.0
     wandb.config.n_layers = 20
 
@@ -54,8 +55,11 @@ def main():
     # ========================
 
     # initialize parameters getter function
-    init_func = init_params_hist(
-        wandb.config.support_extension, wandb.config.precision, wandb.config.alpha,
+    init_func = init_params(
+        support_extension=wandb.config.support_extension,
+        precision=wandb.config.precision,
+        alpha=wandb.config.alpha,
+        method=wandb.config.method,
     )
 
     # define step function (updates the parameters)
@@ -98,7 +102,7 @@ def main():
 
                 # calculate negative log likelihood
                 nll = jax.scipy.stats.norm.logpdf(data) + X_ldj
-                nll = nll.sum(axis=1).mean()
+                nll = -nll.sum(axis=1).mean()
                 wandb.log({"Negative Log-Likelihood": onp.array(nll)})
 
                 # plot the transformation (SLOW)
@@ -169,7 +173,7 @@ def main():
     log_probs = log_probs.sum(axis=1)
 
     # clip probabilities
-    log_probs_clipped = np.clip(log_probs, -20, 0)
+    log_probs_clipped = np.clip(log_probs, -20, 1)
     plot_joint_prob(
         data, log_probs_clipped, "Reds", title="Log Probability", logger=True
     )
