@@ -19,8 +19,8 @@ RBIGParams = namedtuple(
     "RBIGParams", ["support_pdf", "empirical_pdf", "quantiles", "support", "rotation"]
 )
 # define gaussianization functions
-forward_gauss = jax.vmap(forward_gaussianization)
-inverse_gauss = jax.vmap(inverse_gaussianization)
+forward_gauss = jax.jit(jax.vmap(forward_gaussianization))
+inverse_gauss = jax.jit(jax.vmap(inverse_gaussianization))
 
 
 def rbig_init(
