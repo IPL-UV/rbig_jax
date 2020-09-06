@@ -4,7 +4,6 @@ from functools import partial
 
 import jax
 import jax.numpy as np
-
 # Plot Functions
 import matplotlib.pyplot as plt
 import numpy as onp
