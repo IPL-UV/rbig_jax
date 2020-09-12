@@ -8,3 +8,4 @@ def nll_loss(X, X_log_det):
     likelihood = log_prob + X_log_det.sum(axis=1)
     # log likelihood
     return -likelihood.mean()
+

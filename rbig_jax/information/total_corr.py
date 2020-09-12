@@ -1,14 +1,16 @@
 from collections import namedtuple
 from typing import Callable
+import functools
 
 import jax
 import jax.numpy as np
 
 from rbig_jax.information.entropy import histogram_entropy
 from rbig_jax.information.rbig import TrainState
+from rbig_jax.information.rbig import rbig_init
 
 RBIGEntropy = namedtuple(
-    "RBIGEntropy", ["n_layers", "entropy", "mutual_info", "info_loss", "data"]
+    "RBIGEntropy", ["n_layers", "entropy", "total_corr", "info_loss", "data"]
 )
 
 
@@ -71,53 +73,84 @@ def information_reduction(X: np.ndarray, Y: np.ndarray, p: float = 0.25) -> floa
 
 def rbig_total_corr(
     X: np.ndarray,
-    func: Callable,
-    n_layers: int = 100,
+    method: str = "histogram",
+    support_ext: int = 10,
+    precision: int = 1_000,
+    alpha: float = 1e-5,
     min_layers: int = 10,
-    max_layers: int = 10,
+    max_layers: int = 1_000,
     tol_layers: int = 50,
     threshold: float = 0.25,
+    base: int = 2,
 ) -> RBIGEntropy:
 
-    # initialize training state
-    train_state = TrainState(n_layers=0, info_loss=np.zeros((1_000,)), X=X,)
+    # init RBIG params getter
+    rbig_params_init = rbig_init(
+        method=method, support_ext=support_ext, precision=precision, alpha=alpha,
+    )
 
-    # set condition function
-    def condition_fun(state):
-        # stopping criterial
-        stop_crit = jax.lax.bitwise_and(
-            jax.lax.bitwise_not(state.n_layers < min_layers),
-            state.n_layers > max_layers,
-        )
-        stop_crit = jax.lax.bitwise_not(stop_crit)
-        return stop_crit
+    # compile function (faster)
+    rbig_params_init = jax.jit(rbig_params_init)
+    _ = rbig_params_init(X[:10])
+
+    # init loss with stopping criteria
+    init_loss = np.pad(np.zeros((max_layers,)), (tol_layers, 0))
+    init_loss = jax.ops.index_update(
+        init_loss, np.arange(0, tol_layers, dtype=int), 1.0
+    )
+    train_state = TrainState(n_layers=0, info_loss=init_loss, X=X)
+
+    # jit a few functions
+    information_reduction_jitted = jax.jit(
+        functools.partial(information_reduction, p=threshold)
+    )
+
+    def condition(state):
+
+        # get relevant layers (moving window)
+        layers = state.info_loss[state.n_layers : tol_layers + state.n_layers]
+        #     print(layers)
+        info_sum = np.sum(np.abs(layers))
+
+        # condition - there needs to be some loss of info
+        info_crit = info_sum == 0.0
+        verdict = jax.lax.bitwise_not(info_crit)
+        #     print(f"Info: {info_sum}, verdict: {verdict}")
+        return verdict
 
     # find body function
     def body(train_state):
-        Xtrans = func(train_state.X)
+        Xtrans = rbig_params_init(train_state.X)
 
         # calculate the information loss
-        it = information_reduction(train_state.X, Xtrans)
+        it = information_reduction_jitted(train_state.X, Xtrans)
 
         return TrainState(
-            train_state.n_layers + 1,
-            jax.ops.index_update(train_state.info_loss, train_state.n_layers + 1, it),
-            Xtrans,
+            n_layers=train_state.n_layers + 1,
+            info_loss=jax.ops.index_update(
+                train_state.info_loss, tol_layers + train_state.n_layers, it
+            ),
+            X=Xtrans,
         )
 
-    # loop though
-    state = jax.lax.while_loop(condition_fun, body, train_state)
+    body = jax.jit(body)
 
+    # loop though
+    while condition(train_state):
+        train_state = body(train_state)
+
+    # get credible
+    info_loss = train_state.info_loss[tol_layers : tol_layers + train_state.n_layers]
     # calculate entropy
-    Hx = jax.vmap(histogram_entropy, in_axes=(0, None))(X.T, 2).sum()
+    Hx = jax.vmap(histogram_entropy, in_axes=(0, None))(X.T, base).sum()
 
     # calculate mutual info
-    mutual_info = np.sum(state[1]) * np.log(2)
+    total_corr = np.sum(info_loss) * np.log(base)
 
     return RBIGEntropy(
-        n_layers=state.n_layers,
-        info_loss=state.info_loss,
-        data=state.X,
-        mutual_info=mutual_info,
-        entropy=Hx.sum() - mutual_info,
+        n_layers=train_state.n_layers,
+        info_loss=info_loss,
+        data=train_state.X,
+        total_corr=total_corr,
+        entropy=Hx.sum() - total_corr,
     )
