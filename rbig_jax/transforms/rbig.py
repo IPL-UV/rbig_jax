@@ -9,11 +9,9 @@ import jax.numpy as np
 from rbig_jax.transforms.histogram import get_hist_params
 from rbig_jax.transforms.kde import get_kde_params
 from rbig_jax.transforms.linear import compute_projection
-from rbig_jax.transforms.marginal import (
-    forward_gaussianization,
-    forward_inversecdf,
-    inverse_gaussianization,
-)
+from rbig_jax.transforms.marginal import (forward_gaussianization,
+                                          forward_inversecdf,
+                                          inverse_gaussianization)
 
 RBIGParams = namedtuple(
     "RBIGParams", ["support_pdf", "empirical_pdf", "quantiles", "support", "rotation"]

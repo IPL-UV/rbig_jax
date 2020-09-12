@@ -44,7 +44,25 @@ def get_kde_params(
     )
 
 
-@jax.jit
+def kde_transform(
+    X: np.ndarray, support_extension: Union[int, float] = 10, precision: int = 1_000,
+):
+    # generate support points
+    lb, ub = get_domain_extension(X, support_extension)
+    grid = np.linspace(lb, ub, precision)
+
+    bw = scotts_method(X.shape[0], 1) * 0.5
+
+    # calculate the cdf for grid points
+    factor = normalization_factor(X, bw)
+
+    x_cdf = broadcast_kde_cdf(grid, X, factor)
+
+    X_transform = np.interp(X, grid, x_cdf)
+
+    return X_transform
+
+
 def broadcast_kde_pdf(eval_points, samples, bandwidth):
 
     n_samples = samples.shape[0]
@@ -99,7 +117,6 @@ def gaussian_kde_cdf(x_eval, samples, factor):
     return jax.scipy.special.ndtr(hi - low).mean(axis=0)
 
 
-@jax.jit
 def broadcast_kde_cdf(x_evals, samples, factor):
     return jax.scipy.special.ndtr(
         (x_evals[:, np.newaxis] - samples[np.newaxis, :]) / factor
