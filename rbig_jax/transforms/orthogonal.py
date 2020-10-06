@@ -1,7 +1,5 @@
 import collections
-from functools import partial
 
-import jax
 import jax.numpy as np
 
 RotParams = collections.namedtuple("Params", ["projection"])
@@ -45,27 +43,6 @@ def compute_projection(X: np.ndarray) -> np.ndarray:
     return VT.T
 
 
-def init_pca_params(X):
-
-    # compute projection matrix
-    R = compute_projection(X)
-
-    return (
-        np.dot(X, R),
-        RotParams(R),
-        partial(forward_transform, R=R),
-        partial(inverse_transform, R=R),
-    )
-
-
-def forward_transform(X, R):
-    return np.dot(X, R), np.zeros(X.shape)
-
-
-def inverse_transform(X, R):
-    return np.dot(X, R.T)
-
-
 def rot_forward_transform(X, params):
     return np.dot(X, params.R)
 
@@ -76,4 +53,3 @@ def rot_inverse_transform(X, params):
 
 def rot_gradient_transform(X, params):
     return np.ones_like(X)
-

@@ -200,3 +200,16 @@ def histogram_transform(
     uniform_cdf /= np.max(uniform_cdf)
 
     return np.interp(X, new_support, uniform_cdf)
+
+
+def hist_forward_transform(X, params: Params):
+    return np.interp(X, params.support, params.quantiles)
+
+
+def hist_inverse_transform(X, params: Params) -> np.ndarray:
+    return np.interp(X, params.quantiles, params.support)
+
+
+def hist_gradient_transform(X, params: Params) -> np.ndarray:
+    return np.interp(X, params.support_pdf, params.empirical_pdf)
+

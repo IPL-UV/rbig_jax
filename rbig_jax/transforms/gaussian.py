@@ -1,13 +1,26 @@
+from typing import Union
 from functools import partial
 
 import jax
 import jax.numpy as np
 
-from rbig_jax.transforms.histogram import get_hist_params
+from rbig_jax.transforms.histogram import (
+    get_hist_params,
+    hist_forward_transform,
+    hist_gradient_transform,
+    hist_inverse_transform,
+)
+from rbig_jax.transforms.inversecdf import (
+    invgauss_inverse_transform,
+    invgauss_forward_transform,
+)
+
 from rbig_jax.transforms.kde import get_kde_params
-from rbig_jax.transforms.marginal import (forward_gaussianization,
-                                          forward_inversecdf,
-                                          inverse_gaussianization)
+from rbig_jax.transforms.marginal import (
+    forward_gaussianization,
+    forward_inversecdf,
+    inverse_gaussianization,
+)
 
 # def init_params_hist_1d(support_extension=10, precision=100, alpha=1e-5):
 
@@ -67,6 +80,26 @@ def get_gauss_params(X, apply_func):
         jax.vmap(forward_gaussianization),
         jax.vmap(inverse_gaussianization),
     )
+
+
+def mg_forward_transform(X, params):
+
+    X = hist_forward_transform(X, params)
+    X = invgauss_forward_transform(X)
+    return X
+
+
+def mg_inverse_transform(X, params):
+
+    X = invgauss_inverse_transform(X)
+
+    X = hist_inverse_transform(X, params)
+
+    return X
+
+
+def mg_gradient_transform():
+    return None
 
 
 # def get_gauss_params_1d(X, apply_func):

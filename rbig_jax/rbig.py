@@ -8,9 +8,9 @@ from rbig_jax.information.total_corr import information_reduction
 from rbig_jax.transforms.rbig import rbig_init, forward_transform, inverse_transform
 
 
-forward_transform = jax.jit(forward_transform)
-inverse_transform = jax.jit(inverse_transform)
-information_reduction = jax.jit(information_reduction)
+# forward_transform = jax.jit(forward_transform)
+# inverse_transform = jax.jit(inverse_transform)
+# information_reduction = jax.jit(information_reduction)
 
 
 TrainState = namedtuple(
@@ -125,9 +125,9 @@ class RBIG(BaseEstimator, TransformerMixin):
             alpha=self.alpha,
         )
 
-        # compile function (faster)
-        rbig_params_init = jax.jit(rbig_params_init)
-        _ = rbig_params_init(X[:10])
+        # # compile function (faster)
+        # rbig_params_init = jax.jit(rbig_params_init)
+        # _ = rbig_params_init(X[:10])
 
         # init RBIG state
         train_state, cond_func, body = rbig_init_trainer(
