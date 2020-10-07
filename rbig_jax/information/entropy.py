@@ -23,7 +23,7 @@ def histogram_entropy(data, base=2):
     n_samples = np.shape(data)[0]
 
     # get number of bins (default square root heuristic)
-    nbins = int(np.ceil(np.sqrt(n_samples)))
+    nbins = np.ceil(np.sqrt(n_samples)).astype(int)
 
     # get histogram counts and bin edges
     counts, bin_edges = np.histogram(data, bins=nbins, density=False)

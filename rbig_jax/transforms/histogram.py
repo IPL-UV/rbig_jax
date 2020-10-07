@@ -58,10 +58,10 @@ def get_hist_params(
     n_samples = np.shape(X)[0]
 
     # get number of bins (default square root heuristic)
-    nbins = int(np.ceil(np.sqrt(n_samples)))
+    nbins = np.ceil(np.sqrt(n_samples)).astype(int)
 
     # get histogram counts and bin edges
-    counts, bin_edges = np.histogram(X, bins=nbins)
+    counts, bin_edges = np.histogram(X, bins=nbins,)
 
     # add regularization
     counts = np.array(counts) + alpha
@@ -159,7 +159,7 @@ def histogram_transform(
     n_samples = np.shape(X)[0]
 
     # get number of bins (default square root heuristic)
-    nbins = int(np.ceil(np.sqrt(n_samples)))
+    nbins = np.ceil(np.sqrt(n_samples)).astype(int)
 
     # get histogram counts and bin edges
     counts, bin_edges = np.histogram(X, bins=nbins)
