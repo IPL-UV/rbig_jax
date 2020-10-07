@@ -1,11 +1,11 @@
 import collections
-from functools import partial
 from typing import Union
 
 import jax
 import jax.numpy as np
 
 from rbig_jax.transforms.utils import get_domain_extension
+from rbig_jax.transforms.uniformize import UniParams
 
 Params = collections.namedtuple(
     "Params", ["support", "quantiles", "support_pdf", "empirical_pdf"]
@@ -109,8 +109,7 @@ def get_hist_params(
 
     return (
         np.interp(X, new_support, uniform_cdf),
-        np.log(np.interp(X, pdf_support, empirical_pdf)),
-        Params(new_support, uniform_cdf, pdf_support, empirical_pdf),
+        UniParams(new_support, uniform_cdf, pdf_support, empirical_pdf),
     )
 
 

@@ -35,11 +35,9 @@ def get_kde_params(
     X_transform = np.interp(X, grid, x_cdf)
     # print(grid.shape, x_cdf.shape, x_pdf.shape, X.shape)
 
-    X_ldj = np.log(np.interp(X, grid, x_pdf))
     # print(X_ldj.shape)
     return (
         X_transform,
-        X_ldj,
         Params(grid, x_cdf, grid, x_pdf),
     )
 

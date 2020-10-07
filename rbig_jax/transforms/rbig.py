@@ -1,6 +1,12 @@
 from collections import namedtuple
 from functools import partial
+from rbig_jax.transforms.block import (
+    forward_gauss_block_transform,
+    inverse_gauss_block_transform,
+)
 
+from jax.scipy import stats
+import tqdm
 import jax
 import jax.numpy as np
 
@@ -9,9 +15,11 @@ import jax.numpy as np
 from rbig_jax.transforms.histogram import get_hist_params
 from rbig_jax.transforms.kde import get_kde_params
 from rbig_jax.transforms.linear import compute_projection
-from rbig_jax.transforms.marginal import (forward_gaussianization,
-                                          forward_inversecdf,
-                                          inverse_gaussianization)
+from rbig_jax.transforms.marginal import (
+    forward_gaussianization,
+    forward_inversecdf,
+    inverse_gaussianization,
+)
 
 RBIGParams = namedtuple(
     "RBIGParams", ["support_pdf", "empirical_pdf", "quantiles", "support", "rotation"]
@@ -146,57 +154,3 @@ def inverse_transform(params, X):
     X = X.T
     return X
 
-
-# def get_rbig_params(data, init_func):
-#     print(data.min(), data.max())
-
-#     # get gaussian params
-#     (
-#         X_transform,
-#         X_ldj_mg,
-#         mg_params,
-#         forward_mg_func,
-#         inverse_mg_func,
-#     ) = get_gauss_params(data.T, init_func)
-
-#     # get rotation parameters
-#     X_transform, rot_params, forward_rot_func, inverse_rot_func = init_pca_params(
-#         X_transform.T
-#     )
-
-#     # forward transform
-#     return (
-#         X_transform,
-#         X_ldj_mg.T,
-#         # jax.jit(
-#         partial(
-#             forward_transform,
-#             apply_mg=forward_mg_func,
-#             params=mg_params,
-#             apply_rot=forward_rot_func,
-#             # )
-#         ),
-#         # jax.jit(
-#         partial(
-#             inverse_transform,
-#             apply_inv_mg=inverse_mg_func,
-#             params=mg_params,
-#             apply_inv_rot=inverse_rot_func,
-#             # )
-#         ),
-#     )
-
-
-# # @partial(jax.jit, static_argnums=(1, 2, 3))
-# def forward_transform(X, apply_mg, params, apply_rot):
-#     X, X_ldj = apply_mg(X.T, params)
-#     X, _ = apply_rot(X.T)
-#     return X, X_ldj
-
-
-# # @partial(jax.jit, static_argnums=(1, 2, 3))
-# def inverse_transform(X, apply_inv_mg, params, apply_inv_rot):
-#     X = apply_inv_rot(X)
-#     X = apply_inv_mg(X.T, params)
-#     X = X.T
-#     return X

@@ -2,14 +2,14 @@ import collections
 
 import jax.numpy as np
 
-RotParams = collections.namedtuple("Params", ["projection"])
+RotParams = collections.namedtuple("Params", ["rotation"])
 
 
 def get_pca_params(X):
 
     R = compute_projection(X)
 
-    return np.dot(X, X), RotParams(projection=R)
+    return np.dot(X, R), RotParams(rotation=R)
 
 
 def compute_projection(X: np.ndarray) -> np.ndarray:
@@ -44,11 +44,11 @@ def compute_projection(X: np.ndarray) -> np.ndarray:
 
 
 def rot_forward_transform(X, params):
-    return np.dot(X, params.R)
+    return np.dot(X, params.rotation)
 
 
 def rot_inverse_transform(X, params):
-    return np.dot(X, params.R.T)
+    return np.dot(X, params.rotation.T)
 
 
 def rot_gradient_transform(X, params):

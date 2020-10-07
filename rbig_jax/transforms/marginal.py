@@ -1,5 +1,36 @@
+from typing import Callable, List, NamedTuple, Tuple
 import jax
 import jax.numpy as np
+
+from rbig_jax.transforms.uniformize import UniParams
+
+
+def get_params_marginal(X, function: Callable):
+
+    X, params = jax.vmap(function, out_axes=(0, 1))(X.T)
+    return (
+        np.stack(X, axis=1),
+        UniParams(
+            support=params.support.T,
+            quantiles=params.quantiles.T,
+            support_pdf=params.support_pdf.T,
+            empirical_pdf=params.empirical_pdf.T,
+        ),
+    )
+
+
+def get_transform_marginal(X, function: Callable):
+
+    X = jax.vmap(function, out_axes=(0, 1))(X.T)
+
+    return np.vstack(X).T
+
+
+def marginal_transform(X, function: Callable, params: List[NamedTuple]) -> np.ndarray:
+
+    X = jax.vmap(function, in_axes=(0, 0), out_axes=0)(X.T, params)
+
+    return np.vstack(X).T
 
 
 def forward_uniformization(X, params):

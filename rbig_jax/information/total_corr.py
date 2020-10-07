@@ -8,6 +8,13 @@ import jax.numpy as np
 from rbig_jax.information.entropy import histogram_entropy
 from rbig_jax.information.rbig import TrainState
 from rbig_jax.information.rbig import rbig_init
+from rbig_jax.transforms.block import (
+    forward_gauss_block_transform,
+    inverse_gauss_block_transform,
+)
+from rbig_jax.stopping import info_red_cond
+
+InfoLoss = namedtuple("InfoLoss", ["layer", "loss", "total_corr"])
 
 RBIGEntropy = namedtuple(
     "RBIGEntropy", ["n_layers", "entropy", "total_corr", "info_loss", "data"]
@@ -154,3 +161,66 @@ def rbig_total_corr(
         total_corr=total_corr,
         entropy=Hx.sum() - total_corr,
     )
+
+
+class RBIGTC:
+    def __init__(
+        self,
+        rbig_block: Callable,
+        tol_layers: int = 10,
+        max_layers: int = 1_000,
+        p: float = 0.25,
+    ):
+
+        self.block_fit = rbig_block
+        self.block_forward = forward_gauss_block_transform
+        self.block_inverse = inverse_gauss_block_transform
+        self.info_loss = jax.partial(information_reduction, p=p)
+        self.max_layers = max_layers
+        self.tol_layers = tol_layers
+
+    def fit_transform(self, X):
+
+        self.n_features = X.shape[1]
+
+        # initialize parameter storage
+        delta_total_corr = []
+        i_layer = 0
+
+        # initialize condition state
+        state = (0, delta_total_corr, self.tol_layers, self.max_layers)
+        while info_red_cond(state):
+
+            # fix info criteria
+            loss_f = jax.partial(self.info_loss, X=X)
+            X = self.block_fit(X)
+
+            loss = loss_f(Y=X)
+
+            # append Parameters
+            delta_total_corr.append(loss)
+
+            # update the state
+            state = (i_layer, delta_total_corr, self.tol_layers, self.max_layers)
+
+            i_layer += 1
+        self.n_layers = i_layer
+        self.delta_total_corr = np.array(delta_total_corr)
+        return X
+
+
+class RBIGTCJit(RBIGTC):
+    def __init__(
+        self,
+        rbig_block: Callable,
+        tol_layers: int = 10,
+        max_layers: int = 1_000,
+        p: float = 0.25,
+    ):
+
+        self.block_fit = jax.jit(rbig_block)
+        self.block_forward = jax.jit(forward_gauss_block_transform)
+        self.block_inverse = jax.jit(inverse_gauss_block_transform)
+        self.info_loss = jax.jit(jax.partial(information_reduction, p=p))
+        self.max_layers = max_layers
+        self.tol_layers = tol_layers
