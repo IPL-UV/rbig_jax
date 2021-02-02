@@ -4,7 +4,7 @@ from typing import Union
 import jax
 import jax.numpy as np
 
-from rbig_jax.transforms.utils import get_domain_extension
+from rbig_jax.utils import get_domain_extension
 from rbig_jax.transforms.uniformize import UniParams
 
 Params = collections.namedtuple(
@@ -116,6 +116,7 @@ def get_hist_params(
 def histogram_transform(
     X: np.ndarray,
     support_extension: Union[int, float] = 10,
+    nbins: int = 100,
     precision: int = 1_000,
     alpha: float = 1e-5,
 ):
@@ -129,6 +130,9 @@ def histogram_transform(
     support_extension: Union[int, float], default=10
         extend the support by x on both sides
     
+    nbins: int, default=100
+        the number of bins for the histogram approximation
+
     precision: int, default=1_000
         the number of points to use for the interpolation
     
@@ -158,11 +162,13 @@ def histogram_transform(
     # get number of samples
     n_samples = np.shape(X)[0]
 
-    # get number of bins (default square root heuristic)
-    nbins = np.ceil(np.sqrt(n_samples)).astype(int)
+    # bin_edges = np.linspace(np.min(X), np.max(X), num=100)
+    bin_edges = np.histogram_bin_edges(X, bins=nbins)
 
     # get histogram counts and bin edges
-    counts, bin_edges = np.histogram(X, bins=nbins)
+    counts, bin_edges = np.histogram(X, bins=bin_edges)
+
+    # return X
 
     # add regularization
     counts = np.array(counts) + alpha

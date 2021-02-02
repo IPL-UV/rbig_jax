@@ -2,11 +2,7 @@ import jax
 import jax.numpy as np
 
 
-def marginal_histogram_entropy_f(data, base: int = 2, nbins: int = 10):
-    return jax.vmap(jax.partial(histogram_entropy, base=base, nbins=nbins))
-
-
-def histogram_entropy(data, base=2, nbins: int = 10):
+def histogram_entropy(data, base=2, nbins: int=100) -> :
     """Calculates the histogram entropy of 1D data.
     This function uses the histogram and then calculates
     the entropy. Does the miller-maddow correction
@@ -23,6 +19,11 @@ def histogram_entropy(data, base=2, nbins: int = 10):
     -------
     S : float
         the entropy"""
+    # get number of samples
+    n_samples = np.shape(data)[0]
+
+    # get number of bins (default square root heuristic)
+    
 
     # get histogram counts and bin edges
     counts, bin_edges = np.histogram(data, bins=nbins, density=False)
