@@ -62,3 +62,5 @@ def searchsorted(bin_locations, inputs, eps=1e-6):
     input_bins = np.sum(inputs[..., None] >= bin_locations, axis=-1)
 
     return input_bins
+
+

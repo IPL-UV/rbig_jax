@@ -6,7 +6,7 @@ UniParams = collections.namedtuple(
 )
 
 
-def forward_uniformization(X: np.ndarray, params: UniParams) -> np.ndarray:
+def uniformize_transform(X: np.ndarray, params: UniParams) -> np.ndarray:
     """Forward univariate uniformize transformation
     
     Parameters
@@ -16,7 +16,7 @@ def forward_uniformization(X: np.ndarray, params: UniParams) -> np.ndarray:
     
     params: UniParams
         the tuple containing the params. 
-        See `rbig_jax.transforms.histogram` for details.
+        See `rbig_jax.transforms.uniformize` for details.
     
     Returns
     -------
@@ -26,7 +26,7 @@ def forward_uniformization(X: np.ndarray, params: UniParams) -> np.ndarray:
     return np.interp(X, params.support, params.quantiles)
 
 
-def inverse_uniformization(X: np.ndarray, params: UniParams) -> np.ndarray:
+def uniformize_inverse(X: np.ndarray, params: UniParams) -> np.ndarray:
     """Inverse univariate uniformize transformation
     
     Parameters
@@ -46,7 +46,7 @@ def inverse_uniformization(X: np.ndarray, params: UniParams) -> np.ndarray:
     return np.interp(X, params.quantiles, params.support)
 
 
-def forward_uniformization_gradient(X: np.ndarray, params: UniParams) -> np.ndarray:
+def uniformize_gradient(X: np.ndarray, params: UniParams) -> np.ndarray:
     """Forward univariate uniformize transformation gradient
     
     Parameters

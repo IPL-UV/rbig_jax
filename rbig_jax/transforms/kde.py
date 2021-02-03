@@ -5,7 +5,7 @@ from typing import Union
 import jax
 import jax.numpy as np
 
-from rbig_jax.transforms.utils import get_domain_extension
+from rbig_jax.utils import get_domain_extension
 
 Params = collections.namedtuple(
     "Params", ["support", "quantiles", "support_pdf", "empirical_pdf"]

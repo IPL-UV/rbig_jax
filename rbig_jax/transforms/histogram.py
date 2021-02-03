@@ -14,6 +14,7 @@ Params = collections.namedtuple(
 
 def get_hist_params(
     X: np.ndarray,
+    nbins: int = 100,
     support_extension: Union[int, float] = 10,
     precision: int = 1_000,
     alpha: float = 1e-5,
@@ -57,11 +58,8 @@ def get_hist_params(
     # get number of samples
     n_samples = np.shape(X)[0]
 
-    # get number of bins (default square root heuristic)
-    nbins = np.ceil(np.sqrt(n_samples)).astype(int)
-
     # get histogram counts and bin edges
-    counts, bin_edges = np.histogram(X, bins=nbins,)
+    counts, bin_edges = np.histogram(X, bins=nbins)
 
     # add regularization
     counts = np.array(counts) + alpha
