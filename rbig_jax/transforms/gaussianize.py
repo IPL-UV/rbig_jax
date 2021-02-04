@@ -14,11 +14,14 @@ from rbig_jax.transforms.kde import get_kde_params
 from rbig_jax.transforms.uniformize import (
     uniformize_transform,
     uniformize_inverse,
+    uniformize_gradient,
 )
-from rbig_jax.transforms.marginal import marginal_transform
+from rbig_jax.transforms.marginal import marginal_transform, marginal_transform_gradient
 
 
-def gaussianize_forward(X: np.ndarray, uni_transform_f: Callable):
+def gaussianize_forward(
+    X: np.ndarray, uni_transform_f: Callable, return_params: bool = True
+):
     """Gaussianization Transformation w. Params"""
     # forward uniformization function
     X, params = uni_transform_f(X)
@@ -57,6 +60,31 @@ def gaussianize_marginal_transform(X: np.ndarray, params):
     X = invgausscdf_forward_transform(X)
 
     return X
+
+
+def gaussianize_marginal_gradient(X: np.ndarray, params):
+
+    # Log PDF of uniformized data
+    Xu_dj = marginal_transform(X, uniformize_gradient, params)
+
+    Xu_ldj = np.log(Xu_dj)
+
+    # forward uniformization function
+    X = marginal_transform(X, uniformize_transform, params)
+
+    # clip boundaries
+    X = np.clip(X, 1e-5, 1.0 - 1e-5)
+
+    # inverse cdf
+    X = invgausscdf_forward_transform(X)
+
+    # Log PDF for Gaussianized data
+    Xg_ldj = jax.scipy.stats.norm.ppf(X)
+
+    # Full log transformation
+    X_ldj = Xu_ldj - Xg_ldj
+
+    return X, X_ldj
 
 
 def gaussianize_inverse(X: np.ndarray, params):

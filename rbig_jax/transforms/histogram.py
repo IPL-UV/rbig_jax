@@ -18,6 +18,7 @@ def get_hist_params(
     support_extension: Union[int, float] = 10,
     precision: int = 1_000,
     alpha: float = 1e-5,
+    return_params: bool = True,
 ):
     """Get parameters via the histogram transform
     
@@ -105,10 +106,13 @@ def get_hist_params(
     # Normalize CDF estimation
     uniform_cdf /= np.max(uniform_cdf)
 
-    return (
-        np.interp(X, new_support, uniform_cdf),
-        UniParams(new_support, uniform_cdf, pdf_support, empirical_pdf),
-    )
+    if return_params is True:
+        return (
+            np.interp(X, new_support, uniform_cdf),
+            UniParams(new_support, uniform_cdf, pdf_support, empirical_pdf),
+        )
+    else:
+        return np.interp(X, new_support, uniform_cdf)
 
 
 def histogram_transform(
@@ -214,5 +218,8 @@ def hist_inverse_transform(X, params: Params) -> np.ndarray:
 
 
 def hist_gradient_transform(X, params: Params) -> np.ndarray:
-    return np.interp(X, params.support_pdf, params.empirical_pdf)
+    return (
+        hist_forward_transform(X, params),
+        np.interp(X, params.support_pdf, params.empirical_pdf),
+    )
 

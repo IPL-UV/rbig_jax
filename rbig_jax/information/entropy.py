@@ -1,5 +1,15 @@
+from typing import Callable
+from rbig_jax.information.total_corr import (
+    get_tolerance_dimensions,
+    information_reduction,
+)
 import jax
 import jax.numpy as np
+
+from rbig_jax.custom_types import InputData
+from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
+from rbig_jax.transforms.linear import svd_transform
+from rbig_jax.information.total_corr import rbig_total_correlation
 
 
 def marginal_histogram_entropy_f(data, base: int = 2, nbins: int = 10):
@@ -63,3 +73,27 @@ def entropy(pk: np.ndarray, base: int = 2) -> np.ndarray:
     S /= np.log(base)
 
     return S
+
+
+def rbig_entropy(
+    X_samples: InputData,
+    marginal_uni: Callable,
+    marginal_entropy: Callable,
+    n_iterations: int = 100,
+    base: int = 2,
+):
+
+    # create marginal entropy equation
+    marginal_entropy_vectorized = jax.vmap(marginal_entropy)
+
+    # Calculate entropy in data domain
+    H_x = marginal_entropy_vectorized(X_samples).sum()
+
+    # calculate the total correlation
+    _, tc = rbig_total_correlation(
+        X_samples,
+        marginal_uni=marginal_uni,
+        marginal_entropy=marginal_entropy,
+        n_iterations=n_iterations,
+    )
+    return H_x - (np.sum(tc) * np.log(base))

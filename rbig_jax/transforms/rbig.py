@@ -20,6 +20,7 @@ import jax.numpy as np
 from rbig_jax.transforms.linear import compute_projection_v1
 from rbig_jax.transforms.gaussianize import (
     gaussianize_marginal_transform,
+    gaussianize_marginal_gradient,
     gaussianize_marginal_inverse,
 )
 
@@ -171,6 +172,21 @@ def rbig_block_transform(X, params):
     X = np.dot(X, params.rotation)
 
     return X
+
+
+def rbig_block_transform_gradient(X, params):
+
+    # ===================================
+    # MARGINAL GAUSSIANIZATION
+    # ===================================
+    X, ldj = gaussianize_marginal_gradient(X, params)
+
+    # =========================
+    # Rotation
+    # =========================
+    X = np.dot(X, params.rotation)
+
+    return X, ldj
 
 
 def rbig_block_inverse(X, params):

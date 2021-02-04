@@ -26,6 +26,15 @@ def marginal_transform(X, function: Callable, params: List[NamedTuple]) -> np.nd
     return np.vstack(X).T
 
 
+def marginal_transform_gradient(
+    X, function: Callable, params: List[NamedTuple]
+) -> np.ndarray:
+
+    X, log_abs_det = jax.vmap(function, in_axes=(0, 0), out_axes=(0, 0))(X.T, params)
+
+    return np.vstack(X).T, np.vstack(log_abs_det).T
+
+
 # def forward_uniformization(X, params):
 #     return (
 #         np.interp(X, params.support, params.quantiles),

@@ -2,7 +2,7 @@ import jax
 import jax.numpy as np
 from typing import Callable, Tuple
 
-from rbig_jax.transforms.linear import compute_projection
+from rbig_jax.transforms.linear import svd_transform
 from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
 from rbig_jax.custom_types import InputData
 
@@ -15,11 +15,7 @@ def get_tolerance_dimensions(n_samples: int) -> int:
 
 
 def information_reduction(
-    X: np.ndarray,
-    Y: np.ndarray,
-    marginal_entropy_f: Callable,
-    tol_dims: int,
-    p: float = 0.25,
+    X: np.ndarray, Y: np.ndarray, uni_entropy: Callable, tol_dims: int, p: float = 0.25,
 ) -> float:
     """calculates the information reduction between layers
     This function computes the multi-information (total correlation)
@@ -53,42 +49,36 @@ def information_reduction(
             Juan Emmanuel Johnson
     """
     # calculate the marginal entropy
-    hx = marginal_entropy_f(X.T)
-    hy = marginal_entropy_f(Y.T)
+    hx = jax.vmap(uni_entropy)(X.T)
+    hy = jax.vmap(uni_entropy)(Y.T)
 
     # Information content
     delta_info = np.sum(hy) - np.sum(hx)
     tol_info = np.sqrt(np.sum((hy - hx) ** 2))
 
     # get tolerance
-    n_samples, n_dimensions = X.shape
+    n_dimensions = X.shape[1]
 
+    # conditional
     cond = np.logical_or(
         tol_info < np.sqrt(n_dimensions * p * tol_dims ** 2), delta_info < 0
     )
-    # print(type(cond), cond)
-    # print(type(delta_info), delta_info)
-    # print(type(0.0))
     return np.array(np.where(cond, 0.0, delta_info))
 
 
-def total_corr_f(
+def rbig_total_correlation(
     X_samples: InputData,
     marginal_uni: Callable,
-    marginal_entropy: Callable,
+    uni_entropy: Callable,
     n_iterations: int = 100,
+    p: float = 0.25,
 ):
-
-    # create marginal entropy equation
-    marginal_entropy_vectorized = jax.vmap(marginal_entropy)
 
     # total correlation reduction
     tol_dims = get_tolerance_dimensions(X_samples.shape[0])
 
     total_corr_f = jax.partial(
-        information_reduction,
-        marginal_entropy_f=marginal_entropy_vectorized,
-        tol_dims=tol_dims,
+        information_reduction, uni_entropy=uni_entropy, tol_dims=tol_dims, p=p,
     )
 
     marginal_uni_f_vectorized = jax.vmap(marginal_uni)
@@ -103,7 +93,7 @@ def total_corr_f(
         carry_trans = invgausscdf_forward_transform(carry_trans)
 
         # rotation
-        carry_trans = compute_projection(carry_trans)
+        carry_trans = svd_transform(carry_trans)
 
         # information reduction
         info_red = total_corr_f(carry, carry_trans)
