@@ -12,7 +12,7 @@ from shutil import rmtree
 from setuptools import Command, find_packages, setup
 
 # Package meta-data.
-NAME = "jaxkern"
+NAME = "rbig_jax"
 DESCRIPTION = "Python similarity measures."
 URL = "https://github.com/ipl-uv/rbig_jax"
 EMAIL = "jemanjohnson34@gmail.com"
