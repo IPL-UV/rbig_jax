@@ -16,7 +16,7 @@ from rbig_jax.transforms.uniformize import (
     uniformize_inverse,
     uniformize_gradient,
 )
-from rbig_jax.transforms.marginal import marginal_transform, marginal_transform_gradient
+from rbig_jax.transforms.marginal import marginal_transform
 
 
 def gaussianize_forward(
@@ -65,21 +65,19 @@ def gaussianize_marginal_transform(X: np.ndarray, params):
 def gaussianize_marginal_gradient(X: np.ndarray, params):
 
     # Log PDF of uniformized data
-    Xu_dj = marginal_transform(X, uniformize_gradient, params)
-
-    Xu_ldj = np.log(Xu_dj)
+    Xu_ldj = np.log(marginal_transform(X, uniformize_gradient, params))
 
     # forward uniformization function
     X = marginal_transform(X, uniformize_transform, params)
 
     # clip boundaries
-    X = np.clip(X, 1e-5, 1.0 - 1e-5)
+    X = np.clip(X, 1e-6, 1.0 - 1e-6)
 
     # inverse cdf
     X = invgausscdf_forward_transform(X)
 
     # Log PDF for Gaussianized data
-    Xg_ldj = jax.scipy.stats.norm.ppf(X)
+    Xg_ldj = jax.scipy.stats.norm.logpdf(X)
 
     # Full log transformation
     X_ldj = Xu_ldj - Xg_ldj

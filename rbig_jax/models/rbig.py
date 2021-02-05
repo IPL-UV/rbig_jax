@@ -14,6 +14,7 @@ from rbig_jax.transforms.rbig import (
     rbig_block_forward,
     rbig_block_inverse,
     rbig_block_transform,
+    rbig_block_transform_gradient,
 )
 import jax
 import jax.numpy as np
@@ -117,6 +118,7 @@ class IterativeGaussianization:
         )
         self.block_transform = rbig_block_transform
         self.block_inverse = rbig_block_inverse
+        self.block_gradient = rbig_block_transform_gradient
         self.max_layers = max_layers
 
         # INFORMATION THEORY LOSS
@@ -131,7 +133,14 @@ class IterativeGaussianization:
             self.block_forward = jax.jit(self.block_forward)
             self.block_transform = jax.jit(self.block_transform)
             self.block_inverse = jax.jit(self.block_inverse)
+            self.block_gradient = jax.jit(self.block_gradient)
             self.loss_f = jax.jit(self.loss_f)
+
+    def fit(self, X):
+
+        _ = self.fit_transform(X)
+
+        return self
 
     def fit_transform(self, X):
 
@@ -175,13 +184,33 @@ class IterativeGaussianization:
         return X
 
     def log_det_jacobian(self, X):
-        return NotImplementedError()
+        X_ldj = np.zeros_like(X)
+
+        # loop through params
+        for iparams in self.params:
+            X, log_det = self.block_gradient(X, iparams)
+            X_ldj += log_det
+
+        return X_ldj
 
     def score_samples(self, X):
-        return NotImplementedError()
+        X_ldj = np.zeros_like(X)
+
+        # loop through params
+        for iparams in self.params:
+            X, log_det = self.block_gradient(X, iparams)
+            X_ldj += log_det
+
+        # calculate log probability
+        latent_prob = jax.scipy.stats.norm.logpdf(X)
+
+        # log probability
+        log_prob = (latent_prob + X_ldj).sum(-1)
+
+        return log_prob
 
     def score(self, X):
-        return NotImplementedError()
+        return self.score_samples(X).mean()
 
     def sample(self, n_samples: int):
 

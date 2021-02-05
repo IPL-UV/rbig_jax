@@ -64,3 +64,20 @@ def searchsorted(bin_locations, inputs, eps=1e-6):
     return input_bins
 
 
+def make_interior_uniform_probability(X, eps=None):
+    """Convert data to probability values in the open interval between 0 and 1.
+    Parameters
+    ----------
+    X : array-like, shape (n_samples, n_features)
+        Data matrix.
+    eps : float, optional
+        Epsilon for clipping, defaults to ``np.info(X.dtype).eps``
+    Returns
+    -------
+    X : array, shape (n_samples, n_features)
+        Data matrix after possible modification.
+    """
+    # X = check_floating(X)
+    if eps is None:
+        eps = np.finfo(X.dtype).eps
+    return np.minimum(np.maximum(X, eps), 1 - eps)

@@ -49,66 +49,66 @@ def main():
     # EXPERIMENT II - DIMENSIONS VS TIME
     # ===================================
 
-    # times = list()
-    # dimensions = [2, 5, 10, 25, 50, 100, 1_000, 10_000]
-    # n_layers = 100
-    # n_samples = 10_000
-    # tc_true, tc_est = [], []
+    times = list()
+    dimensions = [2, 5, 10, 25, 50, 100, 1_000, 10_000]
+    n_layers = 100
+    n_samples = 10_000
+    tc_true, tc_est = [], []
 
-    # with tqdm.tqdm(dimensions, desc="Dimensions") as pbar:
-    #     for idim in pbar:
+    with tqdm.tqdm(dimensions, desc="Dimensions") as pbar:
+        for idim in pbar:
 
-    #         fake_data = rng.randn(n_samples, idim)
+            fake_data = rng.randn(n_samples, idim)
 
-    #         # Generate random Data
-    #         A = rng.rand(idim, idim)
+            # Generate random Data
+            A = rng.rand(idim, idim)
 
-    #         fake_data = fake_data @ A
-    #         # covariance matrix
-    #         C = A.T @ A
-    #         vv = onp.diag(C)
+            fake_data = fake_data @ A
+            # covariance matrix
+            C = A.T @ A
+            vv = onp.diag(C)
 
-    #         tc = onp.log(onp.sqrt(vv)).sum() - 0.5 * onp.log(onp.linalg.det(C))
+            tc = onp.log(onp.sqrt(vv)).sum() - 0.5 * onp.log(onp.linalg.det(C))
 
-    #         wandb.log({"dim_tc_true": tc}, step=idim)
-    #         tc_true.append(tc)
-    #         t0 = time.time()
+            wandb.log({"dim_tc_true": tc}, step=idim)
+            tc_true.append(tc)
+            t0 = time.time()
 
-    #         # define marginal entropy function
-    #         nbins = int(onp.ceil(onp.sqrt(fake_data.shape[0])))
-    #         entropy_f = jax.partial(histogram_entropy, nbins=nbins, base=2)
+            # define marginal entropy function
+            nbins = int(onp.ceil(onp.sqrt(fake_data.shape[0])))
+            entropy_f = jax.partial(histogram_entropy, nbins=nbins, base=2)
 
-    #         # define marginal uniformization function
-    #         hist_transform_f = jax.partial(histogram_transform, nbins=nbins)
+            # define marginal uniformization function
+            hist_transform_f = jax.partial(histogram_transform, nbins=nbins)
 
-    #         # find the total correlation
-    # X_trans, loss = rbig_total_correlation(
-    #     np.array(fake_data).block_until_ready(),
-    #     marginal_uni=hist_transform_f,
-    #     uni_entropy=entropy_f,
-    #     n_iterations=n_layers,
-    # )
-    #         tc = onp.array(np.sum(loss) * np.log(2))
+            # find the total correlation
+            X_trans, loss = rbig_total_correlation(
+                np.array(fake_data).block_until_ready(),
+                marginal_uni=hist_transform_f,
+                uni_entropy=entropy_f,
+                n_iterations=n_layers,
+            )
+            tc = onp.array(np.sum(loss) * np.log(2))
 
-    #         t1 = time.time() - t0
-    #         wandb.log({"time": t1}, step=idim)
-    #         wandb.log({"dim_tc_est": tc}, step=idim)
-    #         tc_est.append(tc)
-    #         times.append(t1)
+            t1 = time.time() - t0
+            wandb.log({"time": t1}, step=idim)
+            wandb.log({"dim_tc_est": tc}, step=idim)
+            tc_est.append(tc)
+            times.append(t1)
 
-    # fig, ax = plt.subplots()
-    # ax.plot(dimensions, times)
-    # ax.set(xlabel="Dimensions", ylabel="Timing (seconds)")
-    # plt.yscale("log")
-    # plt.tight_layout()
-    # wandb.log({f"Dimensions": [wandb.Image(plt)]})
+    fig, ax = plt.subplots()
+    ax.plot(dimensions, times)
+    ax.set(xlabel="Dimensions", ylabel="Timing (seconds)")
+    plt.yscale("log")
+    plt.tight_layout()
+    wandb.log({f"Dimensions": [wandb.Image(plt)]})
 
-    # fig, ax = plt.subplots()
-    # ax.plot(dimensions, tc_est, label="Estimated")
-    # ax.plot(dimensions, tc_true, label="True")
-    # ax.set(xlabel="Dimensions", ylabel="Timing (seconds)")
-    # plt.tight_layout()
-    # wandb.log({f"TC Dimensions": [wandb.Image(plt)]})
+    fig, ax = plt.subplots()
+    ax.plot(dimensions, tc_est, label="Estimated")
+    ax.plot(dimensions, tc_true, label="True")
+    ax.set(xlabel="Dimensions", ylabel="Timing (seconds)")
+    plt.tight_layout()
+    wandb.log({f"TC Dimensions": [wandb.Image(plt)]})
 
     # ===================================
     # EXPERIMENT II - SAMPLES vs TIME
@@ -161,7 +161,7 @@ def main():
 
     fig, ax = plt.subplots()
     ax.plot(n_samples, times)
-    ax.set(xlabel="Dimensions", ylabel="Timing (seconds)")
+    ax.set(xlabel="Samples", ylabel="Timing (seconds)")
     plt.yscale("log")
     plt.tight_layout()
     wandb.log({f"Samples": [wandb.Image(plt)]})
@@ -169,7 +169,7 @@ def main():
     fig, ax = plt.subplots()
     ax.plot(n_samples, tc_est, label="Estimated")
     ax.plot(n_samples, tc_true, label="True")
-    ax.set(xlabel="Dimensions", ylabel="Timing (seconds)")
+    ax.set(xlabel="Samples", ylabel="Timing (seconds)")
     plt.tight_layout()
     wandb.log({f"TC Samples": [wandb.Image(plt)]})
 
