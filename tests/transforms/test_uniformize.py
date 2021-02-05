@@ -1,12 +1,11 @@
+import chex
 import jax.numpy as np
 import numpy as onp
-import chex
+
 from rbig_jax.transforms.histogram import get_hist_params
 from rbig_jax.transforms.kde import get_kde_params
-from rbig_jax.transforms.uniformize import (
-    forward_uniformization,
-    inverse_uniformization,
-)
+from rbig_jax.transforms.uniformize import (forward_uniformization,
+                                            inverse_uniformization)
 
 # TODO: Think about a test for the uniformization gradient
 

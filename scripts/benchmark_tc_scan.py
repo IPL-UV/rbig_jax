@@ -5,7 +5,7 @@ from pathlib import Path
 
 import jax
 import jax.numpy as np
-
+# plot methods
 # Plot Functions
 import matplotlib.pyplot as plt
 import numpy as onp
@@ -14,19 +14,15 @@ import tqdm
 from jax.config import config
 from scipy.stats import beta
 
-from rbig_jax.data import get_classic
-from rbig_jax.plots import plot_info_loss, plot_joint
-from rbig_jax.information.entropy import histogram_entropy
-from rbig_jax.transforms.histogram import histogram_transform
-from rbig_jax.information.total_corr import rbig_total_correlation
-
 import wandb
+from rbig_jax.data import get_classic
+from rbig_jax.information.entropy import histogram_entropy
+from rbig_jax.information.total_corr import rbig_total_correlation
+from rbig_jax.plots import plot_info_loss, plot_joint
+from rbig_jax.transforms.histogram import histogram_transform
 
 config.update("jax_enable_x64", True)
 
-# plot methods
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 sns.reset_defaults()
 sns.set_context(context="talk", font_scale=0.7)

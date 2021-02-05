@@ -1,15 +1,14 @@
 from typing import Callable
-from rbig_jax.information.total_corr import (
-    get_tolerance_dimensions,
-    information_reduction,
-)
+
 import jax
 import jax.numpy as np
 
 from rbig_jax.custom_types import InputData
+from rbig_jax.information.total_corr import (get_tolerance_dimensions,
+                                             information_reduction,
+                                             rbig_total_correlation)
 from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
 from rbig_jax.transforms.linear import svd_transform
-from rbig_jax.information.total_corr import rbig_total_correlation
 
 
 def marginal_histogram_entropy_f(data, base: int = 2, nbins: int = 10):

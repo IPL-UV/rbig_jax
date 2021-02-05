@@ -143,4 +143,3 @@ def rot_inverse_transform(X, params):
 
 def rot_gradient_transform(X, params):
     return np.ones_like(X)
-

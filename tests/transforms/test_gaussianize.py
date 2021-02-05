@@ -1,15 +1,14 @@
-import pytest
+import chex
 import jax.numpy as np
 import numpy as onp
-import chex
+import pytest
+
+from rbig_jax.transforms.gaussianize import (forward_gaussianize_transform,
+                                             get_gauss_params_hist,
+                                             get_gauss_params_kde,
+                                             inverse_gaussianize_transform)
 from rbig_jax.transforms.histogram import get_hist_params
 from rbig_jax.transforms.kde import get_kde_params
-from rbig_jax.transforms.gaussianize import (
-    get_gauss_params_hist,
-    get_gauss_params_kde,
-    forward_gaussianize_transform,
-    inverse_gaussianize_transform,
-)
 
 # TODO: Think about a test for the uniformization gradient
 

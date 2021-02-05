@@ -1,10 +1,11 @@
-import jax
-import jax.numpy as np
 from typing import Callable, Tuple
 
-from rbig_jax.transforms.linear import svd_transform
-from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
+import jax
+import jax.numpy as np
+
 from rbig_jax.custom_types import InputData
+from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
+from rbig_jax.transforms.linear import svd_transform
 
 
 def get_tolerance_dimensions(n_samples: int) -> int:

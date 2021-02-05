@@ -1,4 +1,5 @@
 from typing import Callable, List, NamedTuple, Tuple
+
 import jax
 import jax.numpy as np
 

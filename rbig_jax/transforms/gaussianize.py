@@ -1,22 +1,17 @@
-from typing import Callable, Union
 from functools import partial
+from typing import Callable, Union
 
 import jax
 import jax.numpy as np
 
 from rbig_jax.transforms.histogram import get_hist_params
-from rbig_jax.transforms.inversecdf import (
-    invgausscdf_inverse_transform,
-    invgausscdf_forward_transform,
-)
-
+from rbig_jax.transforms.inversecdf import (invgausscdf_forward_transform,
+                                            invgausscdf_inverse_transform)
 from rbig_jax.transforms.kde import get_kde_params
-from rbig_jax.transforms.uniformize import (
-    uniformize_transform,
-    uniformize_inverse,
-    uniformize_gradient,
-)
 from rbig_jax.transforms.marginal import marginal_transform
+from rbig_jax.transforms.uniformize import (uniformize_gradient,
+                                            uniformize_inverse,
+                                            uniformize_transform)
 
 
 def gaussianize_forward(

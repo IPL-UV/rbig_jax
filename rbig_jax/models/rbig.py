@@ -1,34 +1,23 @@
 from collections import namedtuple
-from rbig_jax.stopping import info_red_cond
 from typing import Callable, Optional
 
-from rbig_jax.transforms.histogram import get_hist_params
-from rbig_jax.transforms.uniformize import uniformize_transform
-from rbig_jax.transforms.marginal import marginal_transform_params
-from rbig_jax.transforms.gaussianize import gaussianize_forward
-from rbig_jax.transforms.gaussianize import (
-    gaussianize_marginal_transform,
-    gaussianize_marginal_inverse,
-)
-from rbig_jax.transforms.rbig import (
-    rbig_block_forward,
-    rbig_block_inverse,
-    rbig_block_transform,
-    rbig_block_transform_gradient,
-)
 import jax
 import jax.numpy as np
-from jax.scipy import stats
-import tqdm
 import objax
-from rbig_jax.information.total_corr import (
-    get_tolerance_dimensions,
-    information_reduction,
-)
-from rbig_jax.information.entropy import histogram_entropy
-from rbig_jax.transforms.histogram import get_hist_params
-
 import seaborn as sns
+from jax.scipy import stats
+
+from rbig_jax.information.entropy import histogram_entropy
+from rbig_jax.information.total_corr import (get_tolerance_dimensions,
+                                             information_reduction)
+from rbig_jax.stopping import info_red_cond
+from rbig_jax.transforms.gaussianize import gaussianize_forward
+from rbig_jax.transforms.histogram import get_hist_params
+from rbig_jax.transforms.marginal import marginal_transform_params
+from rbig_jax.transforms.rbig import (rbig_block_forward, rbig_block_inverse,
+                                      rbig_block_transform,
+                                      rbig_block_transform_gradient)
+from rbig_jax.transforms.uniformize import uniformize_transform
 
 sns.reset_defaults()
 sns.set_context(context="talk", font_scale=0.7)
@@ -347,4 +336,3 @@ def get_default_entropy(n_samples: int):
 #         for iparams in tqdm.tqdm(self.params[::-1]):
 #             X = inverse_gauss_block_transform_constrained(X, iparams)
 #         return X
-

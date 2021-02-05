@@ -1,29 +1,31 @@
 # jax packages
+from functools import partial
 from pathlib import Path
+
+import chex
 import jax
 import jax.numpy as np
+# plot methods
+import matplotlib.pyplot as plt
+import numpy as onp
+import seaborn as sns
+# logging
+import tqdm
 from jax.config import config
-import chex
+
+import wandb
+# library functions
+from rbig_jax.data import get_classic
+from rbig_jax.information.entropy import histogram_entropy
+from rbig_jax.information.total_corr import total_corr_f
+from rbig_jax.plots import plot_info_loss, plot_joint
+from rbig_jax.transforms.histogram import histogram_transform
 
 config.update("jax_enable_x64", True)
 
-import numpy as onp
-from functools import partial
 
-# library functions
-from rbig_jax.data import get_classic
-from rbig_jax.plots import plot_info_loss, plot_joint
-from rbig_jax.information.entropy import histogram_entropy
-from rbig_jax.transforms.histogram import histogram_transform
-from rbig_jax.information.total_corr import total_corr_f
 
-# logging
-import tqdm
-import wandb
 
-# plot methods
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 sns.reset_defaults()
 sns.set_context(context="talk", font_scale=0.7)

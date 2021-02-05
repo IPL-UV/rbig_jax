@@ -1,4 +1,5 @@
 from collections import namedtuple
+
 import jax
 import jax.numpy as np
 
@@ -33,4 +34,3 @@ def info_red_cond(state):
         return False
     else:
         return True
-

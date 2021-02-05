@@ -26,4 +26,3 @@ def get_params(X):
         return jax.scipy.stats.norm.cdf(X)
 
     return X, log_det_jacobian, forward_function, inverse_function
-
