@@ -31,7 +31,7 @@ REQUIRED = [
 # What packages are optional?
 EXTRAS = {
     "dev": ["black", "isort", "mypy"],
-    "tests": ["pytest", "scikit-learn"],
+    "tests": ["pytest", "scikit-learn", "chex"],
     "extras": ["matplotlib", "seaborn", "tqdm", "wandb", "scipy"],
 }
 
@@ -125,7 +125,8 @@ setup(
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
     # $ setup.py publish support.
