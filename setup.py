@@ -14,10 +14,10 @@ from setuptools import Command, find_packages, setup
 # Package meta-data.
 NAME = "jaxkern"
 DESCRIPTION = "Python similarity measures."
-URL = "https://github.com/ipl-uv/jaxkern"
+URL = "https://github.com/ipl-uv/rbig_jax"
 EMAIL = "jemanjohnson34@gmail.com"
 AUTHOR = "J. Emmanuel Johnson"
-REQUIRES_PYTHON = ">=3.7.0"
+REQUIRES_PYTHON = ">=3.8.0"
 VERSION = "0.1.0"
 
 # What packages are required for this module to be executed?
@@ -25,13 +25,14 @@ REQUIRED = [
     "jax",
     "jaxlib",
     "numpy",
+    "scikit-learn",
 ]
 
 # What packages are optional?
 EXTRAS = {
     "dev": ["black", "isort", "mypy"],
     "tests": ["pytest", "scikit-learn"],
-    "extras": ["matplotlib"],
+    "extras": ["matplotlib", "seaborn", "tqdm", "wandb", "scipy"],
 }
 
 # The rest you shouldn't have to touch too much :)
@@ -125,9 +126,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: Implementation :: CPython",
-        "Programming Language :: Python :: Implementation :: PyPy",
+        "Programming Language :: Python :: 3.8",
     ],
     # $ setup.py publish support.
     cmdclass={"upload": UploadCommand},
