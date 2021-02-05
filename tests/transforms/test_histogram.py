@@ -1,6 +1,7 @@
+import chex
 import jax.numpy as np
 import numpy as onp
-import chex
+
 from rbig_jax.transforms.histogram import get_hist_params
 
 rng = onp.random.RandomState(123)

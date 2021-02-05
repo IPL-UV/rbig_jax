@@ -4,8 +4,8 @@ from typing import Union
 import jax
 import jax.numpy as np
 
-from rbig_jax.transforms.utils import get_domain_extension
 from rbig_jax.transforms.uniformize import UniParams
+from rbig_jax.utils import get_domain_extension
 
 Params = collections.namedtuple(
     "Params", ["support", "quantiles", "support_pdf", "empirical_pdf"]
@@ -14,9 +14,11 @@ Params = collections.namedtuple(
 
 def get_hist_params(
     X: np.ndarray,
+    nbins: int = 100,
     support_extension: Union[int, float] = 10,
     precision: int = 1_000,
     alpha: float = 1e-5,
+    return_params: bool = True,
 ):
     """Get parameters via the histogram transform
     
@@ -57,11 +59,8 @@ def get_hist_params(
     # get number of samples
     n_samples = np.shape(X)[0]
 
-    # get number of bins (default square root heuristic)
-    nbins = np.ceil(np.sqrt(n_samples)).astype(int)
-
     # get histogram counts and bin edges
-    counts, bin_edges = np.histogram(X, bins=nbins,)
+    counts, bin_edges = np.histogram(X, bins=nbins)
 
     # add regularization
     counts = np.array(counts) + alpha
@@ -107,15 +106,19 @@ def get_hist_params(
     # Normalize CDF estimation
     uniform_cdf /= np.max(uniform_cdf)
 
-    return (
-        np.interp(X, new_support, uniform_cdf),
-        UniParams(new_support, uniform_cdf, pdf_support, empirical_pdf),
-    )
+    if return_params is True:
+        return (
+            np.interp(X, new_support, uniform_cdf),
+            UniParams(new_support, uniform_cdf, pdf_support, empirical_pdf),
+        )
+    else:
+        return np.interp(X, new_support, uniform_cdf)
 
 
 def histogram_transform(
     X: np.ndarray,
     support_extension: Union[int, float] = 10,
+    nbins: int = 100,
     precision: int = 1_000,
     alpha: float = 1e-5,
 ):
@@ -129,6 +132,9 @@ def histogram_transform(
     support_extension: Union[int, float], default=10
         extend the support by x on both sides
     
+    nbins: int, default=100
+        the number of bins for the histogram approximation
+
     precision: int, default=1_000
         the number of points to use for the interpolation
     
@@ -158,11 +164,13 @@ def histogram_transform(
     # get number of samples
     n_samples = np.shape(X)[0]
 
-    # get number of bins (default square root heuristic)
-    nbins = np.ceil(np.sqrt(n_samples)).astype(int)
+    # bin_edges = np.linspace(np.min(X), np.max(X), num=100)
+    bin_edges = np.histogram_bin_edges(X, bins=nbins)
 
     # get histogram counts and bin edges
-    counts, bin_edges = np.histogram(X, bins=nbins)
+    counts, bin_edges = np.histogram(X, bins=bin_edges)
+
+    # return X
 
     # add regularization
     counts = np.array(counts) + alpha
@@ -210,5 +218,7 @@ def hist_inverse_transform(X, params: Params) -> np.ndarray:
 
 
 def hist_gradient_transform(X, params: Params) -> np.ndarray:
-    return np.interp(X, params.support_pdf, params.empirical_pdf)
-
+    return (
+        hist_forward_transform(X, params),
+        np.interp(X, params.support_pdf, params.empirical_pdf),
+    )

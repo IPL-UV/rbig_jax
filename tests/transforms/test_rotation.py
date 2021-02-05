@@ -1,12 +1,11 @@
+import chex
 import jax.numpy as np
 import numpy as onp
-import chex
-from rbig_jax.transforms.rotation import (
-    get_pca_params,
-    rot_forward_transform,
-    rot_inverse_transform,
-    rot_gradient_transform,
-)
+
+from rbig_jax.transforms.rotation import (get_pca_params,
+                                          rot_forward_transform,
+                                          rot_gradient_transform,
+                                          rot_inverse_transform)
 
 rng = onp.random.RandomState(123)
 X = rng.randn(100, 3)

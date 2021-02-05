@@ -5,7 +5,7 @@ from typing import Union
 import jax
 import jax.numpy as np
 
-from rbig_jax.transforms.utils import get_domain_extension
+from rbig_jax.utils import get_domain_extension
 
 Params = collections.namedtuple(
     "Params", ["support", "quantiles", "support_pdf", "empirical_pdf"]
@@ -13,13 +13,14 @@ Params = collections.namedtuple(
 
 
 def get_kde_params(
-    X: np.ndarray, support_extension: Union[int, float] = 10, precision: int = 1_000,
+    X: np.ndarray,
+    bw: int = 0.1,
+    support_extension: Union[int, float] = 10,
+    precision: int = 1_000,
 ):
     # generate support points
     lb, ub = get_domain_extension(X, support_extension)
     grid = np.linspace(lb, ub, precision)
-
-    bw = scotts_method(X.shape[0], 1) * 0.5
 
     # calculate the pdf for gaussian pdf
     # print(grid.shape, X.shape, bw.shape)

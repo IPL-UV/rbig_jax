@@ -1,9 +1,12 @@
 from functools import partial
-import numpy as onp
+
 import chex
-from rbig_jax.transforms.marginal import get_params_marginal, marginal_transform
 import jax.numpy as np
+import numpy as onp
+
 from rbig_jax.transforms.gaussianize import get_gauss_params_hist
+from rbig_jax.transforms.marginal import (get_params_marginal,
+                                          marginal_transform)
 
 rng = onp.random.RandomState(123)
 X = rng.randn(1_000, 2)
