@@ -2,6 +2,13 @@
 
 This package implements the Rotation-Based Iterative Gaussianization (RBIG) algorithm using Jax. It is a normalizing flow algorithm that can transform any multi-dimensional distribution into a Gaussian distribution using a sequence of simple marginal Gaussianization transforms (e.g. histogram) and rotations (e.g. PCA). It is invertible which means you can calculate probabilities as well as sample from your distribution. Seen the example below for details.
 
+---
+## Density Estimation Demo
+
+**Demo Colab Notebook** - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/3.0_simple_rbig.ipynb)
+
+
+
 
 |          Original Data           |        Gaussian Transform        |        Inverse Transform        |
 | :------------------------------: | :------------------------------: | :-----------------------------: |
@@ -11,6 +18,12 @@ This package implements the Rotation-Based Iterative Gaussianization (RBIG) algo
 | :-----------------------------: | :---------------------------: |
 | ![](docs/pics/rbig_samples.png) | ![](docs/pics/rbig_lprob.png) |
 
+---
+## Information Theory Metrics Demo
+
+**TODO**
+
+---
 ### Why Jax?
 
 Mainly because I wanted to practice. It's an iterative scheme so perhaps Jax isn't the best for this. But I would like to improve my functional programming skills. In addition, Jax is much faster because of the jit compilation and autobatching. So it handles some difficult aspects of programming a lot easier. Also, the same code can be used for CPU, GPU and TPU with only minor changes. Overall, I didn't see any downside to having some free speed-ups.
