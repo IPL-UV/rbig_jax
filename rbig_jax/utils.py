@@ -11,7 +11,10 @@ BisectionState = namedtuple(
 )
 
 
-@jax.jit
+def safe_log(x: JaxArray) -> JaxArray:
+    return np.log(np.clip(x, a_min=1e-22))
+
+
 def interp_dim(x_new, x, y):
     return jax.vmap(np.interp, in_axes=(0, 0, 0))(x_new, x, y)
 
