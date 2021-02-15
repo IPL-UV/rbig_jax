@@ -3,3 +3,4 @@
 \scripts/*.png
 \wandb/
 \.ipynb_checkpoints/
+/figures/
