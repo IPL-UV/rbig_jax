@@ -8,19 +8,8 @@ from jax.nn import log_softmax, softplus, sigmoid
 class Logit(objax.Module):
     def __init__(self, temperature=1, eps=1e-6, learn_temperature=False):
         super().__init__()
-        self.eps = eps  # TrainRef(np.asarray(eps))
-        # if learn_temperature:
-        #     self.temperature = nn.Parameter(torch.Tensor([temperature]))
-        # else:
+        self.eps = eps
         self.temperature = TrainVar(np.array(temperature))
-
-    # def forward(self, inputs, context=None):
-    #     inputs = self.temperature * inputs
-    #     outputs = torch.sigmoid(inputs)
-    #     logabsdet = torchutils.sum_except_batch(
-    #         torch.log(self.temperature) - F.softplus(-inputs) - F.softplus(inputs)
-    #     )
-    #     return outputs, logabsdet
 
     def __call__(self, inputs):
 
