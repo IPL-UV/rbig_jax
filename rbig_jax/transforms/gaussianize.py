@@ -5,11 +5,110 @@ import jax
 import jax.numpy as np
 
 from rbig_jax.transforms.histogram import get_hist_params
-from rbig_jax.transforms.inversecdf import (invgausscdf_forward_transform,
-                                            invgausscdf_inverse_transform)
+from rbig_jax.transforms.inversecdf import (
+    invgausscdf_forward_transform,
+    invgausscdf_inverse_transform,
+)
 from rbig_jax.transforms.kde import get_kde_params
-from rbig_jax.transforms.uniformize import (forward_uniformization,
-                                            inverse_uniformization)
+from rbig_jax.transforms.uniformize import (
+    forward_uniformization,
+    inverse_uniformization,
+)
+from rbig_jax.transforms.marginal import marginal_transform
+from rbig_jax.transforms.uniformize import (
+    uniformize_gradient,
+    uniformize_inverse,
+    uniformize_transform,
+)
+
+
+def gaussianize_forward(
+    X: np.ndarray, uni_transform_f: Callable, return_params: bool = True
+):
+    """Gaussianization Transformation w. Params"""
+    # forward uniformization function
+    X, params = uni_transform_f(X)
+    # clip boundaries
+    X = np.clip(X, 1e-5, 1.0 - 1e-5)
+
+    # inverse cdf
+    X = invgausscdf_forward_transform(X)
+
+    return X, params
+
+
+def gaussianize_transform(X: np.ndarray, params, return_jacobian=True):
+
+    # forward uniformization function
+    X = uniformize_transform(X, params)
+
+    # clip boundaries
+    X = np.clip(X, 1e-5, 1.0 - 1e-5)
+
+    # inverse cdf
+    X = invgausscdf_forward_transform(X)
+
+    return X
+
+
+def gaussianize_marginal_transform(X: np.ndarray, params):
+
+    # forward uniformization function
+    X = marginal_transform(X, uniformize_transform, params)
+
+    # clip boundaries
+    X = np.clip(X, 1e-5, 1.0 - 1e-5)
+
+    # inverse cdf
+    X = invgausscdf_forward_transform(X)
+
+    return X
+
+
+def gaussianize_marginal_gradient(X: np.ndarray, params):
+
+    # Log PDF of uniformized data
+    Xu_ldj = np.log(marginal_transform(X, uniformize_gradient, params))
+
+    # forward uniformization function
+    X = marginal_transform(X, uniformize_transform, params)
+
+    # clip boundaries
+    X = np.clip(X, 1e-6, 1.0 - 1e-6)
+
+    # inverse cdf
+    X = invgausscdf_forward_transform(X)
+
+    # Log PDF for Gaussianized data
+    Xg_ldj = jax.scipy.stats.norm.logpdf(X)
+
+    # Full log transformation
+    X_ldj = Xu_ldj - Xg_ldj
+
+    return X, X_ldj
+
+
+def gaussianize_inverse(X: np.ndarray, params):
+
+    # inverse cdf
+    X = invgausscdf_inverse_transform(X)
+
+    # inverse  uniformization function
+    X = marginal_transform(X, uniformize_inverse, params)
+
+    return X
+
+
+def gaussianize_marginal_inverse(X: np.ndarray, params):
+
+    # inverse cdf
+    X = invgausscdf_inverse_transform(X)
+
+    # inverse  uniformization function
+    X = marginal_transform(X, uniformize_inverse, params)
+
+    return X
+
 
 # TODO: Implement better clipping scheme for transformations
 
@@ -85,7 +184,7 @@ def get_gauss_params_kde(X, support_extension=10, precision=1000, alpha=1e-5):
 def forward_gaussianize_transform(X, params):
 
     # Unformization transformation
-    X = forward_uniformization(X, params)
+    X = uniformize_transform(X, params)
 
     # clip boundaries
     X = np.clip(X, 1e-5, 1.0 - 1e-5)
@@ -100,7 +199,7 @@ def inverse_gaussianize_transform(X, params):
     X = invgausscdf_inverse_transform(X)
 
     # X = np.clip(X, 1e-5, 1.0 - 1e-5)
-    X = inverse_uniformization(X, params)
+    X = uniformize_inverse(X, params)
 
     return X
 
@@ -111,7 +210,7 @@ def inverse_gaussianize_transform_constrained(X, params, func: Callable):
 
     X = invgausscdf_inverse_transform(X)
 
-    X = inverse_uniformization(X, params)
+    X = uniformize_inverse(X, params)
 
     return X
 

@@ -7,7 +7,12 @@ sns.set_context(context="talk", font_scale=0.7)
 
 
 def plot_joint(
-    data: np.ndarray, color: str = "red", title: str = "", kind="kde", logger=None
+    data: np.ndarray,
+    color: str = "red",
+    title: str = "",
+    kind="kde",
+    logger=None,
+    save_name=None,
 ):
 
     plt.figure()
@@ -16,11 +21,19 @@ def plot_joint(
     plt.ylabel("Y")
     plt.suptitle(title)
     plt.tight_layout()
-    plt.show()
+    if save_name is not None:
+        plt.savefig(save_name)
+    else:
+        plt.show()
 
 
 def plot_joint_prob(
-    data: np.ndarray, probs: np.ndarray, cmap="Reds", title="", logger=None
+    data: np.ndarray,
+    probs: np.ndarray,
+    cmap="Reds",
+    title="",
+    logger=None,
+    save_name=None,
 ):
 
     fig, ax = plt.subplots()
@@ -30,11 +43,18 @@ def plot_joint_prob(
     plt.colorbar(h,)
     ax.set_title(title)
     plt.tight_layout()
-    plt.show()
+    if save_name is not None:
+        plt.savefig(save_name)
+    else:
+        plt.show()
 
 
 def plot_info_loss(
-    data: np.ndarray, n_layers: str = None, title: str = "Information Loss", logger=None
+    data: np.ndarray,
+    n_layers: str = None,
+    title: str = "Information Loss",
+    logger=None,
+    save_name=None,
 ):
 
     # plt.figure()
@@ -53,4 +73,7 @@ def plot_info_loss(
     ax.plot(data)
     ax.set(xlabel="Layers", ylabel="Sum of Marginal Entropy", title=title)
     plt.tight_layout()
-    plt.show()
+    if save_name is not None:
+        plt.savefig(save_name)
+    else:
+        plt.show()
