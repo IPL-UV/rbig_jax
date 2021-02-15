@@ -1,22 +1,20 @@
 from collections import namedtuple
-from rbig_jax.transforms.histogram import hist_inverse_transform
 from typing import Callable, Dict
+
 import jax
 import jax.numpy as np
 from jax.util import partial
-from rbig_jax.transforms.marginal import get_params_marginal, marginal_transform
 
-from rbig_jax.transforms.gaussianize import (
-    forward_gaussianize_transform,
-    inverse_gaussianize_transform,
-    get_gauss_params_hist,
-    get_gauss_params_kde,
-)
-from rbig_jax.transforms.rotation import (
-    get_pca_params,
-    rot_forward_transform,
-    rot_inverse_transform,
-)
+from rbig_jax.transforms.gaussianize import (forward_gaussianize_transform,
+                                             get_gauss_params_hist,
+                                             get_gauss_params_kde,
+                                             inverse_gaussianize_transform)
+from rbig_jax.transforms.histogram import hist_inverse_transform
+from rbig_jax.transforms.marginal import (get_params_marginal,
+                                          marginal_transform)
+from rbig_jax.transforms.rotation import (get_pca_params,
+                                          rot_forward_transform,
+                                          rot_inverse_transform)
 
 GaussParams = namedtuple(
     "GaussParams", ["rotation", "support", "quantiles", "support_pdf", "empirical_pdf"]

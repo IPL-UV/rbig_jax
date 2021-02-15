@@ -1,25 +1,21 @@
 from collections import namedtuple
 from functools import partial
-from rbig_jax.transforms.block import (
-    forward_gauss_block_transform,
-    inverse_gauss_block_transform,
-)
 
-from jax.scipy import stats
-import tqdm
 import jax
 import jax.numpy as np
+import tqdm
+from jax.scipy import stats
 
+from rbig_jax.transforms.block import (forward_gauss_block_transform,
+                                       inverse_gauss_block_transform)
 # from rbig_jax.transforms.gaussian import get_gauss_params
 # from rbig_jax.transforms.linear import init_pca_params
 from rbig_jax.transforms.histogram import get_hist_params
 from rbig_jax.transforms.kde import get_kde_params
 from rbig_jax.transforms.linear import compute_projection
-from rbig_jax.transforms.marginal import (
-    forward_gaussianization,
-    forward_inversecdf,
-    inverse_gaussianization,
-)
+from rbig_jax.transforms.marginal import (forward_gaussianization,
+                                          forward_inversecdf,
+                                          inverse_gaussianization)
 
 RBIGParams = namedtuple(
     "RBIGParams", ["support_pdf", "empirical_pdf", "quantiles", "support", "rotation"]
@@ -153,4 +149,3 @@ def inverse_transform(params, X):
 
     X = X.T
     return X
-

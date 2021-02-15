@@ -1,4 +1,5 @@
 import collections
+
 import jax.numpy as np
 
 UniParams = collections.namedtuple(

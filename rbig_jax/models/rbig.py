@@ -1,19 +1,18 @@
 from collections import namedtuple
-from rbig_jax.stopping import info_red_cond
 from typing import Callable
-from rbig_jax.transforms.block import (
-    forward_gauss_block_transform,
-    inverse_gauss_block_transform,
-    inverse_gauss_block_transform_constrained,
-)
+
 import jax
 import jax.numpy as np
-from jax.scipy import stats
-import tqdm
 import objax
-from rbig_jax.information.total_corr import information_reduction
-
 import seaborn as sns
+import tqdm
+from jax.scipy import stats
+
+from rbig_jax.information.total_corr import information_reduction
+from rbig_jax.stopping import info_red_cond
+from rbig_jax.transforms.block import (
+    forward_gauss_block_transform, inverse_gauss_block_transform,
+    inverse_gauss_block_transform_constrained)
 
 sns.reset_defaults()
 sns.set_context(context="talk", font_scale=0.7)

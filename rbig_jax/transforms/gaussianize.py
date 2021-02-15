@@ -1,20 +1,15 @@
-from typing import Callable, Union
 from functools import partial
+from typing import Callable, Union
 
 import jax
 import jax.numpy as np
 
 from rbig_jax.transforms.histogram import get_hist_params
-from rbig_jax.transforms.inversecdf import (
-    invgausscdf_inverse_transform,
-    invgausscdf_forward_transform,
-)
-
+from rbig_jax.transforms.inversecdf import (invgausscdf_forward_transform,
+                                            invgausscdf_inverse_transform)
 from rbig_jax.transforms.kde import get_kde_params
-from rbig_jax.transforms.uniformize import (
-    forward_uniformization,
-    inverse_uniformization,
-)
+from rbig_jax.transforms.uniformize import (forward_uniformization,
+                                            inverse_uniformization)
 
 # TODO: Implement better clipping scheme for transformations
 

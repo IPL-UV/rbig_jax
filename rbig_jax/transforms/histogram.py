@@ -4,8 +4,8 @@ from typing import Union
 import jax
 import jax.numpy as np
 
-from rbig_jax.transforms.utils import get_domain_extension
 from rbig_jax.transforms.uniformize import UniParams
+from rbig_jax.transforms.utils import get_domain_extension
 
 Params = collections.namedtuple(
     "Params", ["support", "quantiles", "support_pdf", "empirical_pdf"]
@@ -211,4 +211,3 @@ def hist_inverse_transform(X, params: Params) -> np.ndarray:
 
 def hist_gradient_transform(X, params: Params) -> np.ndarray:
     return np.interp(X, params.support_pdf, params.empirical_pdf)
-

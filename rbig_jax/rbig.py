@@ -1,12 +1,14 @@
+from collections import namedtuple
 from typing import Callable, Optional
+
 import jax
 import jax.numpy as np
-from collections import namedtuple
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import check_random_state
-from rbig_jax.information.total_corr import information_reduction
-from rbig_jax.transforms.rbig import rbig_init, forward_transform, inverse_transform
 
+from rbig_jax.information.total_corr import information_reduction
+from rbig_jax.transforms.rbig import (forward_transform, inverse_transform,
+                                      rbig_init)
 
 # forward_transform = jax.jit(forward_transform)
 # inverse_transform = jax.jit(inverse_transform)
@@ -174,4 +176,3 @@ class RBIG(BaseEstimator, TransformerMixin):
         rng = check_random_state(seed)
         X = np.array(rng.randn(n_samples, self.n_dimensions))
         return self.inverse_transform(X)
-

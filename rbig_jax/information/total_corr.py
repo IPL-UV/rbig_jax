@@ -1,18 +1,15 @@
+import functools
 from collections import namedtuple
 from typing import Callable
-import functools
 
 import jax
 import jax.numpy as np
 
 from rbig_jax.information.entropy import histogram_entropy
-from rbig_jax.information.rbig import TrainState
-from rbig_jax.information.rbig import rbig_init
-from rbig_jax.transforms.block import (
-    forward_gauss_block_transform,
-    inverse_gauss_block_transform,
-)
+from rbig_jax.information.rbig import TrainState, rbig_init
 from rbig_jax.stopping import info_red_cond
+from rbig_jax.transforms.block import (forward_gauss_block_transform,
+                                       inverse_gauss_block_transform)
 
 InfoLoss = namedtuple("InfoLoss", ["layer", "loss", "total_corr"])
 
