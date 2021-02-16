@@ -12,9 +12,9 @@ class Logit(Transform):
         super().__init__()
         self.eps = StateVar(np.array(eps))
         if learn_temperature:
-            self.temperature = TrainVar(np.array(temperature))
+            self.temperature = TrainVar(np.array(float(temperature)))
         else:
-            self.temperature = StateVar(np.array(temperature))
+            self.temperature = StateVar(np.array(float(temperature)))
 
     def __call__(self, inputs):
 
