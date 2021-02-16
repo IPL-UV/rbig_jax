@@ -6,7 +6,7 @@ import objax
 import pytest
 from jax import random
 
-from rbig_jax.transforms.logit import Logit
+from rbig_jax.transforms.inversecdf import InverseGaussCDF
 
 seed = 123
 rng = onp.random.RandomState(123)
@@ -32,7 +32,7 @@ def test_logit_shape(n_features):
     x = objax.random.normal((n_features,), generator=generator)
 
     # create layer
-    model = Logit()
+    model = InverseGaussCDF()
 
     # forward transformation
     z, log_abs_det = model(x)
@@ -64,7 +64,7 @@ def test_logit_approx(n_features):
     x = np.clip(x, a_min=eps, a_max=1 - eps)
 
     # create layer
-    model = Logit(eps=eps)
+    model = InverseGaussCDF(eps=eps)
 
     # forward transformation
     z, _ = model(x)
