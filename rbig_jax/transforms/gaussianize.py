@@ -10,10 +10,6 @@ from rbig_jax.transforms.inversecdf import (
     invgausscdf_inverse_transform,
 )
 from rbig_jax.transforms.kde import get_kde_params
-from rbig_jax.transforms.uniformize import (
-    forward_uniformization,
-    inverse_uniformization,
-)
 from rbig_jax.transforms.marginal import marginal_transform
 from rbig_jax.transforms.uniformize import (
     uniformize_gradient,

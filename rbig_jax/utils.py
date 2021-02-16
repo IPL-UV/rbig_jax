@@ -1,5 +1,4 @@
 from collections import namedtuple
-from typing import Callable, Tuple
 from typing import Callable, Tuple, Union
 
 import jax

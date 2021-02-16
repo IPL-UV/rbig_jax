@@ -1,14 +1,18 @@
 from typing import Tuple
+
 import jax
-import objax
-from objax import TrainVar, TrainRef
-from objax.typing import JaxArray
 import jax.numpy as np
-from jax.scipy.special import logsumexp
+import objax
 from jax.nn import log_softmax, softplus
+from jax.scipy.special import logsumexp
+from objax import TrainRef, TrainVar
+from objax.typing import JaxArray
+
+from rbig_jax.transforms.base import Transform
+from rbig_jax.utils import bisection_search
 
 
-class MixtureGaussianCDF(objax.Module):
+class MixtureGaussianCDF(Transform):
     def __init__(self, n_features: int, n_components: int) -> None:
 
         # initialize variables
@@ -19,11 +23,10 @@ class MixtureGaussianCDF(objax.Module):
     def __call__(self, x: JaxArray) -> Tuple[JaxArray, JaxArray]:
 
         # get transformation
-        z_logcdf = mixture_gaussian_log_cdf(
+        z = mixture_gaussian_cdf(
             x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value)
         )
 
-        z = np.exp(z_logcdf)
         # get log_determinant jacobian
         log_abs_det = mixture_gaussian_log_pdf(
             x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value)
@@ -31,8 +34,32 @@ class MixtureGaussianCDF(objax.Module):
 
         return z, log_abs_det
 
+    def transform(self, x: JaxArray) -> Tuple[JaxArray, JaxArray]:
 
-def mixture_gaussian_log_cdf(
+        # get transformation
+        z = mixture_gaussian_cdf(
+            x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value)
+        )
+
+        return z
+
+    def inverse(self, z: JaxArray) -> JaxArray:
+        # INITIALIZE BOUNDS
+        init_lb = np.ones_like(self.means.value).max(axis=1) - 1_000.0
+        init_ub = np.ones_like(self.means.value).max(axis=1) + 1_000.0
+
+        # INITIALIZE FUNCTION
+        f = jax.partial(
+            mixture_gaussian_cdf,
+            prior_logits=self.prior_logits.value,
+            means=self.means.value,
+            scales=np.exp(self.log_scales.value),
+        )
+
+        return bisection_search(f, z, init_lb, init_ub)
+
+
+def mixture_gaussian_cdf(
     x: JaxArray, prior_logits: JaxArray, means: JaxArray, scales: JaxArray
 ) -> JaxArray:
     """

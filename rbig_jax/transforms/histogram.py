@@ -5,7 +5,6 @@ import jax
 import jax.numpy as np
 
 from rbig_jax.transforms.uniformize import UniParams
-from rbig_jax.transforms.utils import get_domain_extension
 from rbig_jax.utils import get_domain_extension
 
 Params = collections.namedtuple(
@@ -219,11 +218,7 @@ def hist_inverse_transform(X, params: Params) -> np.ndarray:
 
 
 def hist_gradient_transform(X, params: Params) -> np.ndarray:
-<<<<<<< HEAD
-    return np.interp(X, params.support_pdf, params.empirical_pdf)
-=======
     return (
         hist_forward_transform(X, params),
         np.interp(X, params.support_pdf, params.empirical_pdf),
     )
->>>>>>> 19d719e88b6afec3c9e982da429f91fea3d17901

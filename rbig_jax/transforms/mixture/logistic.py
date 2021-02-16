@@ -1,15 +1,18 @@
 from typing import Tuple
+
 import jax
-import objax
-from objax import TrainVar, TrainRef
-from objax.typing import JaxArray
 import jax.numpy as np
+import objax
+from jax.nn import log_sigmoid, log_softmax, softplus
 from jax.scipy.special import logsumexp
-from jax.nn import log_softmax, softplus, log_sigmoid
+from objax import TrainRef, TrainVar
+from objax.typing import JaxArray
+
+from rbig_jax.transforms.base import Transform
 from rbig_jax.utils import bisection_search
 
 
-class MixtureLogisticCDF(objax.Module):
+class MixtureLogisticCDF(Transform):
     def __init__(self, n_features: int, n_components: int) -> None:
 
         # initialize variables
@@ -29,6 +32,15 @@ class MixtureLogisticCDF(objax.Module):
         )
 
         return z, log_abs_det
+
+    def transform(self, x: JaxArray) -> Tuple[JaxArray, JaxArray]:
+
+        # get transformation
+        z = mixture_logistic_cdf(
+            x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value)
+        )
+
+        return z
 
     def inverse(self, z: JaxArray) -> JaxArray:
         # INITIALIZE BOUNDS
@@ -114,6 +126,8 @@ def mixture_logistic_cdf(
     # normalize distribution for components, (D,K)->(D,)
     log_cdf = logsumexp(log_cdfs, axis=1)
 
+    return log_cdf
+
 
 def logistic_log_cdf(x: JaxArray, mean: JaxArray, scale: JaxArray) -> JaxArray:
     """Element-wise log CDF of the logistic distribution
@@ -136,3 +150,25 @@ def logistic_log_cdf(x: JaxArray, mean: JaxArray, scale: JaxArray) -> JaxArray:
 
     return log_cdf
 
+
+def logistic_log_pdf(x: JaxArray, mean: JaxArray, scale: JaxArray) -> JaxArray:
+    """Element-wise log PDF of the logistic distribution
+
+    Args:
+        x (JaxArray): feature vector to be transformed
+        mean (JaxArray) : mean for the features
+        scale (JaxArray) : scale for features
+
+    Returns:
+        log_prob (JaxArray): log probability of the distribution
+    """
+
+    # change of variables
+    z = (x - mean) / scale
+
+    # log probability
+    # log_prob = z - np.log(scale) - 2 * jax.nn.softplus(z)
+    # log_prob = jax.scipy.stats.logistic.logpdf(z)
+    log_prob = z - np.log(scale) - 2 * softplus(z)
+
+    return log_prob

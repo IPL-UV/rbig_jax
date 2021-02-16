@@ -1,5 +1,4 @@
 from collections import namedtuple
-from typing import Callable
 from typing import Callable, Optional
 
 import jax
@@ -9,30 +8,19 @@ import seaborn as sns
 import tqdm
 from jax.scipy import stats
 
-from rbig_jax.information.total_corr import information_reduction
+from rbig_jax.information.entropy import histogram_entropy
+from rbig_jax.information.total_corr import (get_tolerance_dimensions,
+                                             information_reduction)
 from rbig_jax.stopping import info_red_cond
 from rbig_jax.transforms.block import (
-    forward_gauss_block_transform,
-    inverse_gauss_block_transform,
-    inverse_gauss_block_transform_constrained,
-)
-from jax.scipy import stats
-
-from rbig_jax.information.entropy import histogram_entropy
-from rbig_jax.information.total_corr import (
-    get_tolerance_dimensions,
-    information_reduction,
-)
-from rbig_jax.stopping import info_red_cond
+    forward_gauss_block_transform, inverse_gauss_block_transform,
+    inverse_gauss_block_transform_constrained)
 from rbig_jax.transforms.gaussianize import gaussianize_forward
 from rbig_jax.transforms.histogram import get_hist_params
 from rbig_jax.transforms.marginal import marginal_transform_params
-from rbig_jax.transforms.rbig import (
-    rbig_block_forward,
-    rbig_block_inverse,
-    rbig_block_transform,
-    rbig_block_transform_gradient,
-)
+from rbig_jax.transforms.rbig import (rbig_block_forward, rbig_block_inverse,
+                                      rbig_block_transform,
+                                      rbig_block_transform_gradient)
 from rbig_jax.transforms.uniformize import uniformize_transform
 
 sns.reset_defaults()

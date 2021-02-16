@@ -1,11 +1,13 @@
-import objax
-from objax import TrainVar, TrainRef, StateVar
 import jax.numpy as np
+import objax
+from jax.nn import log_softmax, sigmoid, softplus
+from objax import StateVar, TrainRef, TrainVar
 from objax.typing import JaxArray
-from jax.nn import log_softmax, softplus, sigmoid
+
+from rbig_jax.transforms.base import Transform
 
 
-class Logit(objax.Module):
+class Logit(Transform):
     def __init__(self, temperature=1, eps=1e-6, learn_temperature=False):
         super().__init__()
         self.eps = StateVar(np.array(eps))
@@ -25,6 +27,13 @@ class Logit(objax.Module):
             - softplus(self.temperature.value * outputs)
         )
         return outputs, logabsdet
+
+    def transform(self, inputs):
+
+        inputs = np.clip(inputs, self.eps.value, 1 - self.eps.value)
+
+        outputs = (1 / self.temperature.value) * (np.log(inputs) - np.log1p(-inputs))
+        return outputs
 
     def inverse(self, inputs: JaxArray) -> JaxArray:
         inputs = inputs * self.temperature.value
