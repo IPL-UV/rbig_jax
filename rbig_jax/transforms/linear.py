@@ -16,6 +16,9 @@ class HouseHolder(Transform):
         self.n_features = n_features
         self.n_reflections = n_reflections
 
+        if generator is None:
+            generator = objax.random.Generator(123)
+
         self.V = objax.TrainVar(
             objax.random.normal((n_reflections, n_features), generator=generator)
         )
