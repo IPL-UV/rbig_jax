@@ -27,9 +27,10 @@ generator = objax.random.Generator(123)
 
 
 @pytest.mark.parametrize("n_features", [1, 3, 10])
-def test_logit_shape(n_features):
+@pytest.mark.parametrize("n_samples", [1, 3, 10])
+def test_invgausscdf_shape(n_samples, n_features):
 
-    x = objax.random.normal((n_features,), generator=generator)
+    x = objax.random.normal((n_samples, n_features,), generator=generator)
 
     # create layer
     model = InverseGaussCDF()
@@ -39,7 +40,7 @@ def test_logit_shape(n_features):
 
     # checks
     chex.assert_equal_shape([z, x])
-    chex.assert_equal_shape([log_abs_det, x])
+    chex.assert_shape(log_abs_det, (n_samples,))
 
     # forward transformation
     z = model.transform(x)
@@ -55,9 +56,10 @@ def test_logit_shape(n_features):
 
 
 @pytest.mark.parametrize("n_features", [1, 3, 10])
-def test_logit_approx(n_features):
+@pytest.mark.parametrize("n_samples", [1, 3, 10])
+def test_invgausscdf_approx(n_samples, n_features):
 
-    x = objax.random.uniform((n_features,), generator=generator)
+    x = objax.random.uniform((n_samples, n_features,), generator=generator)
 
     # clip elements
     eps = 1e-6
@@ -73,4 +75,4 @@ def test_logit_approx(n_features):
     x_approx = model.inverse(z)
 
     # checks
-    chex.assert_tree_all_close(x, x_approx, atol=1e-3)
+    chex.assert_tree_all_close(x, x_approx, atol=1e-5)

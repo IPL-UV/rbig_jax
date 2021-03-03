@@ -24,7 +24,7 @@ class InverseGaussCDF(Transform):
 
         logabsdet = -jax.scipy.stats.norm.logpdf(outputs)
 
-        return outputs, logabsdet
+        return outputs, logabsdet.sum(axis=1)
 
     def transform(self, inputs: JaxArray) -> JaxArray:
 
