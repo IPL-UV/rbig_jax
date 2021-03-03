@@ -21,15 +21,31 @@ class HouseHolder(Transform):
         )
 
     def __call__(self, inputs: JaxArray) -> Tuple[JaxArray, JaxArray]:
-        outputs = householder_transform(inputs, self.V.value)
-        logabsdet = np.zeros_like(inputs)
+
+        # forward transformation with batch dimension
+        outputs = jax.vmap(householder_transform, in_axes=(0, None))(
+            inputs, self.V.value
+        )
+
+        # log abs det, all zeros
+        logabsdet = np.zeros(inputs.shape[0])
+
         return outputs, logabsdet
 
     def transform(self, inputs: JaxArray) -> JaxArray:
-        return householder_transform(inputs, self.V.value)
+
+        outputs = jax.vmap(householder_transform, in_axes=(0, None))(
+            inputs, self.V.value
+        )
+
+        return outputs
 
     def inverse(self, inputs: JaxArray) -> JaxArray:
-        return householder_inverse_transform(inputs, self.V.value)
+
+        outputs = jax.vmap(householder_inverse_transform, in_axes=(0, None))(
+            inputs, self.V.value
+        )
+        return outputs
 
 
 def householder_product(inputs: JaxArray, q_vector: JaxArray) -> JaxArray:
