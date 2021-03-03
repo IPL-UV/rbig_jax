@@ -22,41 +22,34 @@ class MixtureGaussianCDF(Transform):
 
     def __call__(self, x: JaxArray) -> Tuple[JaxArray, JaxArray]:
 
-        # get transformation
-        z = mixture_gaussian_cdf(
-            x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value)
+        # transformation
+        z = mixture_gaussian_cdf_vectorized(
+            x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value),
         )
 
         # get log_determinant jacobian
-        log_abs_det = mixture_gaussian_log_pdf(
-            x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value)
+        log_abs_det = mixture_gaussian_log_pdf_vectorized(
+            x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value),
         )
 
-        return z, log_abs_det
+        return z, log_abs_det.sum(axis=1)
 
     def transform(self, x: JaxArray) -> Tuple[JaxArray, JaxArray]:
 
-        # get transformation
-        z = mixture_gaussian_cdf(
-            x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value)
+        # transformation
+        z = mixture_gaussian_cdf_vectorized(
+            x, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value),
         )
 
         return z
 
     def inverse(self, z: JaxArray) -> JaxArray:
-        # INITIALIZE BOUNDS
-        init_lb = np.ones_like(self.means.value).max(axis=1) - 1_000.0
-        init_ub = np.ones_like(self.means.value).max(axis=1) + 1_000.0
-
-        # INITIALIZE FUNCTION
-        f = jax.partial(
-            mixture_gaussian_cdf,
-            prior_logits=self.prior_logits.value,
-            means=self.means.value,
-            scales=np.exp(self.log_scales.value),
+        # transformation
+        z = mixture_gaussian_invcdf_vectorized(
+            z, self.prior_logits.value, self.means.value, np.exp(self.log_scales.value),
         )
 
-        return bisection_search(f, z, init_lb, init_ub)
+        return z
 
 
 def mixture_gaussian_cdf(
@@ -73,7 +66,7 @@ def mixture_gaussian_cdf(
         scales (JaxArray): scales per component per feature
             (D, K)
     Returns:
-        log_cdf (JaxArray) : log CDF for the mixture distribution
+        x_cdf (JaxArray) : CDF for the mixture distribution
     """
     # n_features, n_components = prior_logits
     #
@@ -89,6 +82,44 @@ def mixture_gaussian_cdf(
     log_cdf = jax.scipy.special.logsumexp(log_cdfs, axis=1)
 
     return np.exp(log_cdf)
+
+
+mixture_gaussian_cdf_vectorized = jax.vmap(
+    mixture_gaussian_cdf, in_axes=(0, None, None, None)
+)
+
+
+def mixture_gaussian_invcdf(
+    x: JaxArray, prior_logits: JaxArray, means: JaxArray, scales: JaxArray
+) -> JaxArray:
+    """
+    Args:
+        x (JaxArray): input vector
+            (D,)
+        prior_logits (JaxArray): prior logits to weight the components
+            (D, K)
+        means (JaxArray): means per component per feature
+            (D, K)
+        scales (JaxArray): scales per component per feature
+            (D, K)
+    Returns:
+        x_invcdf (JaxArray) : log CDF for the mixture distribution
+    """
+    # INITIALIZE BOUNDS
+    init_lb = np.ones_like(means).max(axis=1) - 1_000.0
+    init_ub = np.ones_like(means).max(axis=1) + 1_000.0
+
+    # INITIALIZE FUNCTION
+    f = jax.partial(
+        mixture_gaussian_cdf, prior_logits=prior_logits, means=means, scales=scales,
+    )
+
+    return bisection_search(f, x, init_lb, init_ub)
+
+
+mixture_gaussian_invcdf_vectorized = jax.vmap(
+    mixture_gaussian_invcdf, in_axes=(0, None, None, None)
+)
 
 
 def mixture_gaussian_log_pdf(
@@ -121,3 +152,8 @@ def mixture_gaussian_log_pdf(
     log_pdf = logsumexp(log_pdfs, axis=1)
 
     return log_pdf
+
+
+mixture_gaussian_log_pdf_vectorized = jax.vmap(
+    mixture_gaussian_log_pdf, in_axes=(0, None, None, None)
+)
