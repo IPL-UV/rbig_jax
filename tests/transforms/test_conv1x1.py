@@ -5,7 +5,7 @@ import numpy as onp
 import objax
 import pytest
 
-from rbig_jax.transforms.conv import OnebyOneConv
+from rbig_jax.transforms.conv import Conv1x1
 
 seed = 123
 rng = onp.random.RandomState(123)
@@ -20,7 +20,7 @@ def test_conv1x1_shape(n_channels, hw, n_samples):
     x = objax.random.normal((n_samples, hw[0], hw[1], n_channels), generator=generator)
     # print(x.shape)
     # create layer
-    model = OnebyOneConv(n_channels=n_channels)
+    model = Conv1x1(n_channels=n_channels)
 
     # forward transformation
     z, log_abs_det = model(x)
@@ -52,7 +52,7 @@ def test_conv1x1_approx(n_channels, hw, n_samples):
     x = objax.random.normal((n_samples, hw[0], hw[1], n_channels), generator=generator)
 
     # create layer
-    model = OnebyOneConv(n_channels=n_channels)
+    model = Conv1x1(n_channels=n_channels)
 
     # forward transformation
     z, log_abs_det = model(x)
@@ -62,3 +62,4 @@ def test_conv1x1_approx(n_channels, hw, n_samples):
 
     # checks
     chex.assert_tree_all_close(x, x_approx, atol=1e-5)
+
