@@ -26,7 +26,7 @@ class Logit(Transform):
             - softplus(-self.temperature.value * outputs)
             - softplus(self.temperature.value * outputs)
         )
-        return outputs, logabsdet
+        return outputs, logabsdet.sum(axis=1)
 
     def transform(self, inputs):
 
