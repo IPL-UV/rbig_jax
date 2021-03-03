@@ -24,7 +24,7 @@ class CompositeTransform(Transform):
 
     def __call__(self, inputs: JaxArray) -> Tuple[JaxArray, JaxArray]:
         outputs = inputs
-        total_logabsdet = np.zeros_like(outputs)
+        total_logabsdet = np.zeros_like(outputs.shape[0])
         for transform in self._transforms:
             outputs, logabsdet = transform(outputs)
             total_logabsdet += logabsdet
