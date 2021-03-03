@@ -17,10 +17,11 @@ generator = objax.random.Generator(123)
 
 
 @pytest.mark.parametrize("n_features", [1, 3,])
-@pytest.mark.parametrize("n_components", [1, 1,])
-def test_composite_shape(n_features, n_components):
+@pytest.mark.parametrize("n_components", [1, 5,])
+@pytest.mark.parametrize("n_samples", [1, 5, 10])
+def test_composite_shape(n_samples, n_features, n_components):
 
-    x = objax.random.normal((n_features,), generator=generator)
+    x = objax.random.normal((n_samples, n_features,), generator=generator)
 
     # create layer
     transform = CompositeTransform(
@@ -32,7 +33,7 @@ def test_composite_shape(n_features, n_components):
 
     # checks
     chex.assert_equal_shape([z, x])
-    chex.assert_equal_shape([log_abs_det, x])
+    chex.assert_shape(log_abs_det, (n_samples,))
 
     # forward transformation
     z = transform.transform(x)
@@ -48,10 +49,10 @@ def test_composite_shape(n_features, n_components):
 
 
 @pytest.mark.parametrize("n_features", [1, 3,])
-@pytest.mark.parametrize("n_components", [1, 1,])
-def test_composite_vmap_shape(n_features, n_components):
+@pytest.mark.parametrize("n_components", [1, 5,])
+@pytest.mark.parametrize("n_samples", [1, 5, 10])
+def test_composite_shape_jitted(n_samples, n_features, n_components):
 
-    n_samples = 10
     x = objax.random.normal((n_samples, n_features,), generator=generator)
 
     # create layer
@@ -60,22 +61,21 @@ def test_composite_vmap_shape(n_features, n_components):
     )
 
     # forward transformation
-    v_net = objax.Vectorize(transform, batch_axis=(0,))
-    jit_net = objax.Jit(v_net)
+    jit_net = objax.Jit(transform, transform.vars())
     z, log_abs_det = jit_net(x)
 
     # checks
     chex.assert_equal_shape([z, x])
-    chex.assert_equal_shape([log_abs_det, x])
+    chex.assert_shape(log_abs_det, (n_samples,))
 
     # forward transformation
-    z = jax.vmap(transform.transform)(x)
+    z = transform.transform(x)
 
     # checks
     chex.assert_equal_shape([z, x])
 
     # inverse transformation
-    x_approx = jax.vmap(transform.inverse)(z)
+    x_approx = transform.inverse(z)
 
     # checks
     chex.assert_equal_shape([x_approx, x])
