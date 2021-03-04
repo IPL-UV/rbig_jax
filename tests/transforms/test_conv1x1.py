@@ -62,4 +62,3 @@ def test_conv1x1_approx(n_channels, hw, n_samples):
 
     # checks
     chex.assert_tree_all_close(x, x_approx, atol=1e-5)
-

@@ -9,7 +9,7 @@ from jax.interpreters.batching import batch
 
 from rbig_jax.transforms.base import CompositeTransform
 from rbig_jax.transforms.logit import Logit
-from rbig_jax.transforms.mixture import MixtureGaussianCDF, MixtureLogisticCDF
+from rbig_jax.transforms.mixture import MixtureGaussianCDF
 
 seed = 123
 rng = onp.random.RandomState(123)
