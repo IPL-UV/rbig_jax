@@ -4,15 +4,13 @@ import jax
 import jax.numpy as np
 
 from rbig_jax.custom_types import InputData
-from rbig_jax.information.total_corr import (get_tolerance_dimensions,
-                                             information_reduction,
-                                             rbig_total_correlation)
+from rbig_jax.information.total_corr import (
+    get_tolerance_dimensions,
+    information_reduction,
+    rbig_total_correlation,
+)
 from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
 from rbig_jax.transforms.linear import svd_transform
-
-
-def marginal_histogram_entropy_f(data, base: int = 2, nbins: int = 10):
-    return jax.vmap(jax.partial(histogram_entropy, base=base, nbins=nbins))
 
 
 def histogram_entropy(data, base=2, nbins: int = 10):
@@ -52,6 +50,10 @@ def histogram_entropy(data, base=2, nbins: int = 10):
     correction = 0.5 * (np.sum(counts > 0) - 1) / counts.sum()
 
     return S + correction + np.log2(delta)
+
+
+def marginal_histogram_entropy_f(data, base: int = 2, nbins: int = 10):
+    return jax.vmap(jax.partial(histogram_entropy, base=base, nbins=nbins))
 
 
 def entropy(pk: np.ndarray, base: int = 2) -> np.ndarray:

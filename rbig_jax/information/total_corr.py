@@ -6,11 +6,10 @@ import jax
 import jax.numpy as np
 
 from rbig_jax.custom_types import InputData
-from rbig_jax.information.entropy import histogram_entropy
-from rbig_jax.information.rbig import TrainState, rbig_init
-from rbig_jax.stopping import info_red_cond
-from rbig_jax.transforms.block import (forward_gauss_block_transform,
-                                       inverse_gauss_block_transform)
+from rbig_jax.transforms.block import (
+    forward_gauss_block_transform,
+    inverse_gauss_block_transform,
+)
 from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
 from rbig_jax.transforms.linear import svd_transform
 

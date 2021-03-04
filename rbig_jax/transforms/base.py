@@ -20,7 +20,7 @@ class Transform(Module):
 class CompositeTransform(Transform):
     def __init__(self, transforms: List[Module]) -> None:
         super().__init__()
-        self._transforms = objax.nn.Sequential(transforms)
+        self._transforms = objax.ModuleList(transforms)
 
     def __call__(self, inputs: JaxArray) -> Tuple[JaxArray, JaxArray]:
         outputs = inputs
