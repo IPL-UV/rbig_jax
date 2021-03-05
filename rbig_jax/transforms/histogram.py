@@ -3,13 +3,59 @@ from typing import Union
 
 import jax
 import jax.numpy as np
-
-from rbig_jax.transforms.uniformize import UniParams
+from chex import Array, dataclass
 from rbig_jax.utils import get_domain_extension
 
-Params = collections.namedtuple(
-    "Params", ["support", "quantiles", "support_pdf", "empirical_pdf"]
-)
+
+@dataclass
+class UniHistParams:
+    support: Array
+    quantiles: Array
+    support_pdf: Array
+    empirical_pdf: Array
+
+
+def InitUniHistUniformize(
+    n_samples: int,
+    nbins: int,
+    support_extension: Union[int, float] = 10,
+    precision: int = 1_000,
+    alpha: float = 1e-5,
+):
+
+    # TODO a bin initialization function
+
+    def init_fun(inputs):
+
+        outputs, params = get_hist_params(
+            X=inputs,
+            nbins=nbins,
+            support_extension=support_extension,
+            precision=precision,
+            alpha=alpha,
+            return_params=True,
+        )
+
+        return outputs, params
+
+    def forward_transform(params, inputs):
+
+        return np.interp(inputs, params.support, params.quantiles)
+
+    def gradient_transform(params, inputs):
+
+        outputs = forward_transform(params, inputs)
+
+        absdet = np.interp(inputs, params.support_pdf, params.empirical_pdf)
+
+        logabsdet = np.log(absdet)
+
+        return outputs, logabsdet
+
+    def inverse_transform(params, inputs):
+        return np.interp(inputs, params.quantiles, params.support)
+
+    return init_fun, forward_transform, gradient_transform, inverse_transform
 
 
 def get_hist_params(
@@ -106,13 +152,22 @@ def get_hist_params(
     # Normalize CDF estimation
     uniform_cdf /= np.max(uniform_cdf)
 
+    # forward transformation
+    outputs = np.interp(X, new_support, uniform_cdf)
+
     if return_params is True:
-        return (
-            np.interp(X, new_support, uniform_cdf),
-            UniParams(new_support, uniform_cdf, pdf_support, empirical_pdf),
+
+        # initialize parameters
+        params = UniHistParams(
+            support=new_support,
+            quantiles=uniform_cdf,
+            support_pdf=pdf_support,
+            empirical_pdf=empirical_pdf,
         )
+
+        return outputs, params
     else:
-        return np.interp(X, new_support, uniform_cdf)
+        return outputs
 
 
 def histogram_transform(
@@ -209,15 +264,15 @@ def histogram_transform(
     return np.interp(X, new_support, uniform_cdf)
 
 
-def hist_forward_transform(X, params: Params):
+def hist_forward_transform(X, params: UniHistParams):
     return np.interp(X, params.support, params.quantiles)
 
 
-def hist_inverse_transform(X, params: Params) -> np.ndarray:
+def hist_inverse_transform(X, params: UniHistParams) -> np.ndarray:
     return np.interp(X, params.quantiles, params.support)
 
 
-def hist_gradient_transform(X, params: Params) -> np.ndarray:
+def hist_gradient_transform(X, params: UniHistParams) -> np.ndarray:
     return (
         hist_forward_transform(X, params),
         np.interp(X, params.support_pdf, params.empirical_pdf),
