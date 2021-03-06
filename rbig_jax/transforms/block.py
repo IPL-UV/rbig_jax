@@ -103,7 +103,6 @@ def get_default_rbig_block_params(
     precision: int = 1_000,
     support_extension: int = 10,
     alpha: float = 1e-5,
-    eps: float = 1e-5,
 ) -> Tuple[Callable, Callable]:
     # initialize histogram parameters
     if nbins is None:
@@ -120,4 +119,24 @@ def get_default_rbig_block_params(
     # initialize rotation transformation
     rot_transform = InitPCARotation()
 
+    return uni_uniformize, rot_transform
+
+
+def get_default_rbig_block(
+    n_samples: int,
+    nbins: Optional[int] = None,
+    precision: int = 1_000,
+    support_extension: int = 10,
+    alpha: float = 1e-5,
+    eps: float = 1e-5,
+) -> Tuple[Callable, Callable]:
+    uni_uniformize, rot_transform = get_default_rbig_block_params(
+        n_samples=n_samples,
+        nbins=nbins,
+        support_extension=support_extension,
+        precision=precision,
+        alpha=alpha,
+    )
+
     return InitRBIGBlock(uni_uniformize, rot_transform, eps=eps)
+
