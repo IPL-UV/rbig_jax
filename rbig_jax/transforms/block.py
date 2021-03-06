@@ -1,5 +1,4 @@
 from typing import Callable
-import jax.numpy as np
 from chex import dataclass, Array
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
 from rbig_jax.transforms.marginal import (
@@ -10,7 +9,7 @@ from rbig_jax.transforms.marginal import (
 
 
 @dataclass
-class RBIGParams:
+class RBIGBlockParams:
     support: Array
     quantiles: Array
     support_pdf: Array
@@ -22,7 +21,7 @@ def InitRBIGBlock(uni_uniformize: Callable, rot_transform: Callable, eps: float 
 
     # unpack functions
     uni_init_f, uni_forward_f, uni_grad_f, uni_inverse_f = uni_uniformize
-    icdf_inif_f, icdf_forward_f, icdf_grad_f, icdf_inverse_f = InitInverseGaussCDF(
+    icdf_init_f, icdf_forward_f, icdf_grad_f, icdf_inverse_f = InitInverseGaussCDF(
         eps=eps
     )
     rot_init_f, rot_forward_f, _, rot_inverse_f = rot_transform
@@ -34,13 +33,13 @@ def InitRBIGBlock(uni_uniformize: Callable, rot_transform: Callable, eps: float 
         inputs, uni_params = marginal_fit_transform(inputs, uni_init_f)
 
         # inverse CDF Transformation
-        inputs, _ = icdf_inif_f(inputs)
+        inputs, _ = icdf_init_f(inputs)
 
         # rotation
         outputs, rot_params = rot_init_f(inputs)
 
         # initialize new RBiG params
-        params = RBIGParams(
+        params = RBIGBlockParams(
             support=uni_params.support,
             quantiles=uni_params.quantiles,
             empirical_pdf=uni_params.empirical_pdf,
