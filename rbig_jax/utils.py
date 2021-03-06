@@ -3,7 +3,7 @@ from typing import Callable, Tuple, Union
 
 import jax
 import jax.numpy as np
-from objax.typing import JaxArray
+from chex import Array, dataclass
 
 BisectionState = namedtuple(
     "BisectionState",
@@ -11,7 +11,11 @@ BisectionState = namedtuple(
 )
 
 
-def safe_log(x: JaxArray) -> JaxArray:
+def reverse_dataclass_params(params: dataclass) -> dataclass:
+    return jax.tree_map(lambda x: x[::-1], params)
+
+
+def safe_log(x: Array) -> Array:
     return np.log(np.clip(x, a_min=1e-22))
 
 
@@ -124,12 +128,12 @@ def bisection_body(f: Callable, state: BisectionState) -> BisectionState:
 
 def bisection_search(
     f: Callable,
-    x: JaxArray,
-    lower: JaxArray,
-    upper: JaxArray,
+    x: Array,
+    lower: Array,
+    upper: Array,
     atol: float = 1e-8,
     max_iters: int = 1_000,
-) -> JaxArray:
+) -> Array:
 
     # initialize solution
     y = np.zeros_like(x)
