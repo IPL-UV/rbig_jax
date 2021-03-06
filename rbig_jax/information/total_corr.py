@@ -1,17 +1,16 @@
 import functools
 from collections import namedtuple
-from typing import Callable, Tuple
+from typing import Callable, Optional, Tuple
 
 import jax
 import jax.numpy as np
 
 from rbig_jax.custom_types import InputData
-from rbig_jax.transforms.block import (
-    forward_gauss_block_transform,
-    inverse_gauss_block_transform,
-)
+
 from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
 from rbig_jax.transforms.linear import svd_transform
+from rbig_jax.information.entropy import histogram_entropy
+from chex import dataclass, Array
 
 
 def get_tolerance_dimensions(n_samples: int) -> int:
@@ -19,6 +18,24 @@ def get_tolerance_dimensions(n_samples: int) -> int:
     yyy = np.array([0.1571, 0.0468, 0.0145, 0.0046, 0.0014, 0.0001, 0.00001])
     tol_dimensions = np.interp(n_samples, xxx, yyy)
     return tol_dimensions
+
+
+def init_information_reduction_loss(
+    n_samples: int, nbins: Optional[int] = None, p: int = 0.25, **kwargs
+):
+    if nbins is None:
+        nbins = int(np.sqrt(n_samples))  # important parameter
+    entropy_est = jax.partial(histogram_entropy, nbins=nbins, **kwargs)
+
+    tol_dims = get_tolerance_dimensions(n_samples)
+
+    def loss_function(X_before, X_after):
+
+        return information_reduction(
+            X_before, X_after, uni_entropy=entropy_est, tol_dims=tol_dims, p=p
+        )
+
+    return loss_function
 
 
 def information_reduction(
@@ -73,39 +90,39 @@ def information_reduction(
     return np.array(np.where(cond, 0.0, delta_info))
 
 
-def rbig_total_correlation(
-    X_samples: InputData,
-    marginal_uni: Callable,
-    uni_entropy: Callable,
-    n_iterations: int = 100,
-    p: float = 0.25,
-):
+# def rbig_total_correlation(
+#     X_samples: InputData,
+#     marginal_uni: Callable,
+#     uni_entropy: Callable,
+#     n_iterations: int = 100,
+#     p: float = 0.25,
+# ):
 
-    # total correlation reduction
-    tol_dims = get_tolerance_dimensions(X_samples.shape[0])
+#     # total correlation reduction
+#     tol_dims = get_tolerance_dimensions(X_samples.shape[0])
 
-    total_corr_f = jax.partial(
-        information_reduction, uni_entropy=uni_entropy, tol_dims=tol_dims, p=p,
-    )
+#     total_corr_f = jax.partial(
+#         information_reduction, uni_entropy=uni_entropy, tol_dims=tol_dims, p=p,
+#     )
 
-    marginal_uni_f_vectorized = jax.vmap(marginal_uni)
-    # create function for scan
+#     marginal_uni_f_vectorized = jax.vmap(marginal_uni)
+#     # create function for scan
 
-    def body(carry, inputs):
+#     def body(carry, inputs):
 
-        # marginal gaussianization
-        carry_trans = marginal_uni_f_vectorized(carry.T).T
+#         # marginal gaussianization
+#         carry_trans = marginal_uni_f_vectorized(carry.T).T
 
-        # inverse CDF transformation
-        carry_trans = invgausscdf_forward_transform(carry_trans)
+#         # inverse CDF transformation
+#         carry_trans = invgausscdf_forward_transform(carry_trans)
 
-        # rotation
-        carry_trans = svd_transform(carry_trans)
+#         # rotation
+#         carry_trans = svd_transform(carry_trans)
 
-        # information reduction
-        info_red = total_corr_f(carry, carry_trans)
-        # print(type(info_red))
+#         # information reduction
+#         info_red = total_corr_f(carry, carry_trans)
+#         # print(type(info_red))
 
-        return carry_trans, info_red
+#         return carry_trans, info_red
 
-    return jax.lax.scan(f=body, init=X_samples, xs=None, length=n_iterations)
+#     return jax.lax.scan(f=body, init=X_samples, xs=None, length=n_iterations)
