@@ -37,7 +37,7 @@ class InverseGaussCDF(Transform):
         return jax.scipy.stats.norm.cdf(inputs)
 
 
-def InitInverseGaussCDF(eps: float = 1e-5,):
+def InitInverseGaussCDF(eps: float = 1e-5,) -> Tuple:
 
     # TODO a bin initialization function
 
