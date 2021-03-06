@@ -1,4 +1,7 @@
-from typing import Callable
+from rbig_jax.transforms.histogram import InitUniHistUniformize
+from rbig_jax.transforms.rotation import InitPCARotation
+import jax.numpy as np
+from typing import Callable, Optional, Tuple
 from chex import dataclass, Array
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
 from rbig_jax.transforms.marginal import (
@@ -92,3 +95,29 @@ def InitRBIGBlock(uni_uniformize: Callable, rot_transform: Callable, eps: float 
         return outputs
 
     return init_func, transform, gradient_transform, inverse_transform
+
+
+def get_default_rbig_block_params(
+    n_samples: int,
+    nbins: Optional[int] = None,
+    precision: int = 1_000,
+    support_extension: int = 10,
+    alpha: float = 1e-5,
+    eps: float = 1e-5,
+) -> Tuple[Callable, Callable]:
+    # initialize histogram parameters
+    if nbins is None:
+        nbins = int(np.sqrt(n_samples))
+
+    # initialize histogram function
+    uni_uniformize = InitUniHistUniformize(
+        n_samples=n_samples,
+        nbins=nbins,
+        support_extension=support_extension,
+        precision=precision,
+        alpha=alpha,
+    )
+    # initialize rotation transformation
+    rot_transform = InitPCARotation()
+
+    return InitRBIGBlock(uni_uniformize, rot_transform, eps=eps)
