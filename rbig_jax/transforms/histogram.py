@@ -1,5 +1,5 @@
 import collections
-from typing import Union
+from typing import Optional, Union
 
 import jax
 import jax.numpy as np
@@ -18,13 +18,15 @@ class UniHistParams:
 
 def InitUniHistUniformize(
     n_samples: int,
-    nbins: int,
+    nbins: Optional[int] = None,
     support_extension: Union[int, float] = 10,
     precision: int = 1_000,
     alpha: float = 1e-5,
 ):
 
     # TODO a bin initialization function
+    if nbins is None:
+        nbins = int(np.sqrt(n_samples))
 
     def init_fun(inputs):
 
@@ -47,14 +49,14 @@ def InitUniHistUniformize(
 
         outputs = forward_transform(params, inputs)
 
-        absdet = np.interp(inputs, params.support_pdf, params.empirical_pdf)
+        absdet = hist_gradient_transform(params, inputs)
 
         logabsdet = np.log(absdet)
 
         return outputs, logabsdet
 
     def inverse_transform(params, inputs):
-        return np.interp(inputs, params.quantiles, params.support)
+        return hist_inverse_transform(params, inputs)
 
     return init_fun, forward_transform, gradient_transform, inverse_transform
 
@@ -172,12 +174,60 @@ def get_hist_params(
 
 
 def hist_forward_transform(params: UniHistParams, X: JaxArray):
+    """Forward univariate uniformize transformation
+    
+    Parameters
+    ----------
+    X : np.ndarray
+        The univariate data to be transformed.
+    
+    params: UniParams
+        the tuple containing the params. 
+        See `rbig_jax.transforms.uniformize` for details.
+    
+    Returns
+    -------
+    X_trans : np.ndarray
+        The transformed univariate parameters
+    """
     return np.interp(X, params.support, params.quantiles)
 
 
 def hist_inverse_transform(params: UniHistParams, X: JaxArray) -> np.ndarray:
+    """Inverse univariate uniformize transformation
+    
+    Parameters
+    ----------
+    X : np.ndarray
+        The uniform univariate data to be transformed.
+    
+    params: UniParams
+        the tuple containing the params. 
+        See `rbig_jax.transforms.histogram` for details.
+    
+    Returns
+    -------
+    X_trans : np.ndarray
+        The transformed univariate parameters
+    """
     return np.interp(X, params.quantiles, params.support)
 
 
 def hist_gradient_transform(params: UniHistParams, X: JaxArray) -> np.ndarray:
+    """Forward univariate uniformize transformation gradient
+    
+    Parameters
+    ----------
+    X : np.ndarray
+        The univariate data to be transformed.
+    
+    params: UniParams
+        the tuple containing the params. 
+        See `rbig_jax.transforms.histogram` for details.
+    
+    Returns
+    -------
+    X_trans : np.ndarray
+        The transformed univariate parameters
+    """
     return np.interp(X, params.support_pdf, params.empirical_pdf)
