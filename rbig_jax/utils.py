@@ -23,6 +23,19 @@ def marginal_transform(f: Callable):
     return jax.vmap(f)
 
 
+def get_minimum_zeroth_element(x: Array, window_size: int = 10) -> int:
+
+    # window for the convolution
+    window = np.ones(window_size) / window_size
+
+    # rolling average
+    x_cumsum_window = np.convolve(np.abs(x), window, "valid")
+
+    # get minimum zeroth element
+    min_idx = int(np.min(np.argwhere(x_cumsum_window == 0.0)[0]))
+    return min_idx
+
+
 def get_domain_extension(
     data: np.ndarray, extension: Union[float, int],
 ) -> Tuple[float, float]:

@@ -3,9 +3,17 @@ from typing import Callable, Optional
 import jax
 import jax.numpy as np
 import objax
-from chex import Array
-from rbig_jax.transforms.block import InitRBIGBlock
-from rbig_jax.utils import reverse_dataclass_params
+from chex import Array, dataclass
+from rbig_jax.transforms.block import InitRBIGBlock, RBIGBlockParams
+from rbig_jax.utils import get_minimum_zeroth_element, reverse_dataclass_params
+from rbig_jax.information.total_corr import init_information_reduction_loss
+
+
+@dataclass
+class InfoLossState:
+    max_layers: int
+    ilayer: int
+    info_loss: Array
 
 
 class IterativeGaussianization:
@@ -14,19 +22,31 @@ class IterativeGaussianization:
         uni_uniformize: Callable,
         rot_transform: Callable,
         n_features: int,
+        n_samples: int = 10_000,
+        zero_tolerance: int = 50,
+        zero_tolerance_buffer: int = 10,
         eps: float = 1e-5,
-        max_layers: int = 1_000,
+        max_layers: int = 10_000,
+        p: float = 0.1,
     ):
         # create Gaussinization block
         fit_transform_f, forward_f, grad_f, inverse_f = InitRBIGBlock(
             uni_uniformize, rot_transform, eps
         )
+        self.info_loss_f = init_information_reduction_loss(
+            n_samples=n_samples, base=2, p=0.1
+        )
         self.max_layers = max_layers
+        self.zero_tolerance = zero_tolerance
+        self.zero_tolerance_buffer = zero_tolerance_buffer
         self.n_features = n_features
-        self.block_fit_transform = fit_transform_f
+        self.block_fit_transform = jax.jit(fit_transform_f)
         self.block_transform = forward_f
         self.block_inverse_transform = inverse_f
         self.block_gradient_transform = grad_f
+        self.info_loss_f = jax.jit(
+            init_information_reduction_loss(n_samples=n_samples, base=2, p=p)
+        )
         # self.block_forward = jax.partial(
         #     rbig_block_forward, marginal_gauss_f=gaussianize_f
         # )
@@ -57,38 +77,55 @@ class IterativeGaussianization:
         return self
 
     def fit_transform(self, X: Array) -> Array:
-        def f_fit_transform(inputs, i):
-            return self.block_fit_transform(inputs)
 
-        X, layer_params = jax.lax.scan(f_fit_transform, X, None, self.max_layers)
+        window = np.ones(self.zero_tolerance) / self.zero_tolerance
 
-        # self.n_features = X.shape[1]
+        def condition(state):
 
-        # # initialize parameter storage
-        # params = []
-        # losses = []
-        # i_layer = 0
+            # rolling average
+            x_cumsum_window = np.convolve(np.abs(state.info_loss), window, "valid")
+            n_zeros = int(np.sum(np.where(x_cumsum_window > 0.0, 0, 1)))
+            return jax.lax.ne(n_zeros, 1) or state.ilayer > state.max_layers
 
-        # # loop through
-        # while i_layer < self.max_layers:
+        state = InfoLossState(
+            max_layers=self.max_layers, ilayer=0, info_loss=np.ones(self.max_layers)
+        )
+        X_g = X
+        params = []
+        while condition(state):
 
-        #     loss = jax.partial(self.loss_f, X=X)
+            layer_loss = jax.partial(self.info_loss_f, X_before=X_g)
 
-        #     # fix info criteria
-        #     X, block_params = self.block_forward(X)
+            # compute
+            X_g, layer_params = self.block_fit_transform(X_g)
 
-        #     info_red = loss(Y=X)
+            # get information reduction
+            layer_loss = layer_loss(X_after=X_g)
 
-        #     # append Parameters
-        #     params.append(block_params)
-        #     losses.append(info_red)
+            # update layer loss
+            info_losses = jax.ops.index_update(
+                state.info_loss, state.ilayer, layer_loss
+            )
+            state = InfoLossState(
+                max_layers=self.max_layers,
+                ilayer=state.ilayer + 1,
+                info_loss=info_losses,
+            )
+            params.append(layer_params)
 
-        #     i_layer += 1
-
+        params = RBIGBlockParams(
+            support=np.stack([iparam.support for iparam in params]),
+            quantiles=np.stack([iparam.quantiles for iparam in params]),
+            empirical_pdf=np.stack([iparam.empirical_pdf for iparam in params]),
+            support_pdf=np.stack([iparam.support_pdf for iparam in params]),
+            rotation=np.stack([iparam.rotation for iparam in params]),
+        )
         # self.n_layers = i_layer
-        self.params = layer_params
-        # self.info_loss = np.array(losses)
-        return X
+        self.params = params
+        self.info_loss = info_losses[: state.ilayer]
+        self.n_layers = state.ilayer
+
+        return X_g
 
     def transform(self, X: Array) -> Array:
         def f_apply(inputs, params):
@@ -152,8 +189,8 @@ class IterativeGaussianization:
         # inverse transformation
         return self.inverse_transform(X_gauss)
 
-    # def total_correlation(self, base: int = 2) -> np.ndarray:
-    #     return np.sum(self.info_loss) * np.log(base)
+    def total_correlation(self, base: int = 2) -> np.ndarray:
+        return np.sum(self.info_loss)  # * np.log(base)
 
-    # def entropy(self, X: np.ndarray, base: int = 2) -> np.ndarray:
-    #     return self.uni_ent_est(X).sum() * np.log(base) - self.total_correlation(base)
+    def entropy(self, X: np.ndarray, base: int = 2) -> np.ndarray:
+        return self.uni_ent_est(X).sum() * np.log(base) - self.total_correlation(base)
