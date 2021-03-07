@@ -1,7 +1,7 @@
 program: scripts/toy_data/2d_gaussflow.py
 project: "gf_2d_data"
 entity: "ipl_uv"
-name : "gf_2d_classic"
+name : "gf_2d_moons"
 description : "Finding the Best parameters for 2D dataset with GF"
 method: grid
 metric: 
@@ -20,3 +20,5 @@ parameters:
     values: ["logit", "igausscdf"]
   learning_rate:
     values: [0.1, 0.01, 0.05]
+  dataset:
+    values: ["helix"]
