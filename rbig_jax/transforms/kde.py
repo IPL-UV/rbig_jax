@@ -39,13 +39,20 @@ def InitKDEUniformize(
 
     def forward_transform(params, inputs):
 
-        return np.interp(inputs, params.support, params.quantiles)
+        return kde_forward_transform(params, inputs)
 
     def gradient_transform(params, inputs):
-        return np.interp(inputs, params.support_pdf, params.empirical_pdf)
+
+        outputs = kde_forward_transform(params, inputs)
+
+        absdet = kde_gradient_transform(params, inputs)
+
+        logabsdet = np.log(absdet)
+
+        return outputs, logabsdet
 
     def inverse_transform(params, inputs):
-        return np.interp(inputs, params.quantiles, params.support)
+        return kde_inverse_transform(params, inputs)
 
     return init_fun, forward_transform, gradient_transform, inverse_transform
 
@@ -172,3 +179,15 @@ def scotts_method(n, d=1):
 
 def silvermans_method(n, d=1):
     return np.power(n * (d + 2.0) / 4.0, -1.0 / (d + 4))
+
+
+def kde_forward_transform(params: UniKDEParams, X: Array) -> Array:
+    return np.interp(X, params.support, params.quantiles)
+
+
+def kde_inverse_transform(params: UniKDEParams, X: Array) -> Array:
+    return np.interp(X, params.quantiles, params.support)
+
+
+def kde_gradient_transform(params: UniKDEParams, X: Array) -> Array:
+    return np.interp(X, params.support_pdf, params.empirical_pdf)

@@ -13,25 +13,20 @@ from setuptools import Command, find_packages, setup
 
 # Package meta-data.
 NAME = "rbig_jax"
-DESCRIPTION = "Python similarity measures."
+DESCRIPTION = "Gaussianization with JAX."
 URL = "https://github.com/ipl-uv/rbig_jax"
 EMAIL = "jemanjohnson34@gmail.com"
 AUTHOR = "J. Emmanuel Johnson"
-REQUIRES_PYTHON = ">=3.6.0"
+REQUIRES_PYTHON = ">=3.7.0"
 VERSION = "0.1.0"
 
 # What packages are required for this module to be executed?
-REQUIRED = [
-    "jax",
-    "jaxlib",
-    "numpy",
-    "scikit-learn",
-]
+REQUIRED = ["jax", "jaxlib", "numpy", "scikit-learn", "objax", "chex"]
 
 # What packages are optional?
 EXTRAS = {
     "dev": ["black", "isort", "mypy"],
-    "tests": ["pytest", "scikit-learn", "chex"],
+    "tests": ["pytest", "scikit-learn"],
     "extras": ["matplotlib", "seaborn", "tqdm", "wandb", "scipy"],
 }
 

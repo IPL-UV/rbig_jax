@@ -3,7 +3,7 @@ from typing import Callable, Tuple, Union
 
 import jax
 import jax.numpy as np
-from objax.typing import JaxArray
+from chex import Array, dataclass
 
 BisectionState = namedtuple(
     "BisectionState",
@@ -11,12 +11,29 @@ BisectionState = namedtuple(
 )
 
 
-def safe_log(x: JaxArray) -> JaxArray:
+def reverse_dataclass_params(params: dataclass) -> dataclass:
+    return jax.tree_map(lambda x: x[::-1], params)
+
+
+def safe_log(x: Array) -> Array:
     return np.log(np.clip(x, a_min=1e-22))
 
 
 def marginal_transform(f: Callable):
     return jax.vmap(f)
+
+
+def get_minimum_zeroth_element(x: Array, window_size: int = 10) -> int:
+
+    # window for the convolution
+    window = np.ones(window_size) / window_size
+
+    # rolling average
+    x_cumsum_window = np.convolve(np.abs(x), window, "valid")
+
+    # get minimum zeroth element
+    min_idx = int(np.min(np.argwhere(x_cumsum_window == 0.0)[0]))
+    return min_idx
 
 
 def get_domain_extension(
@@ -124,12 +141,12 @@ def bisection_body(f: Callable, state: BisectionState) -> BisectionState:
 
 def bisection_search(
     f: Callable,
-    x: JaxArray,
-    lower: JaxArray,
-    upper: JaxArray,
+    x: Array,
+    lower: Array,
+    upper: Array,
     atol: float = 1e-8,
     max_iters: int = 1_000,
-) -> JaxArray:
+) -> Array:
 
     # initialize solution
     y = np.zeros_like(x)
