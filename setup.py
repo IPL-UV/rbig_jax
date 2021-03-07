@@ -27,7 +27,7 @@ REQUIRED = ["jax", "jaxlib", "numpy", "scikit-learn", "objax", "chex"]
 EXTRAS = {
     "dev": ["black", "isort", "mypy"],
     "tests": ["pytest", "scikit-learn"],
-    "extras": ["matplotlib", "seaborn", "tqdm", "wandb", "scipy"],
+    "extras": ["matplotlib", "seaborn", "tqdm", "wandb", "scipy", "corner"],
 }
 
 # The rest you shouldn't have to touch too much :)
