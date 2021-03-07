@@ -2,6 +2,7 @@ from typing import Tuple
 
 import jax.numpy as np
 import numpy as onp
+from chex import Array
 
 
 def get_data(
@@ -32,3 +33,12 @@ def get_classic(n_samples=10_000, seed=123):
     x = onp.abs(2 * rng.randn(1, n_samples))
     y = onp.sin(x) + 0.25 * rng.randn(1, n_samples)
     return onp.vstack((x, y)).T
+
+
+def generate_2d_grid(data: Array, n_grid: int = 1_000, buffer: float = 0.01) -> Array:
+
+    xline = np.linspace(data[:, 0].min() - buffer, data[:, 0].max() + buffer, n_grid)
+    yline = np.linspace(data[:, 1].min() - buffer, data[:, 1].max() + buffer, n_grid)
+    xgrid, ygrid = np.meshgrid(xline, yline)
+    xyinput = np.concatenate([xgrid.reshape(-1, 1), ygrid.reshape(-1, 1)], axis=1)
+    return xyinput

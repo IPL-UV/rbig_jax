@@ -1,3 +1,4 @@
+from rbig_jax.transforms.histogram import InitUniHistUniformize
 from typing import Callable, Optional
 
 import jax
@@ -7,6 +8,7 @@ from chex import Array, dataclass
 from rbig_jax.transforms.block import InitRBIGBlock, RBIGBlockParams
 from rbig_jax.utils import get_minimum_zeroth_element, reverse_dataclass_params
 from rbig_jax.information.total_corr import init_information_reduction_loss
+from rbig_jax.transforms.rotation import InitPCARotation
 
 
 @dataclass
@@ -24,7 +26,6 @@ class IterativeGaussianization:
         n_features: int,
         n_samples: int = 10_000,
         zero_tolerance: int = 50,
-        zero_tolerance_buffer: int = 10,
         eps: float = 1e-5,
         max_layers: int = 10_000,
         p: float = 0.1,
@@ -33,12 +34,8 @@ class IterativeGaussianization:
         fit_transform_f, forward_f, grad_f, inverse_f = InitRBIGBlock(
             uni_uniformize, rot_transform, eps
         )
-        self.info_loss_f = init_information_reduction_loss(
-            n_samples=n_samples, base=2, p=0.1
-        )
         self.max_layers = max_layers
         self.zero_tolerance = zero_tolerance
-        self.zero_tolerance_buffer = zero_tolerance_buffer
         self.n_features = n_features
         self.block_fit_transform = jax.jit(fit_transform_f)
         self.block_transform = forward_f
@@ -47,28 +44,6 @@ class IterativeGaussianization:
         self.info_loss_f = jax.jit(
             init_information_reduction_loss(n_samples=n_samples, base=2, p=p)
         )
-        # self.block_forward = jax.partial(
-        #     rbig_block_forward, marginal_gauss_f=gaussianize_f
-        # )
-        # self.block_transform = rbig_block_transform
-        # self.block_inverse = rbig_block_inverse
-        # self.block_gradient = rbig_block_transform_gradient
-        # self.max_layers = max_layers
-
-        # # INFORMATION THEORY LOSS
-        # tol_dims = get_tolerance_dimensions(n_samples)
-        # self.uni_ent_est = uni_ent_est
-        # self.loss_f = jax.partial(
-        #     information_reduction, uni_entropy=self.uni_ent_est, tol_dims=tol_dims, p=p
-        # )
-
-        # # jit arguments (much faster!)
-        # if jitted:
-        #     self.block_forward = jax.jit(self.block_forward)
-        #     self.block_transform = jax.jit(self.block_transform)
-        #     self.block_inverse = jax.jit(self.block_inverse)
-        #     self.block_gradient = jax.jit(self.block_gradient)
-        #     self.loss_f = jax.jit(self.loss_f)
 
     def fit(self, X):
 
@@ -194,3 +169,76 @@ class IterativeGaussianization:
 
     def entropy(self, X: np.ndarray, base: int = 2) -> np.ndarray:
         return self.uni_ent_est(X).sum() * np.log(base) - self.total_correlation(base)
+
+
+class RBIG(IterativeGaussianization):
+    def __init__(
+        self,
+        n_samples: int,
+        n_features: int,
+        support_extension: int = 10,
+        zero_tolerance: int = 30,
+        precision: int = 100,
+        alpha: int = 1e-5,
+        nbins: Optional[int] = None,
+        p: int = 0.25,
+        max_layers: int = 1_000,
+        eps: float = 1e-5,
+    ):
+        if nbins is None:
+            nbins = int(np.sqrt(n_samples))
+
+        # initialize histogram transformation
+        uni_uniformize = InitUniHistUniformize(
+            n_samples=n_samples,
+            nbins=nbins,
+            support_extension=support_extension,
+            precision=precision,
+            alpha=alpha,
+        )
+        # initialize rotation transformation
+        rot_transform = InitPCARotation()
+
+        super().__init__(
+            uni_uniformize=uni_uniformize,
+            rot_transform=rot_transform,
+            p=p,
+            n_samples=n_samples,
+            n_features=n_features,
+            max_layers=max_layers,
+            zero_tolerance=zero_tolerance,
+            eps=eps,
+        )
+
+
+def get_default_mg(n_samples: int, return_params: bool = True):
+
+    support_extension = 10
+    alpha = 1e-5
+    precision = 100
+    nbins = int(np.sqrt(n_samples))
+    return_params = return_params
+
+    uniformize_transform = jax.partial(
+        get_hist_params,
+        nbins=nbins,
+        support_extension=support_extension,
+        precision=precision,
+        alpha=alpha,
+        return_params=return_params,
+    )
+
+    uni_transform_f = jax.partial(
+        marginal_transform_params, function=uniformize_transform
+    )
+
+    gaussianize_f = jax.partial(gaussianize_forward, uni_transform_f=uni_transform_f)
+
+    return gaussianize_f
+
+
+def get_default_entropy(n_samples: int):
+    nbins = int(np.sqrt(n_samples))
+    entropy_f = jax.partial(histogram_entropy, nbins=nbins, base=2)
+
+    return entropy_f
