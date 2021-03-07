@@ -4,12 +4,23 @@ from typing import Callable
 
 import jax
 import jax.numpy as np
+import tqdm
 from jax.scipy import stats
 
+from rbig_jax.transforms.block import (forward_gauss_block_transform,
+                                       inverse_gauss_block_transform)
 from rbig_jax.transforms.gaussianize import (gaussianize_marginal_gradient,
                                              gaussianize_marginal_inverse,
                                              gaussianize_marginal_transform)
-from rbig_jax.transforms.linear import compute_projection_v1
+# from rbig_jax.transforms.gaussian import get_gauss_params
+# from rbig_jax.transforms.linear import init_pca_params
+from rbig_jax.transforms.histogram import get_hist_params
+from rbig_jax.transforms.kde import get_kde_params
+from rbig_jax.transforms.linear import (compute_projection,
+                                        compute_projection_v1)
+from rbig_jax.transforms.marginal import (forward_gaussianization,
+                                          forward_inversecdf,
+                                          inverse_gaussianization)
 
 RBIGParams = namedtuple(
     "RBIGParams", ["support_pdf", "empirical_pdf", "quantiles", "support", "rotation"]
@@ -189,6 +200,8 @@ def rbig_block_inverse(X, params):
     X = gaussianize_marginal_inverse(X, params)
 
     return X
+<<<<<<< HEAD
+=======
 
 
 # def forward_transform(params, X):
@@ -213,3 +226,4 @@ def rbig_block_inverse(X, params):
 
 #     X = X.T
 #     return X
+>>>>>>> 19d719e88b6afec3c9e982da429f91fea3d17901

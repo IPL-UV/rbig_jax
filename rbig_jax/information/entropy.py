@@ -2,17 +2,9 @@ from typing import Callable
 
 import jax
 import jax.numpy as np
+from chex import Array
 
-from rbig_jax.custom_types import InputData
-from rbig_jax.information.total_corr import (get_tolerance_dimensions,
-                                             information_reduction,
-                                             rbig_total_correlation)
-from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
-from rbig_jax.transforms.linear import svd_transform
-
-
-def marginal_histogram_entropy_f(data, base: int = 2, nbins: int = 10):
-    return jax.vmap(jax.partial(histogram_entropy, base=base, nbins=nbins))
+# from rbig_jax.information.total_corr import rbig_total_correlation
 
 
 def histogram_entropy(data, base=2, nbins: int = 10):
@@ -46,7 +38,7 @@ def histogram_entropy(data, base=2, nbins: int = 10):
     pk = 1.0 * np.array(counts) / np.sum(counts)
 
     # calculate the entropy
-    S = entropy(pk, base=base)
+    S = univariate_entropy(pk, base=base)
 
     # Miller Maddow Correction
     correction = 0.5 * (np.sum(counts > 0) - 1) / counts.sum()
@@ -54,7 +46,11 @@ def histogram_entropy(data, base=2, nbins: int = 10):
     return S + correction + np.log2(delta)
 
 
-def entropy(pk: np.ndarray, base: int = 2) -> np.ndarray:
+def marginal_histogram_entropy_f(data, base: int = 2, nbins: int = 10):
+    return jax.vmap(jax.partial(histogram_entropy, base=base, nbins=nbins))
+
+
+def univariate_entropy(pk: np.ndarray, base: int = 2) -> np.ndarray:
     """calculate the entropy
     
     Notes
@@ -74,25 +70,25 @@ def entropy(pk: np.ndarray, base: int = 2) -> np.ndarray:
     return S
 
 
-def rbig_entropy(
-    X_samples: InputData,
-    marginal_uni: Callable,
-    marginal_entropy: Callable,
-    n_iterations: int = 100,
-    base: int = 2,
-):
+# def rbig_entropy(
+#     X_samples: Array,
+#     marginal_uni: Callable,
+#     marginal_entropy: Callable,
+#     n_iterations: int = 100,
+#     base: int = 2,
+# ):
 
-    # create marginal entropy equation
-    marginal_entropy_vectorized = jax.vmap(marginal_entropy)
+#     # create marginal entropy equation
+#     marginal_entropy_vectorized = jax.vmap(marginal_entropy)
 
-    # Calculate entropy in data domain
-    H_x = marginal_entropy_vectorized(X_samples).sum()
+#     # Calculate entropy in data domain
+#     H_x = marginal_entropy_vectorized(X_samples).sum()
 
-    # calculate the total correlation
-    _, tc = rbig_total_correlation(
-        X_samples,
-        marginal_uni=marginal_uni,
-        marginal_entropy=marginal_entropy,
-        n_iterations=n_iterations,
-    )
-    return H_x - (np.sum(tc) * np.log(base))
+#     # calculate the total correlation
+#     _, tc = rbig_total_correlation(
+#         X_samples,
+#         marginal_uni=marginal_uni,
+#         marginal_entropy=marginal_entropy,
+#         n_iterations=n_iterations,
+#     )
+#     return H_x - (np.sum(tc) * np.log(base))

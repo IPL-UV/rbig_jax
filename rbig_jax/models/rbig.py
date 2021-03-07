@@ -5,12 +5,16 @@ import jax
 import jax.numpy as np
 import objax
 import seaborn as sns
+import tqdm
 from jax.scipy import stats
 
 from rbig_jax.information.entropy import histogram_entropy
 from rbig_jax.information.total_corr import (get_tolerance_dimensions,
                                              information_reduction)
 from rbig_jax.stopping import info_red_cond
+from rbig_jax.transforms.block import (
+    forward_gauss_block_transform, inverse_gauss_block_transform,
+    inverse_gauss_block_transform_constrained)
 from rbig_jax.transforms.gaussianize import gaussianize_forward
 from rbig_jax.transforms.histogram import get_hist_params
 from rbig_jax.transforms.marginal import marginal_transform_params

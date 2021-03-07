@@ -1,15 +1,60 @@
-import collections
 from functools import partial
 from typing import Union
 
 import jax
 import jax.numpy as np
-
+from chex import Array, dataclass
 from rbig_jax.utils import get_domain_extension
 
-Params = collections.namedtuple(
-    "Params", ["support", "quantiles", "support_pdf", "empirical_pdf"]
-)
+
+@dataclass
+class UniKDEParams:
+    support: Array
+    quantiles: Array
+    support_pdf: Array
+    empirical_pdf: Array
+
+
+def InitKDEUniformize(
+    n_samples: int,
+    support_extension: Union[int, float] = 10,
+    precision: int = 1_000,
+    bw: float = 0.1,
+):
+
+    # TODO a kde bin init function
+    # bw = scotts_method(n_samples, 1) * 0.5
+
+    def init_fun(inputs):
+
+        outputs, params = get_kde_params(
+            X=inputs,
+            support_extension=support_extension,
+            precision=precision,
+            bw=bw,
+            return_params=True,
+        )
+
+        return outputs, params
+
+    def forward_transform(params, inputs):
+
+        return kde_forward_transform(params, inputs)
+
+    def gradient_transform(params, inputs):
+
+        outputs = kde_forward_transform(params, inputs)
+
+        absdet = kde_gradient_transform(params, inputs)
+
+        logabsdet = np.log(absdet)
+
+        return outputs, logabsdet
+
+    def inverse_transform(params, inputs):
+        return kde_inverse_transform(params, inputs)
+
+    return init_fun, forward_transform, gradient_transform, inverse_transform
 
 
 def get_kde_params(
@@ -17,30 +62,36 @@ def get_kde_params(
     bw: int = 0.1,
     support_extension: Union[int, float] = 10,
     precision: int = 1_000,
+    return_params: bool = True,
 ):
     # generate support points
     lb, ub = get_domain_extension(X, support_extension)
-    grid = np.linspace(lb, ub, precision)
+    support = np.linspace(lb, ub, precision)
 
     # calculate the pdf for gaussian pdf
-    # print(grid.shape, X.shape, bw.shape)
-    x_pdf = broadcast_kde_pdf(grid, X, bw)
-    # print(x_pdf.shape)
-    # print(x_pdf.shape)
+    pdf_support = broadcast_kde_pdf(support, X, bw)
 
-    # calculate the cdf for grid points
+    # calculate the cdf for support points
     factor = normalization_factor(X, bw)
-    # print("Before CDF:", grid.shape, X.shape, factor)
-    x_cdf = broadcast_kde_cdf(grid, X, factor)
-    # print("CDF:", x_pdf.shape)
-    X_transform = np.interp(X, grid, x_cdf)
-    # print(grid.shape, x_cdf.shape, x_pdf.shape, X.shape)
 
-    # print(X_ldj.shape)
-    return (
-        X_transform,
-        Params(grid, x_cdf, grid, x_pdf),
-    )
+    quantiles = broadcast_kde_cdf(support, X, factor)
+
+    # forward transformation
+    outputs = np.interp(X, support, quantiles)
+
+    if return_params is True:
+
+        # initialize parameters
+        params = UniKDEParams(
+            support=support,
+            quantiles=quantiles,
+            support_pdf=support,
+            empirical_pdf=pdf_support,
+        )
+
+        return outputs, params
+    else:
+        return outputs
 
 
 def kde_transform(
@@ -128,3 +179,15 @@ def scotts_method(n, d=1):
 
 def silvermans_method(n, d=1):
     return np.power(n * (d + 2.0) / 4.0, -1.0 / (d + 4))
+
+
+def kde_forward_transform(params: UniKDEParams, X: Array) -> Array:
+    return np.interp(X, params.support, params.quantiles)
+
+
+def kde_inverse_transform(params: UniKDEParams, X: Array) -> Array:
+    return np.interp(X, params.quantiles, params.support)
+
+
+def kde_gradient_transform(params: UniKDEParams, X: Array) -> Array:
+    return np.interp(X, params.support_pdf, params.empirical_pdf)

@@ -3,13 +3,60 @@ from typing import Union
 
 import jax
 import jax.numpy as np
-
-from rbig_jax.transforms.uniformize import UniParams
+from chex import Array, dataclass
 from rbig_jax.utils import get_domain_extension
+from objax.typing import JaxArray
 
-Params = collections.namedtuple(
-    "Params", ["support", "quantiles", "support_pdf", "empirical_pdf"]
-)
+
+@dataclass
+class UniHistParams:
+    support: Array
+    quantiles: Array
+    support_pdf: Array
+    empirical_pdf: Array
+
+
+def InitUniHistUniformize(
+    n_samples: int,
+    nbins: int,
+    support_extension: Union[int, float] = 10,
+    precision: int = 1_000,
+    alpha: float = 1e-5,
+):
+
+    # TODO a bin initialization function
+
+    def init_fun(inputs):
+
+        outputs, params = get_hist_params(
+            X=inputs,
+            nbins=nbins,
+            support_extension=support_extension,
+            precision=precision,
+            alpha=alpha,
+            return_params=True,
+        )
+
+        return outputs, params
+
+    def forward_transform(params, inputs):
+
+        return hist_forward_transform(params, inputs)
+
+    def gradient_transform(params, inputs):
+
+        outputs = forward_transform(params, inputs)
+
+        absdet = np.interp(inputs, params.support_pdf, params.empirical_pdf)
+
+        logabsdet = np.log(absdet)
+
+        return outputs, logabsdet
+
+    def inverse_transform(params, inputs):
+        return np.interp(inputs, params.quantiles, params.support)
+
+    return init_fun, forward_transform, gradient_transform, inverse_transform
 
 
 def get_hist_params(
@@ -106,119 +153,31 @@ def get_hist_params(
     # Normalize CDF estimation
     uniform_cdf /= np.max(uniform_cdf)
 
+    # forward transformation
+    outputs = np.interp(X, new_support, uniform_cdf)
+
     if return_params is True:
-        return (
-            np.interp(X, new_support, uniform_cdf),
-            UniParams(new_support, uniform_cdf, pdf_support, empirical_pdf),
+
+        # initialize parameters
+        params = UniHistParams(
+            support=new_support,
+            quantiles=uniform_cdf,
+            support_pdf=pdf_support,
+            empirical_pdf=empirical_pdf,
         )
+
+        return outputs, params
     else:
-        return np.interp(X, new_support, uniform_cdf)
+        return outputs
 
 
-def histogram_transform(
-    X: np.ndarray,
-    support_extension: Union[int, float] = 10,
-    nbins: int = 100,
-    precision: int = 1_000,
-    alpha: float = 1e-5,
-):
-    """Get parameters via the histogram transform
-    
-    Parameters
-    ----------
-    X : np.ndarray, (n_samples)
-        input to get histogram transformation
-    
-    support_extension: Union[int, float], default=10
-        extend the support by x on both sides
-    
-    nbins: int, default=100
-        the number of bins for the histogram approximation
-
-    precision: int, default=1_000
-        the number of points to use for the interpolation
-    
-    alpha: float, default=1e-5
-        the regularization for the histogram. ensures that
-        there are no zeros in the empirical pdf.
-    
-    Returns
-    -------
-    X_trans : np.ndarray, (n_samples,)
-        the data transformed via the empirical function
-    log_dX : np.ndarray, (n_samples,)
-        the log pdf of the data
-    Params: namedTuple
-        a named tuple with the elements needed for the
-        forward and inverse transformation
-    
-    Examples
-    --------
-    >>> # single set of parameters
-    >>> X_transform, params = get_params(x_samples, 10, 1000)
-    
-    >>> # example with multiple dimensions
-    >>> multi_dims = jax.vmap(get_params, in_axes=(0, None, None))
-    >>> X_transform, params = multi_dims(X, 10, 1000)
-    """
-    # get number of samples
-    n_samples = np.shape(X)[0]
-
-    # bin_edges = np.linspace(np.min(X), np.max(X), num=100)
-    bin_edges = np.histogram_bin_edges(X, bins=nbins)
-
-    # get histogram counts and bin edges
-    counts, bin_edges = np.histogram(X, bins=bin_edges)
-
-    # return X
-
-    # add regularization
-    counts = np.array(counts) + alpha
-
-    # get bin centers and sizes
-    bin_centers = np.mean(np.vstack((bin_edges[0:-1], bin_edges[1:])), axis=0)
-    bin_size = bin_edges[2] - bin_edges[1]
-
-    # =================================
-    # CDF Estimation
-    # =================================
-    c_sum = np.cumsum(counts)
-    cdf = (1 - 1 / n_samples) * c_sum / n_samples
-
-    incr_bin = bin_size / 2
-
-    # ===============================
-    # Extend CDF Support
-    # ===============================
-    lb, ub = get_domain_extension(X, support_extension)
-
-    # get new bin edges
-    new_bin_edges = np.hstack((lb, np.min(X), bin_centers + incr_bin, ub,))
-
-    extended_cdf = np.hstack((0.0, 1.0 / n_samples, cdf, 1.0))
-
-    new_support = np.linspace(new_bin_edges[0], new_bin_edges[-1], int(precision))
-
-    uniform_cdf = jax.lax.cummax(
-        np.interp(new_support, new_bin_edges, extended_cdf), axis=0
-    )
-
-    # Normalize CDF estimation
-    uniform_cdf /= np.max(uniform_cdf)
-
-    return np.interp(X, new_support, uniform_cdf)
-
-
-def hist_forward_transform(X, params: Params):
+def hist_forward_transform(params: UniHistParams, X: JaxArray):
     return np.interp(X, params.support, params.quantiles)
 
 
-def hist_inverse_transform(X, params: Params) -> np.ndarray:
+def hist_inverse_transform(params: UniHistParams, X: JaxArray) -> np.ndarray:
     return np.interp(X, params.quantiles, params.support)
 
 
-def hist_gradient_transform(X, params: Params) -> np.ndarray:
-    return (
-        hist_forward_transform(X, params),
-        np.interp(X, params.support_pdf, params.empirical_pdf),
-    )
+def hist_gradient_transform(params: UniHistParams, X: JaxArray) -> np.ndarray:
+    return np.interp(X, params.support_pdf, params.empirical_pdf)

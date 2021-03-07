@@ -1,9 +1,13 @@
+import chex
+import jax
 import jax.numpy as np
 import numpy as onp
 import pytest
 from jax import random
 
 from rbig_jax.utils import searchsorted
+
+rng = onp.random.RandomState(123)
 
 
 def test_searchsorted():

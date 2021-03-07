@@ -12,9 +12,10 @@ dependencies:
 - pip
 - pip:
   # Jax framework
-  - "git+https://github.com/google/jax.git"
+  - jax
   - jaxlib
   - "git+git://github.com/deepmind/chex.git"
+  - objax
   # formatting
   - black
   - isort
