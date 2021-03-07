@@ -1,0 +1,22 @@
+program: scripts/toy_data/2d_gaussflow.py
+project: "gf_2d_data"
+entity: "ipl_uv"
+name : "gf_2d_classic"
+description : "Finding the Best parameters for 2D dataset with GF"
+method: grid
+metric: 
+  name: nll_loss
+  goal: minimize
+parameters:
+  batchsize:
+    values: [128, 256, 512]
+  n_layers:
+    values: [4, 5, 6]
+  n_components:
+    values: [5, 10, 20]
+  n_reflections:
+    values: [2, 5, 10]
+  quantile:
+    values: ["logit", "igausscdf"]
+  learning_rate:
+    values: [0.1, 0.01, 0.05]

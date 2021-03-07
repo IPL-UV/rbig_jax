@@ -1,0 +1,18 @@
+program: scripts/toy_data/configs/2d_rbig.py
+project: "rbig_2d_data"
+entity: "ipl_uv"
+name : "rbig_2d_classic_histogram"
+description : "Finding the Best parameters for 2D dataset with GF"
+method: grid
+metric: 
+  name: nll
+  goal: minimize
+parameters:
+  support_extension:
+    values: [5, 10, 20, 50, 100]
+  precision:
+    values: [100, 500, 1_000]
+  zero_tol:
+    values: [5, 10, 30, 50, 100]
+  alpha:
+    values: [1e-5, 1e-2, 1e-0, 0.1, 0.5]
