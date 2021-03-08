@@ -7,7 +7,7 @@ This package implements the Rotation-Based Iterative Gaussianization (RBIG) algo
 
 **Demo Colab Notebooks**
 
-* Iterative Gaussianization - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/parametric/1.0_Demo_GaussFlows.ipynb)
+* Iterative Gaussianization - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/https://github.com/IPL-UV/rbig_jax/blob/master/notebooks/iterative/1.0_simple_rbig.ipynb)
 * Parametric Gaussianization - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/parametric/1.0_Demo_GaussFlows.ipynb)
 
 
