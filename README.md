@@ -5,9 +5,16 @@ This package implements the Rotation-Based Iterative Gaussianization (RBIG) algo
 ---
 ## Density Estimation Demo
 
-**Demo Colab Notebook** - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/3.0_simple_rbig.ipynb)
+**Demo Colab Notebooks**
+
+* Iterative Gaussianization - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/parametric/1.0_Demo_GaussFlows.ipynb)
+* Parametric Gaussianization - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/parametric/1.0_Demo_GaussFlows.ipynb)
 
 
+<details>
+  <summary>Demo</summary>
+  
+  
 
 
 |          Original Data           |        Gaussian Transform        |        Inverse Transform        |
@@ -18,6 +25,7 @@ This package implements the Rotation-Based Iterative Gaussianization (RBIG) algo
 | :-----------------------------: | :---------------------------: |
 | ![](docs/pics/rbig_samples.png) | ![](docs/pics/rbig_lprob.png) |
 
+  </details>
 ---
 ## Information Theory Metrics Demo
 
