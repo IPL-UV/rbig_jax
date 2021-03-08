@@ -26,6 +26,7 @@ This package implements the Rotation-Based Iterative Gaussianization (RBIG) algo
 | ![](docs/pics/rbig_samples.png) | ![](docs/pics/rbig_lprob.png) |
 
   </details>
+  
 ---
 ## Information Theory Metrics Demo
 
