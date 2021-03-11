@@ -29,11 +29,13 @@ class IterativeGaussianization:
         eps: float = 1e-5,
         max_layers: int = 10_000,
         p: float = 0.1,
+        base: int = 2,
     ):
         # create Gaussinization block
         fit_transform_f, forward_f, grad_f, inverse_f = InitRBIGBlock(
             uni_uniformize, rot_transform, eps
         )
+        self.base = base
         self.max_layers = max_layers
         self.zero_tolerance = zero_tolerance
         self.n_features = n_features
@@ -42,7 +44,7 @@ class IterativeGaussianization:
         self.block_inverse_transform = inverse_f
         self.block_gradient_transform = grad_f
         self.info_loss_f = jax.jit(
-            init_information_reduction_loss(n_samples=n_samples, base=2, p=p)
+            init_information_reduction_loss(n_samples=n_samples, base=self.base, p=p)
         )
 
     def fit(self, X):
@@ -164,11 +166,12 @@ class IterativeGaussianization:
         # inverse transformation
         return self.inverse_transform(X_gauss)
 
-    def total_correlation(self, base: int = 2) -> np.ndarray:
-        return np.sum(self.info_loss)  # * np.log(base)
+    def total_correlation(self) -> np.ndarray:
+        return np.sum(self.info_loss) * np.log(self.base)
 
     def entropy(self, X: np.ndarray, base: int = 2) -> np.ndarray:
-        return self.uni_ent_est(X).sum() * np.log(base) - self.total_correlation(base)
+        raise NotImplementedError
+        # return self.uni_ent_est(X).sum() * np.log(base) - self.total_correlation(base)
 
 
 class RBIG(IterativeGaussianization):

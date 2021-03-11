@@ -1,0 +1,20 @@
+program: scripts/toy_data/configs/2d_rbig.py
+project: "rbig_2d_data"
+entity: "ipl_uv"
+name : "rbig_2d_moons_histogram"
+description : "Finding the Best parameters for 2D dataset with GF"
+method: grid
+metric: 
+  name: nll
+  goal: minimize
+parameters:
+  support_extension:
+    values: [10, 20, 30]
+  precision:
+    values: [100, 500, 1_000]
+  zero_tol:
+    values: [30, 50]
+  alpha:
+    values: [1e-5, 1e-2, 1e-0]
+  dataset:
+    values: ["swiss_roll"]
