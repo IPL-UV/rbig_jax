@@ -21,4 +21,4 @@ parameters:
   learning_rate:
     values: [0.1, 0.01, 0.05]
   dataset:
-    values: ["helix"]
+    values: ["swiss_roll"]

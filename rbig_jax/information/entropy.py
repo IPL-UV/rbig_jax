@@ -1,10 +1,8 @@
-from typing import Callable
+from typing import Callable, Optional
 
 import jax
 import jax.numpy as np
 from chex import Array
-
-# from rbig_jax.information.total_corr import rbig_total_correlation
 
 
 def histogram_entropy(data, base=2, nbins: int = 10):
@@ -77,25 +75,20 @@ def get_default_entropy(n_samples: int):
     return entropy_f
 
 
-# def rbig_entropy(
-#     X_samples: Array,
-#     marginal_uni: Callable,
-#     marginal_entropy: Callable,
-#     n_iterations: int = 100,
-#     base: int = 2,
-# ):
+def rbig_multivariate_entropy(
+    X: Array, base: int = 2, nbins: Optional[int] = None, **kwargs
+):
 
-#     # create marginal entropy equation
-#     marginal_entropy_vectorized = jax.vmap(marginal_entropy)
+    n_samples = X.shape[0]
 
-#     # Calculate entropy in data domain
-#     H_x = marginal_entropy_vectorized(X_samples).sum()
+    if nbins is None:
+        nbins = int(np.sqrt(n_samples))
 
-#     # calculate the total correlation
-#     _, tc = rbig_total_correlation(
-#         X_samples,
-#         marginal_uni=marginal_uni,
-#         marginal_entropy=marginal_entropy,
-#         n_iterations=n_iterations,
-#     )
-#     return H_x - (np.sum(tc) * np.log(base))
+    # Calculate entropy in data domain
+    H_x = jax.vmap(histogram_entropy, in_axes=(1, None, None))(X, base, nbins).sum()
+
+    from rbig_jax.information.total_corr import rbig_total_correlation
+
+    # calculate the total correlation
+    tc = rbig_total_correlation(X=X, nbins=nbins, base=base, return_all=False, **kwargs)
+    return H_x - (np.sum(tc) * np.log(base))

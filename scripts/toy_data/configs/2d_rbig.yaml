@@ -1,7 +1,7 @@
 program: scripts/toy_data/configs/2d_rbig.py
 project: "rbig_2d_data"
 entity: "ipl_uv"
-name : "rbig_2d_helix_histogram"
+name : "rbig_2d_moons_histogram"
 description : "Finding the Best parameters for 2D dataset with GF"
 method: grid
 metric: 
@@ -17,4 +17,4 @@ parameters:
   alpha:
     values: [1e-5, 1e-2, 1e-0]
   dataset:
-    values: ["helix"]
+    values: ["swiss_roll"]

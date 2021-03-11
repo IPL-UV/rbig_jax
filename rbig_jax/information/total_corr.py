@@ -4,13 +4,22 @@ from typing import Callable, Optional, Tuple
 
 import jax
 import jax.numpy as np
-
+from chex import Array, dataclass
 from rbig_jax.custom_types import InputData
 
 from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
 from rbig_jax.transforms.linear import svd_transform
+from rbig_jax.transforms.block import InitRBIGBlock
+from rbig_jax.transforms.rotation import InitPCARotation
+from rbig_jax.transforms.histogram import InitUniHistUniformize
 from rbig_jax.information.entropy import histogram_entropy
-from chex import dataclass, Array
+
+
+@dataclass
+class InfoLossState:
+    max_layers: int
+    ilayer: int
+    info_loss: Array
 
 
 def get_tolerance_dimensions(n_samples: int) -> int:
@@ -90,39 +99,123 @@ def information_reduction(
     return np.array(np.where(cond, 0.0, delta_info))
 
 
-# def rbig_total_correlation(
-#     X_samples: InputData,
-#     marginal_uni: Callable,
-#     uni_entropy: Callable,
-#     n_iterations: int = 100,
-#     p: float = 0.25,
-# ):
+def total_correlation(
+    X: Array,
+    uni_uniformize: Optional[Callable] = None,
+    rot_transform: Optional[Callable] = None,
+    eps: float = 1e-5,
+    zero_tolerance: int = 30,
+    max_layers: int = 1_000,
+    p: float = 0.25,
+    base: int = 2,
+    return_all: bool = False,
+):
 
-#     # total correlation reduction
-#     tol_dims = get_tolerance_dimensions(X_samples.shape[0])
+    # create Gaussinization block
+    fit_transform_f, *_ = InitRBIGBlock(uni_uniformize, rot_transform, eps)
+    block_fit_transform = jax.jit(fit_transform_f)
+    # initialize information loss function
+    info_loss_f = jax.jit(
+        init_information_reduction_loss(n_samples=X.shape[0], base=base, p=p)
+    )
 
-#     total_corr_f = jax.partial(
-#         information_reduction, uni_entropy=uni_entropy, tol_dims=tol_dims, p=p,
-#     )
+    window = np.ones(zero_tolerance) / zero_tolerance
 
-#     marginal_uni_f_vectorized = jax.vmap(marginal_uni)
-#     # create function for scan
+    def condition(state):
 
-#     def body(carry, inputs):
+        # rolling average
+        x_cumsum_window = np.convolve(np.abs(state.info_loss), window, "valid")
+        n_zeros = int(np.sum(np.where(x_cumsum_window > 0.0, 0, 1)))
+        return jax.lax.ne(n_zeros, 1) or state.ilayer > state.max_layers
 
-#         # marginal gaussianization
-#         carry_trans = marginal_uni_f_vectorized(carry.T).T
+    # initialize loss states
+    state = InfoLossState(
+        max_layers=max_layers, ilayer=0, info_loss=np.ones(max_layers)
+    )
 
-#         # inverse CDF transformation
-#         carry_trans = invgausscdf_forward_transform(carry_trans)
+    X_g = X
+    while condition(state):
 
-#         # rotation
-#         carry_trans = svd_transform(carry_trans)
+        layer_loss = jax.partial(info_loss_f, X_before=X_g)
 
-#         # information reduction
-#         info_red = total_corr_f(carry, carry_trans)
-#         # print(type(info_red))
+        # compute
+        X_g, layer_params = block_fit_transform(X_g)
 
-#         return carry_trans, info_red
+        # get information reduction
+        layer_loss = layer_loss(X_after=X_g)
 
-#     return jax.lax.scan(f=body, init=X_samples, xs=None, length=n_iterations)
+        # update layer loss
+        info_losses = jax.ops.index_update(state.info_loss, state.ilayer, layer_loss)
+        state = InfoLossState(
+            max_layers=max_layers, ilayer=state.ilayer + 1, info_loss=info_losses,
+        )
+
+    info_loss = info_losses[: state.ilayer]
+    if return_all:
+        return X_g, info_loss
+    else:
+        return np.sum(info_loss) * np.log(base)
+
+
+def total_correlation_max_layers(
+    X: Array,
+    uni_uniformize: Optional[Callable] = None,
+    rot_transform: Optional[Callable] = None,
+    eps: float = 1e-5,
+    max_layers: int = 1_000,
+    p: float = 0.25,
+    return_all: bool = False,
+):
+
+    # create Gaussinization block
+    fit_transform_f, *_ = InitRBIGBlock(uni_uniformize, rot_transform, eps)
+    block_fit_transform = jax.jit(fit_transform_f)
+    # initialize information loss function
+    info_loss_f = jax.jit(
+        init_information_reduction_loss(n_samples=X.shape[0], base=2, p=p)
+    )
+
+    def body(carry, inputs):
+        layer_loss = jax.partial(info_loss_f, X_before=carry)
+
+        # do transformation
+        carry, _ = block_fit_transform(carry)
+
+        layer_loss = layer_loss(X_after=carry)
+        carry = np.array(carry, dtype=np.float32)
+        return carry, layer_loss
+
+    X, info_loss = jax.lax.scan(f=body, init=X, xs=None, length=max_layers)
+
+    if return_all:
+        return X, info_loss
+    else:
+        return np.sum(info_loss)
+
+
+def rbig_total_correlation(
+    X: Array,
+    nbins: Optional[int] = None,
+    precision: int = 100,
+    support_extension: int = 10,
+    alpha: int = 1e-5,
+    **kwargs,
+):
+
+    n_samples = X.shape[0]
+    if nbins is None:
+        nbins = int(np.sqrt(n_samples))
+    uni_uniformize = InitUniHistUniformize(
+        n_samples=n_samples,
+        nbins=nbins,
+        support_extension=support_extension,
+        precision=precision,
+        alpha=alpha,
+    )
+
+    rot_transform = InitPCARotation()
+
+    return total_correlation(
+        X=X, uni_uniformize=uni_uniformize, rot_transform=rot_transform, **kwargs
+    )
+
