@@ -91,4 +91,4 @@ def rbig_multivariate_entropy(
 
     # calculate the total correlation
     tc = rbig_total_correlation(X=X, nbins=nbins, base=base, return_all=False, **kwargs)
-    return H_x - (np.sum(tc) * np.log(base))
+    return H_x - tc
