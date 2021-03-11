@@ -23,3 +23,6 @@ dependencies:
   - pytest
   # logging
   - wandb
+  # plotting
+  - seaborn
+  - celluloid

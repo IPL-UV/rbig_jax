@@ -21,13 +21,22 @@ REQUIRES_PYTHON = ">=3.7.0"
 VERSION = "0.1.0"
 
 # What packages are required for this module to be executed?
-REQUIRED = ["jax", "jaxlib", "numpy", "scikit-learn", "objax", "chex"]
+REQUIRED = [
+    "jax",
+    "jaxlib",
+    "numpy",
+    "scikit-learn",
+    "objax",
+    "chex",
+    "matplotlib",
+    "seaborn",
+]
 
 # What packages are optional?
 EXTRAS = {
     "dev": ["black", "isort", "mypy"],
     "tests": ["pytest", "scikit-learn"],
-    "extras": ["matplotlib", "seaborn", "tqdm", "wandb", "scipy"],
+    "extras": ["tqdm", "wandb", "scipy", "corner", "celluloid",],
 }
 
 # The rest you shouldn't have to touch too much :)
@@ -120,7 +129,6 @@ setup(
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],

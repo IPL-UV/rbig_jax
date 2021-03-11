@@ -182,12 +182,60 @@ def silvermans_method(n, d=1):
 
 
 def kde_forward_transform(params: UniKDEParams, X: Array) -> Array:
+    """Forward univariate uniformize transformation
+    
+    Parameters
+    ----------
+    X : np.ndarray
+        The univariate data to be transformed.
+    
+    params: UniParams
+        the tuple containing the params. 
+        See `rbig_jax.transforms.uniformize` for details.
+    
+    Returns
+    -------
+    X_trans : np.ndarray
+        The transformed univariate parameters
+    """
     return np.interp(X, params.support, params.quantiles)
 
 
 def kde_inverse_transform(params: UniKDEParams, X: Array) -> Array:
+    """Inverse univariate uniformize transformation
+    
+    Parameters
+    ----------
+    X : np.ndarray
+        The uniform univariate data to be transformed.
+    
+    params: UniParams
+        the tuple containing the params. 
+        See `rbig_jax.transforms.histogram` for details.
+    
+    Returns
+    -------
+    X_trans : np.ndarray
+        The transformed univariate parameters
+    """
     return np.interp(X, params.quantiles, params.support)
 
 
 def kde_gradient_transform(params: UniKDEParams, X: Array) -> Array:
+    """Forward univariate uniformize transformation gradient
+    
+    Parameters
+    ----------
+    X : np.ndarray
+        The univariate data to be transformed.
+    
+    params: UniParams
+        the tuple containing the params. 
+        See `rbig_jax.transforms.histogram` for details.
+    
+    Returns
+    -------
+    X_trans : np.ndarray
+        The transformed univariate parameters
+    """
     return np.interp(X, params.support_pdf, params.empirical_pdf)

@@ -70,6 +70,13 @@ def univariate_entropy(pk: np.ndarray, base: int = 2) -> np.ndarray:
     return S
 
 
+def get_default_entropy(n_samples: int):
+    nbins = int(np.sqrt(n_samples))
+    entropy_f = jax.partial(histogram_entropy, nbins=nbins, base=2)
+
+    return entropy_f
+
+
 # def rbig_entropy(
 #     X_samples: Array,
 #     marginal_uni: Callable,
