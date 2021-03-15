@@ -46,7 +46,7 @@ This repo uses the most updated `jax` library on github so this is absolutely es
 1. Clone the repository.
 
 ```bash
-git clone https://github.com/jejjohnson/rbig_jax
+git clone https://github.com/IPL-UV/rbig_jax
 ```
 
 2. Install using conda.
