@@ -190,11 +190,6 @@
    Demo Layers
   </a>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="1.4_stopping_criteria.html">
-   Stopping Criteria
-  </a>
- </li>
 </ul>
 
 </nav> <!-- To handle the deprecated key -->
@@ -364,12 +359,11 @@
     <span class="kn">from</span> <span class="nn">pyprojroot</span> <span class="kn">import</span> <span class="n">here</span>
 
     <span class="c1"># spyder up to find the root</span>
-    <span class="n">root</span> <span class="o">=</span> <span class="n">here</span><span class="p">(</span><span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.here&quot;</span><span class="p">])</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">here</span><span class="p">(</span><span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.here&quot;</span><span class="p">,</span> <span class="s2">&quot;setup.py&quot;</span><span class="p">])</span>
 
     <span class="c1"># append to path</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">here</span><span class="p">()))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
 <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
-    <span class="o">%%capture</span>
     <span class="kn">import</span> <span class="nn">os</span>
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install objax chex&quot;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install git+https://github.com/IPL-UV/rbig_jax.git#egg=rbig_jax&quot;</span><span class="p">)</span>
@@ -501,7 +495,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fcd9cae36d0&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f5766853a30&gt;]
 </pre></div>
 </div>
 <img alt="../../../_images/1.1_univariate_gaussinization_11_1.png" src="../../../_images/1.1_univariate_gaussinization_11_1.png" />
@@ -540,7 +534,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7fcd9ca9d550&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f5766981130&gt;
 </pre></div>
 </div>
 <img alt="../../../_images/1.1_univariate_gaussinization_16_1.png" src="../../../_images/1.1_univariate_gaussinization_16_1.png" />
@@ -554,7 +548,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7fcd9c979940&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f576689c9a0&gt;
 </pre></div>
 </div>
 <img alt="../../../_images/1.1_univariate_gaussinization_17_1.png" src="../../../_images/1.1_univariate_gaussinization_17_1.png" />
@@ -575,7 +569,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7fcd9cac17c0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f56dc28ba00&gt;
 </pre></div>
 </div>
 <img alt="../../../_images/1.1_univariate_gaussinization_19_1.png" src="../../../_images/1.1_univariate_gaussinization_19_1.png" />

@@ -192,11 +192,6 @@
    Demo Layers
   </a>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="1.4_stopping_criteria.html">
-   Stopping Criteria
-  </a>
- </li>
 </ul>
 
 </nav> <!-- To handle the deprecated key -->
@@ -406,9 +401,8 @@
     <span class="n">root</span> <span class="o">=</span> <span class="n">here</span><span class="p">(</span><span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.here&quot;</span><span class="p">])</span>
 
     <span class="c1"># append to path</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">here</span><span class="p">()))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
 <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
-    <span class="o">%%capture</span>
     <span class="kn">import</span> <span class="nn">os</span>
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install objax chex&quot;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install git+https://github.com/IPL-UV/rbig_jax.git#egg=rbig_jax&quot;</span><span class="p">)</span>
@@ -577,7 +571,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.JointGrid at 0x7f1c41ab8be0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.JointGrid at 0x7f4404415a00&gt;
 </pre></div>
 </div>
 <img alt="../../../_images/1.3_iterative_gaussianization_12_1.png" src="../../../_images/1.3_iterative_gaussianization_12_1.png" />
@@ -619,7 +613,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.JointGrid at 0x7f1c418abd90&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.JointGrid at 0x7f436ce3e730&gt;
 </pre></div>
 </div>
 <img alt="../../../_images/1.3_iterative_gaussianization_16_1.png" src="../../../_images/1.3_iterative_gaussianization_16_1.png" />
@@ -740,8 +734,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>186 ms ± 3.12 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-523 µs ± 3.1 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>204 ms ± 1.99 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+527 µs ± 3.18 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 </pre></div>
 </div>
 </div>
@@ -925,8 +919,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2.41 s, sys: 0 ns, total: 2.41 s
-Wall time: 2.37 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2.48 s, sys: 0 ns, total: 2.48 s
+Wall time: 2.46 s
 </pre></div>
 </div>
 </div>
@@ -965,8 +959,8 @@ Wall time: 2.37 s
   warnings.warn(msg.format(dtype, fun_name , truncated_dtype))
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 535 ms, sys: 57.3 ms, total: 593 ms
-Wall time: 396 ms
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 530 ms, sys: 70.1 ms, total: 600 ms
+Wall time: 393 ms
 </pre></div>
 </div>
 </div>
@@ -987,8 +981,8 @@ Wall time: 396 ms
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 407 ms, sys: 6.59 ms, total: 413 ms
-Wall time: 391 ms
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 440 ms, sys: 1.7 ms, total: 442 ms
+Wall time: 422 ms
 </pre></div>
 </div>
 </div>
@@ -1036,8 +1030,8 @@ Wall time: 391 ms
   warnings.warn(msg.format(dtype, fun_name , truncated_dtype))
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 936 ms, sys: 105 ms, total: 1.04 s
-Wall time: 740 ms
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 902 ms, sys: 103 ms, total: 1.01 s
+Wall time: 716 ms
 </pre></div>
 </div>
 </div>
@@ -1049,7 +1043,7 @@ Wall time: 740 ms
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.JointGrid at 0x7f0e14353a90&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.JointGrid at 0x7f436cdd9d90&gt;
 </pre></div>
 </div>
 <img alt="../../../_images/1.3_iterative_gaussianization_57_1.png" src="../../../_images/1.3_iterative_gaussianization_57_1.png" />
