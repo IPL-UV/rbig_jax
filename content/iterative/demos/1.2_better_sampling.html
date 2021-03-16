@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>1.3.1 IterativeGaussianization &#8212; Gaussianization</title>
+    <title>Better Sampling &#8212; Gaussianization</title>
     
   <link rel="stylesheet" href="../../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -57,7 +57,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Details" href="../details/overview.html" />
-    <link rel="prev" title="Demo - RBIG" href="1.0_simple_rbig.html" />
+    <link rel="prev" title="Simple Demo" href="1.0_simple_rbig.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -105,12 +105,12 @@
   <ul class="current collapse-ul">
    <li class="toctree-l2">
     <a class="reference internal" href="1.0_simple_rbig.html">
-     Demo - RBIG
+     Simple Demo
     </a>
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     1.3.1 IterativeGaussianization
+     Better Sampling
     </a>
    </li>
   </ul>
@@ -124,17 +124,17 @@
   <ul class="collapse-ul">
    <li class="toctree-l2">
     <a class="reference internal" href="../details/1.3_iterative_gaussianization.html">
-     1.3.1 IterativeGaussianization
+     Iterative Gaussianization
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../details/1.3.1_demo_layers.html">
-     1.3.1 IterativeGaussianization
+     Demo Layers
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../details/1.4_stopping_criteria.html">
-     1.4 - Stopping Criteria
+     Stopping Criteria
     </a>
    </li>
   </ul>
@@ -148,37 +148,17 @@
   <ul class="collapse-ul">
    <li class="toctree-l2">
     <a class="reference internal" href="../info_theory/2.1_total_corr.html">
-     Total Correation with Iterative Gaussianization
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../info_theory/2.1_total_corr.html#simple-dataset">
-     Simple Dataset
+     Total Correlation
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../info_theory/2.2_entropy.html">
-     Data
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../info_theory/2.2_entropy.html#initialization">
-     Initialization
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../info_theory/2.2_entropy.html#high-dimensional-entropy-example">
-     High-Dimensional Entropy Example
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../info_theory/2.2_entropy.html#rbig-approximate-solution">
-     RBIG Approximate Solution
+     Entropy
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../info_theory/2.3_mutual_info.html">
-     RBIG 4 IT - Mutual Information
+     Mutual Information
     </a>
    </li>
   </ul>
@@ -199,12 +179,12 @@
   <ul class="collapse-ul">
    <li class="toctree-l2">
     <a class="reference internal" href="../../parametric/demos/1.0_Demo_GaussFlows.html">
-     Gaussianization Flows
+     Demo
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../../parametric/demos/1.1_Demo_Layers.html">
-     Gaussianization Flows - Details
+     Demo (More Details)
     </a>
    </li>
   </ul>
@@ -334,7 +314,7 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#better-sampling">
+  <a class="reference internal nav-link" href="#id1">
    Better Sampling
   </a>
  </li>
@@ -364,12 +344,12 @@
       </a>
      </li>
      <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#id1">
+      <a class="reference internal nav-link" href="#id2">
        Sampling
       </a>
      </li>
      <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#id2">
+      <a class="reference internal nav-link" href="#id3">
        Better Sampling
       </a>
      </li>
@@ -389,8 +369,8 @@
         
               <div>
                 
-  <div class="section" id="iterativegaussianization">
-<h1>1.3.1 IterativeGaussianization<a class="headerlink" href="#iterativegaussianization" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="better-sampling">
+<h1>Better Sampling<a class="headerlink" href="#better-sampling" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#@title Install Packages</span>
@@ -670,8 +650,8 @@ Wall time: 2.32 s
 </div>
 </div>
 </div>
-<div class="section" id="better-sampling">
-<h2>Better Sampling<a class="headerlink" href="#better-sampling" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h2>Better Sampling<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Recall that the RBIG Block works as follows:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -983,8 +963,8 @@ Wall time: 10.9 s
 </div>
 </div>
 </div>
-<div class="section" id="id1">
-<h4>Sampling<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id2">
+<h4>Sampling<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
@@ -1099,8 +1079,8 @@ Wall time: 18 s
 </div>
 </div>
 </div>
-<div class="section" id="id2">
-<h4>Better Sampling<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id3">
+<h4>Better Sampling<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
@@ -1257,7 +1237,7 @@ Wall time: 30.7 s
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="1.0_simple_rbig.html" title="previous page">Demo - RBIG</a>
+    <a class='left-prev' id="prev-link" href="1.0_simple_rbig.html" title="previous page">Simple Demo</a>
     <a class='right-next' id="next-link" href="../details/overview.html" title="next page">Details</a>
 
         </div>
