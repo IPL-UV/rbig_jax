@@ -1,0 +1,25 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+- file: intro
+
+- part: Iterative Gaussianization
+  chapters: 
+  - file: content/iterative/overview.md
+    sections:
+    - file: content/iterative/demos/1.0_simple_rbig.md
+  - file: content/iterative/details/overview.md
+    sections:
+    - file: content/iterative/details/1.1_univariate_gaussianization.ipynb
+  - file: content/iterative/info_theory/overview.md
+    sections:
+    - file: content/iterative/info_theory/2.1_total_corr.ipynb
+    - file: content/iterative/info_theory/2.2_entropy.ipynb
+    - file: content/iterative/info_theory/2.3_mutual_info.ipynb
+  
+- part: Parametric Gaussianization
+  chapters: 
+  - file: content/parametric/overview.md
+    sections:
+    - file: content/parametric/demos/1.0_Demo_GaussFlows.md
+    - file: content/parametric/demos/1.1_Demo_layers.md
+
