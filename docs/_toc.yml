@@ -8,17 +8,12 @@
     sections:
     - file: content/iterative/demos/1.0_simple_rbig.md
     - file: content/iterative/demos/1.2_better_sampling.md
-    - file: content/iterative/details/1.1_univariate_gaussianization.md
-    - file: content/iterative/details/1.2_marginal_gaussinization.md
-    - file: content/iterative/details/1.3_iterative_gaussianization.md
-    - file: content/iterative/details/1.3.1_demo_layers.md
-    - file: content/iterative/details/1.4_stopping_criteria.md
   - file: content/iterative/info_theory/overview.md
     sections:
     - file: content/iterative/info_theory/2.1_total_corr.md
     - file: content/iterative/info_theory/2.2_entropy.md
     - file: content/iterative/info_theory/2.3_mutual_info.md
-  
+
 - part: Parametric Gaussianization
   chapters: 
   - file: content/parametric/overview.md
@@ -26,3 +21,11 @@
     - file: content/parametric/demos/1.0_Demo_GaussFlows.md
     - file: content/parametric/demos/1.1_Demo_Layers.md
 
+- part: RBIG From Scratch
+  chapters: 
+  - file: content/iterative/details/overview.md
+  - file: content/iterative/details/1.1_univariate_gaussianization.md
+  - file: content/iterative/details/1.2_marginal_gaussinization.md
+  - file: content/iterative/details/1.3_iterative_gaussianization.md
+  - file: content/iterative/details/1.3.1_demo_layers.md
+  - file: content/iterative/details/1.4_stopping_criteria.md
