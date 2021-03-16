@@ -1,0 +1,54 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/nbclient/client.py", line 1112, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/nbclient/util.py", line 74, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/nbclient/util.py", line 53, in just_run
+    return loop.run_until_complete(coro)
+  File "/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/nbclient/client.py", line 553, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/nbclient/client.py", line 857, in async_execute_cell
+    self._check_raise_for_error(cell, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/nbclient/client.py", line 760, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+#@title Install Packages
+# %%capture
+try:
+    import sys, os
+    from pyprojroot import here
+
+    # spyder up to find the root
+    root = here(project_files=[".here"])
+
+    # append to path
+    sys.path.append(str(here()))
+except ModuleNotFoundError:
+    import os
+    os.system("pip install git+https://github.com/IPL-UV/rbig_jax.git#egg=rbig_jax")
+    
+finally:
+    # import library functions
+    from rbig_jax.data import get_classic
+    from rbig_jax.plots import plot_joint, plot_joint_prob, plot_info_loss
+    from rbig_jax.models.itergauss import IterativeGaussianization
+    from rbig_jax.information.total_corr import rbig_total_correlation
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+[0;32m<ipython-input-1-2aeb98f9a273>[0m in [0;36m<module>[0;34m[0m
+[1;32m     16[0m [0;32mfinally[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     17[0m     [0;31m# import library functions[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 18[0;31m     [0;32mfrom[0m [0mrbig_jax[0m[0;34m.[0m[0mdata[0m [0;32mimport[0m [0mget_classic[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     19[0m     [0;32mfrom[0m [0mrbig_jax[0m[0;34m.[0m[0mplots[0m [0;32mimport[0m [0mplot_joint[0m[0;34m,[0m [0mplot_joint_prob[0m[0;34m,[0m [0mplot_info_loss[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     20[0m     [0;32mfrom[0m [0mrbig_jax[0m[0;34m.[0m[0mmodels[0m[0;34m.[0m[0mitergauss[0m [0;32mimport[0m [0mIterativeGaussianization[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mModuleNotFoundError[0m: No module named 'rbig_jax'
+ModuleNotFoundError: No module named 'rbig_jax'
+
