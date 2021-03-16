@@ -1,0 +1,1180 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1.4 - Stopping Criteria &#8212; Gaussianization</title>
+    
+  <link rel="stylesheet" href="../../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Information Theory Measures" href="../info_theory/overview.html" />
+    <link rel="prev" title="1.3.1 IterativeGaussianization" href="1.3.1_demo_layers.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../../../index.html">
+  
+  
+  <h1 class="site-logo" id="site-title">Gaussianization</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../intro.html">
+   RBIG using Jax
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Iterative Gaussianization
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="../overview.html">
+   Iterative Gaussianization
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../demos/1.0_simple_rbig.html">
+     Demo - RBIG
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../demos/1.2_better_sampling.html">
+     1.3.1 IterativeGaussianization
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 current active collapsible-parent">
+  <a class="reference internal" href="overview.html">
+   Details
+  </a>
+  <ul class="current collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="1.3_iterative_gaussianization.html">
+     1.3.1 IterativeGaussianization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="1.3.1_demo_layers.html">
+     1.3.1 IterativeGaussianization
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     1.4 - Stopping Criteria
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="../info_theory/overview.html">
+   Information Theory Measures
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../info_theory/2.1_total_corr.html">
+     Total Correation with Iterative Gaussianization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../info_theory/2.1_total_corr.html#simple-dataset">
+     Simple Dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../info_theory/2.2_entropy.html">
+     Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../info_theory/2.2_entropy.html#initialization">
+     Initialization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../info_theory/2.2_entropy.html#high-dimensional-entropy-example">
+     High-Dimensional Entropy Example
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../info_theory/2.2_entropy.html#rbig-approximate-solution">
+     RBIG Approximate Solution
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../info_theory/2.3_mutual_info.html">
+     RBIG 4 IT - Mutual Information
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Parametric Gaussianization
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="../../parametric/overview.html">
+   Parametric Gaussianization
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../parametric/demos/1.0_Demo_GaussFlows.html">
+     Gaussianization Flows
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../parametric/demos/1.1_Demo_Layers.html">
+     Gaussianization Flows - Details
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../../_sources/content/iterative/details/1.4_stopping_criteria.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/content/iterative/details/1.4_stopping_criteria.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data">
+   Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#initialization">
+   Initialization
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#gaussianization">
+   Gaussianization
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#fixed-number-of-layers">
+     Fixed Number of Layers
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#negative-log-likelihood">
+   Negative Log-Likelihood
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#loss-function">
+     Loss Function
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#training">
+     Training
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#plot-losses">
+     Plot Losses
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#negative-log-likelihood-change-per-layer">
+     Negative Log-Likelihood (Change per layer)
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#information-loss">
+   Information Loss
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id1">
+     Loss Function
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id2">
+     Training
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#total-correlation">
+     Total Correlation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#optimal-gaussianization">
+   Optimal Gaussianization
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="stopping-criteria">
+<h1>1.4 - Stopping Criteria<a class="headerlink" href="#stopping-criteria" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#@title Install Packages</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">pyprojroot</span> <span class="kn">import</span> <span class="n">here</span>
+
+    <span class="c1"># spyder up to find the root</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">here</span><span class="p">(</span><span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.here&quot;</span><span class="p">])</span>
+
+    <span class="c1"># append to path</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">here</span><span class="p">()))</span>
+    
+    <span class="c1"># library parameters</span>
+    <span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">get_classic</span>
+    <span class="kn">from</span> <span class="nn">rbig_jax.plots</span> <span class="kn">import</span> <span class="n">plot_info_loss</span><span class="p">,</span> <span class="n">plot_joint</span><span class="p">,</span> <span class="n">plot_joint_prob</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="o">%%capture</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install objax chex&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install git+https://github.com/IPL-UV/rbig_jax.git#egg=rbig_jax&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># jax packages</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">import</span> <span class="nn">chex</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="c1"># logging</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">import</span> <span class="nn">wandb</span>
+
+<span class="c1"># plot methods</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">reset_defaults</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="data">
+<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># %%wandb</span>
+<span class="c1"># get data</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">2_000</span>
+<span class="n">n_features</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">get_classic</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+
+<span class="c1"># plot data</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Data Domain&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 432x288 with 0 Axes&gt;
+</pre></div>
+</div>
+<img alt="../../../_images/1.4_stopping_criteria_4_1.png" src="../../../_images/1.4_stopping_criteria_4_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="initialization">
+<h2>Initialization<a class="headerlink" href="#initialization" title="Permalink to this headline">¶</a></h2>
+<p>First we need to initialize our RBIG method with some parameters. For example, which marginal gaussianization method, what precision do we want, and what rotation method do we want.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">method</span></code> - the method used to marginally transform the data. We have histogram or kde currently implemented</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">support_extension</span></code> - this is the amount we want to extend the support for our marginal distributions. Higher values indicate higher</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">precision</span></code> - we use interpolation because it is much faster. So the CDF, PDF and PPF are interpolation schemes. This value will allow one to have more “precision” for the estimated quantities but it will be slower.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/emmanuel/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/lib/xla_bridge.py:130: UserWarning: No GPU/TPU found, falling back to CPU.
+  warnings.warn(&#39;No GPU/TPU found, falling back to CPU.&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="gaussianization">
+<h2>Gaussianization<a class="headerlink" href="#gaussianization" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.transforms.block</span> <span class="kn">import</span> <span class="n">get_default_rbig_block</span>
+
+<span class="c1"># initialize with default block parameters</span>
+<span class="n">fit_transform_func</span><span class="p">,</span> <span class="n">forward_f</span><span class="p">,</span> <span class="n">grad_f</span><span class="p">,</span> <span class="n">inverse_f</span> <span class="o">=</span> <span class="n">get_default_rbig_block</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">)</span>
+
+<span class="c1"># optional, compiles the function to make it faster</span>
+<span class="n">fit_transform_func_jitted</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">fit_transform_func</span><span class="p">)</span>
+<span class="n">forward_f_jitted</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">forward_f</span><span class="p">)</span>
+<span class="n">grad_f_jitted</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">grad_f</span><span class="p">)</span>
+<span class="n">inverse_f_jitted</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">inverse_f</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="fixed-number-of-layers">
+<h3>Fixed Number of Layers<a class="headerlink" href="#fixed-number-of-layers" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">chex</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">MaxLoss</span><span class="p">:</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">max_layers</span><span class="p">:</span> <span class="nb">int</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">max_condition</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    <span class="n">loss_state</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">state</span>
+    <span class="k">return</span> <span class="n">loss_state</span><span class="o">.</span><span class="n">layer</span> <span class="o">&lt;=</span> <span class="n">loss_state</span><span class="o">.</span><span class="n">max_layers</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="n">n_layers</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">ilayer</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">X_g</span> <span class="o">=</span> <span class="n">X</span>
+
+<span class="n">state</span> <span class="o">=</span> <span class="n">MaxLoss</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_layers</span><span class="o">=</span><span class="n">n_layers</span><span class="p">),</span> <span class="n">X_g</span><span class="p">,</span> <span class="n">params</span>
+
+<span class="n">max_condition</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="k">while</span> <span class="n">max_condition</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    
+    <span class="n">loss_state</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">state</span>
+    
+    <span class="c1"># compute </span>
+    <span class="n">X_g</span><span class="p">,</span> <span class="n">layer_params</span> <span class="o">=</span> <span class="n">fit_transform_func_jitted</span><span class="p">(</span><span class="n">X_g</span><span class="p">)</span>
+    
+    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer_params</span><span class="p">)</span>  
+    
+    <span class="n">state</span> <span class="o">=</span> <span class="n">MaxLoss</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">loss_state</span><span class="o">.</span><span class="n">layer</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_layers</span><span class="o">=</span><span class="n">loss_state</span><span class="o">.</span><span class="n">max_layers</span><span class="p">),</span> <span class="n">X_g</span><span class="p">,</span> <span class="n">params</span>
+    
+      
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 29.8 ms, sys: 8.06 ms, total: 37.9 ms
+Wall time: 11.1 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">max_layer_condition</span><span class="p">(</span><span class="n">ilayer</span><span class="p">,</span> <span class="n">true_fun</span><span class="p">,</span> <span class="n">false_fun</span><span class="p">,</span> <span class="n">operand</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">pred</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">true_fun</span><span class="p">(</span><span class="n">operand</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">false_fun</span><span class="p">(</span><span class="n">operand</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">info_change_condition</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">true_fun</span><span class="p">,</span> <span class="n">false_fun</span><span class="p">,</span> <span class="n">operand</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">pred</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">true_fun</span><span class="p">(</span><span class="n">operand</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">false_fun</span><span class="p">(</span><span class="n">operand</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">init_state</span> <span class="o">=</span> <span class="n">MaxLoss</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_layers</span><span class="o">=</span><span class="n">n_layers</span><span class="p">),</span> <span class="n">X_g</span>
+
+<span class="k">def</span> <span class="nf">max_condition</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    <span class="n">loss_state</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">state</span>
+    <span class="n">verdict</span> <span class="o">=</span> <span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">loss_state</span><span class="o">.</span><span class="n">layer</span> <span class="o">&lt;=</span> <span class="n">loss_state</span><span class="o">.</span><span class="n">max_layers</span>
+
+<span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    <span class="n">loss_state</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">state</span>
+
+    <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fit_transform_func_jitted</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">loss_state</span><span class="o">.</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">loss_state</span><span class="o">.</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">10</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer_params</span><span class="p">)</span>  
+    <span class="n">state</span> <span class="o">=</span> <span class="n">MaxLoss</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">loss_state</span><span class="o">.</span><span class="n">layer</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_layers</span><span class="o">=</span><span class="n">loss_state</span><span class="o">.</span><span class="n">max_layers</span><span class="p">),</span> <span class="n">x</span>
+    
+    <span class="k">return</span> <span class="n">state</span>
+    
+<span class="n">final_state</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">while_loop</span><span class="p">(</span><span class="n">max_condition</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">init_state</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">final_state</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>---------------------------------------------------------------------------
+ConcretizationTypeError                   Traceback (most recent call last)
+&lt;ipython-input-69-551858eab1c5&gt; in &lt;module&gt;
+     21     return state
+     22 
+---&gt; 23 final_state = jax.lax.while_loop(max_condition, body, init_state)
+     24 
+     25 print(final_state[1][:10].shape)
+
+~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/lax/lax_control_flow.py in while_loop(cond_fun, body_fun, init_val)
+    269   init_avals = tuple(_map(_abstractify, init_vals))
+    270   cond_jaxpr, cond_consts, cond_tree = _initial_style_jaxpr(cond_fun, in_tree, init_avals)
+--&gt; 271   body_jaxpr, body_consts, body_tree = _initial_style_jaxpr(body_fun, in_tree, init_avals)
+    272   if not treedef_is_leaf(cond_tree) or len(cond_jaxpr.out_avals) != 1:
+    273     msg = &quot;cond_fun must return a boolean scalar, but got pytree {}.&quot;
+
+~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/lax/lax_control_flow.py in _initial_style_jaxpr(fun, in_tree, in_avals)
+     70 @cache()
+     71 def _initial_style_jaxpr(fun: Callable, in_tree, in_avals):
+---&gt; 72   jaxpr, out_avals, consts, out_tree = _initial_style_open_jaxpr(fun, in_tree, in_avals)
+     73   closed_jaxpr = core.ClosedJaxpr(pe.convert_constvars_jaxpr(jaxpr), ())
+     74   return closed_jaxpr, consts, out_tree
+
+~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/lax/lax_control_flow.py in _initial_style_open_jaxpr(fun, in_tree, in_avals)
+     65 def _initial_style_open_jaxpr(fun: Callable, in_tree, in_avals):
+     66   wrapped_fun, out_tree = flatten_fun_nokwargs(lu.wrap_init(fun), in_tree)
+---&gt; 67   jaxpr, out_avals, consts = pe.trace_to_jaxpr_dynamic(wrapped_fun, in_avals)
+     68   return jaxpr, out_avals, consts, out_tree()
+     69 
+
+~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/interpreters/partial_eval.py in trace_to_jaxpr_dynamic(fun, in_avals)
+   1007     main.source_info = fun_sourceinfo(fun.f)  # type: ignore
+   1008     main.jaxpr_stack = ()  # type: ignore
+-&gt; 1009     jaxpr, out_avals, consts = trace_to_subjaxpr_dynamic(fun, main, in_avals)
+   1010     del main
+   1011   return jaxpr, out_avals, consts
+
+~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/interpreters/partial_eval.py in trace_to_subjaxpr_dynamic(fun, main, in_avals)
+   1017     trace = DynamicJaxprTrace(main, core.cur_sublevel())
+   1018     in_tracers = map(trace.new_arg, in_avals)
+-&gt; 1019     ans = fun.call_wrapped(*in_tracers)
+   1020     out_tracers = map(trace.full_raise, ans)
+   1021   jaxpr, out_avals, consts = frame.to_jaxpr(in_tracers, out_tracers)
+
+~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/linear_util.py in call_wrapped(self, *args, **kwargs)
+    149 
+    150     try:
+--&gt; 151       ans = self.f(*args, **dict(self.params, **kwargs))
+    152     except:
+    153       # Some transformations yield from inside context managers, so we have to
+
+&lt;ipython-input-69-551858eab1c5&gt; in body(state)
+     10     x, _ = fit_transform_func_jitted(x)
+     11 
+---&gt; 12     if loss_state.layer == 1:
+     13         i = 1
+     14     else:
+
+~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/core.py in __bool__(self)
+    505   def __getitem__(self, idx): return self.aval._getitem(self, idx)
+    506   def __nonzero__(self): return self.aval._nonzero(self)
+--&gt; 507   def __bool__(self): return self.aval._bool(self)
+    508   def __int__(self): return self.aval._int(self)
+    509   def __long__(self): return self.aval._long(self)
+
+~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/core.py in error(self, arg)
+    863                       f&quot;or `jnp.array(x, {fun.__name__})` instead.&quot;)
+    864   def error(self, arg):
+--&gt; 865     raise_concretization_error(arg, fname_context)
+    866   return error
+    867 
+
+~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/core.py in raise_concretization_error(val, context)
+    852          &quot;See https://jax.readthedocs.io/en/latest/faq.html#abstract-tracer-value-encountered-where-concrete-value-is-expected-error for more information.\n\n&quot;
+    853           f&quot;Encountered tracer value: {val}&quot;)
+--&gt; 854   raise ConcretizationTypeError(msg)
+    855 
+    856 
+
+ConcretizationTypeError: Abstract tracer value encountered where concrete value is expected.
+
+The problem arose with the `bool` function. 
+
+While tracing the function body at &lt;ipython-input-69-551858eab1c5&gt;:7, this concrete value was not available in Python because it depends on the value of the arguments to body at &lt;ipython-input-69-551858eab1c5&gt;:7 at flattened positions [0], and the computation of these values is being staged out (that is, delayed rather than executed eagerly).
+
+You can use transformation parameters such as `static_argnums` for `jit` to avoid tracing particular arguments of transformed functions, though at the cost of more recompiles.
+
+See https://jax.readthedocs.io/en/latest/faq.html#abstract-tracer-value-encountered-where-concrete-value-is-expected-error for more information.
+
+Encountered tracer value: Traced&lt;ShapedArray(bool[])&gt;with&lt;DynamicJaxprTrace(level=1/0)&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">init_state</span> <span class="o">=</span> <span class="n">MaxLoss</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_layers</span><span class="o">=</span><span class="n">n_layers</span><span class="p">),</span> <span class="n">X_g</span><span class="p">,</span> <span class="n">params</span>
+
+<span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    <span class="n">loss_state</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">state</span>
+
+    <span class="n">x</span><span class="p">,</span> <span class="n">layer_params</span> <span class="o">=</span> <span class="n">fit_transform_func_jitted</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    
+    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer_params</span><span class="p">)</span>  
+    <span class="n">state</span> <span class="o">=</span> <span class="n">MaxLoss</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">loss_state</span><span class="o">.</span><span class="n">layer</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_layers</span><span class="o">=</span><span class="n">loss_state</span><span class="o">.</span><span class="n">max_layers</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span> <span class="n">params</span>
+    
+    <span class="k">return</span> <span class="n">state</span>
+    
+<span class="n">final_state</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">while_loop</span><span class="p">(</span><span class="n">max_condition</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">init_state</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">59</span><span class="o">-</span><span class="mi">7</span><span class="n">c4d70e89b92</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">11</span>     <span class="k">return</span> <span class="n">state</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> 
+<span class="ne">---&gt; </span><span class="mi">13</span> <span class="n">final_state</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">while_loop</span><span class="p">(</span><span class="n">max_condition</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">init_state</span><span class="p">)</span>
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/lax/lax_control_flow.py</span> in <span class="ni">while_loop</span><span class="nt">(cond_fun, body_fun, init_val)</span>
+<span class="g g-Whitespace">    </span><span class="mi">279</span>   <span class="n">in_tree_children</span> <span class="o">=</span> <span class="n">in_tree</span><span class="o">.</span><span class="n">children</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">280</span>   <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_tree_children</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="ne">--&gt; </span><span class="mi">281</span>   <span class="n">_check_tree_and_avals</span><span class="p">(</span><span class="s2">&quot;body_fun output and input&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">282</span>                         <span class="n">body_tree</span><span class="p">,</span> <span class="n">body_jaxpr</span><span class="o">.</span><span class="n">out_avals</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">283</span>                         <span class="n">in_tree_children</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">init_avals</span><span class="p">)</span>
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/lax/lax_control_flow.py</span> in <span class="ni">_check_tree_and_avals</span><span class="nt">(what, tree1, avals1, tree2, avals2)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1871</span>   <span class="k">if</span> <span class="n">tree1</span> <span class="o">!=</span> <span class="n">tree2</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1872</span>     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> must have same type structure, got </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1873</span>     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">what</span><span class="p">,</span> <span class="n">tree1</span><span class="p">,</span> <span class="n">tree2</span><span class="p">))</span>
+<span class="g g-Whitespace">   </span><span class="mi">1874</span>   <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">safe_map</span><span class="p">(</span><span class="n">typematch</span><span class="p">,</span> <span class="n">avals1</span><span class="p">,</span> <span class="n">avals2</span><span class="p">)):</span>
+<span class="g g-Whitespace">   </span><span class="mi">1875</span>     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> must have identical types, &quot;</span>
+
+<span class="ne">TypeError</span>: body_fun output and input must have same type structure, got PyTreeDef(tuple, [PyTreeDef(&lt;class &#39;__main__.MaxLoss&#39;&gt;[PyTreeDef(dict[[&#39;layer&#39;, &#39;max_layers&#39;]], [*,*])], [*,*]),*,PyTreeDef(list, [PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*])])]) and PyTreeDef(tuple, [PyTreeDef(&lt;class &#39;__main__.MaxLoss&#39;&gt;[PyTreeDef(dict[[&#39;layer&#39;, &#39;max_layers&#39;]], [*,*])], [*,*]),*,PyTreeDef(list, [PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*]),PyTreeDef(&lt;class &#39;rbig_jax.transforms.block.RBIGBlockParams&#39;&gt;[PyTreeDef(dict[[&#39;empirical_pdf&#39;, &#39;quantiles&#39;, &#39;rotation&#39;, &#39;support&#39;, &#39;support_pdf&#39;]], [*,*,*,*,*])], [*,*,*,*,*])])]).
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_joint</span><span class="p">(</span><span class="n">X_g</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;kde&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 432x288 with 0 Axes&gt;
+</pre></div>
+</div>
+<img alt="../../../_images/1.4_stopping_criteria_20_1.png" src="../../../_images/1.4_stopping_criteria_20_1.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="negative-log-likelihood">
+<h2>Negative Log-Likelihood<a class="headerlink" href="#negative-log-likelihood" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="loss-function">
+<h3>Loss Function<a class="headerlink" href="#loss-function" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span> <span class="nf">nll_loss</span><span class="p">(</span><span class="n">X_gauss</span><span class="p">,</span> <span class="n">X_ldj</span><span class="p">):</span>
+    <span class="n">latent_prob</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">X_g</span><span class="p">)</span>
+
+    <span class="n">log_prob</span> <span class="o">=</span> <span class="p">(</span><span class="n">latent_prob</span> <span class="o">+</span> <span class="n">X_ldj</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span> <span class="n">log_prob</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="training">
+<h3>Training<a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="n">X_g_</span> <span class="o">=</span> <span class="n">X</span>
+<span class="n">X_ldj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">nll_losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">iparam</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+
+    <span class="n">X_g_</span><span class="p">,</span> <span class="n">iX_ldj</span> <span class="o">=</span> <span class="n">grad_f_jitted</span><span class="p">(</span><span class="n">iparam</span><span class="p">,</span> <span class="n">X_g_</span><span class="p">)</span>
+    <span class="n">X_ldj</span> <span class="o">+=</span> <span class="n">iX_ldj</span>
+    
+    <span class="n">nll_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">X_g_</span><span class="p">,</span> <span class="n">X_ldj</span><span class="p">))</span>
+    
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_g_</span><span class="p">,</span> <span class="n">X_g</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/emmanuel/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/lax/lax.py:6190: UserWarning: Explicitly requested dtype float64 requested in array is not available, and will be truncated to dtype float32. To enable more dtypes, set the jax_enable_x64 configuration option or the JAX_ENABLE_X64 shell environment variable. See https://github.com/google/jax#current-gotchas for more.
+  warnings.warn(msg.format(dtype, fun_name , truncated_dtype))
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 1 s, sys: 57.6 ms, total: 1.06 s
+Wall time: 900 ms
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="plot-losses">
+<h3>Plot Losses<a class="headerlink" href="#plot-losses" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">nll_losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Negative Log-Likelihood&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/1.4_stopping_criteria_27_0.png" src="../../../_images/1.4_stopping_criteria_27_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="negative-log-likelihood-change-per-layer">
+<h3>Negative Log-Likelihood (Change per layer)<a class="headerlink" href="#negative-log-likelihood-change-per-layer" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="n">X_g_</span> <span class="o">=</span> <span class="n">X</span>
+<span class="n">X_ldj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">nll_change_losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">iparam</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+
+    <span class="n">X_g_</span><span class="p">,</span> <span class="n">iX_ldj</span> <span class="o">=</span> <span class="n">grad_f_jitted</span><span class="p">(</span><span class="n">iparam</span><span class="p">,</span> <span class="n">X_g_</span><span class="p">)</span>
+    <span class="n">X_ldj</span> <span class="o">+=</span> <span class="n">iX_ldj</span>
+    
+    <span class="n">nll_change_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">X_g_</span><span class="p">,</span> <span class="n">iX_ldj</span><span class="p">))</span>
+    
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_g_</span><span class="p">,</span> <span class="n">X_g</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 165 ms, sys: 35.1 ms, total: 200 ms
+Wall time: 43.8 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">nll_change_losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Change in Log-Likelihood&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/1.4_stopping_criteria_30_0.png" src="../../../_images/1.4_stopping_criteria_30_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="information-loss">
+<h2>Information Loss<a class="headerlink" href="#information-loss" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Loss Function<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.information.total_corr</span> <span class="kn">import</span> <span class="n">init_information_reduction_loss</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># information reduction loss</span>
+<span class="n">info_loss_f</span> <span class="o">=</span> <span class="n">init_information_reduction_loss</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+
+<span class="n">loss_f_jitted</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">info_loss_f</span><span class="p">)</span>  <span class="c1"># much faster!</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">chex</span>
+
+<span class="nd">@chex</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">InfoLossState</span><span class="p">:</span>
+    <span class="n">max_layers</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">ilayer</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">info_loss</span><span class="p">:</span> <span class="n">chex</span><span class="o">.</span><span class="n">Array</span>
+    
+<span class="k">def</span> <span class="nf">get_minimum_zeroth_element</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">chex</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+
+    <span class="c1"># window for the convolution</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span> <span class="o">/</span> <span class="n">window_size</span>
+
+    <span class="c1"># rolling average</span>
+    <span class="n">x_cumsum_window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">window</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">)</span>
+
+    <span class="c1"># get minimum zeroth element</span>
+    <span class="n">min_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">x_cumsum_window</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">min_idx</span>
+    
+    
+<span class="c1"># window for the convolution</span>
+<span class="n">zero_tolerance</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">zero_tolerance</span><span class="p">)</span> <span class="o">/</span> <span class="n">zero_tolerance</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initialize state</span>
+<span class="n">max_layers</span> <span class="o">=</span> <span class="mi">10_000</span>
+<span class="n">ilayer</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">init_state</span> <span class="o">=</span> <span class="n">InfoLossState</span><span class="p">(</span>
+    <span class="n">max_layers</span><span class="o">=</span><span class="n">max_layers</span><span class="p">,</span>
+    <span class="n">ilayer</span><span class="o">=</span><span class="n">ilayer</span><span class="p">,</span>
+    <span class="n">info_loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">max_layers</span><span class="p">)</span><span class="c1">#np.array([10.]*20 + [0.0] * 5)#np.ones(max_layers)</span>
+<span class="p">)</span>
+
+
+<span class="n">condition</span><span class="p">(</span><span class="n">init_state</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DeviceArray(True, dtype=bool)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>Training<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="n">n_layers</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">info_losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">ilayer</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">X_g</span> <span class="o">=</span> <span class="n">X</span>
+
+<span class="c1"># initialize state</span>
+<span class="n">max_layers</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">ilayer</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">InfoLossState</span><span class="p">(</span>
+    <span class="n">max_layers</span><span class="o">=</span><span class="n">max_layers</span><span class="p">,</span>
+    <span class="n">ilayer</span><span class="o">=</span><span class="n">ilayer</span><span class="p">,</span>
+    <span class="n">info_loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">max_layers</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="k">while</span> <span class="n">condition</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    
+    <span class="n">layer_loss</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">loss_f_jitted</span><span class="p">,</span> <span class="n">X_before</span><span class="o">=</span><span class="n">X_g</span><span class="p">)</span>
+    
+    <span class="c1"># compute </span>
+    <span class="n">X_g</span><span class="p">,</span> <span class="n">layer_params</span> <span class="o">=</span> <span class="n">fit_transform_func_jitted</span><span class="p">(</span><span class="n">X_g</span><span class="p">)</span>
+    
+    <span class="c1"># get information reduction</span>
+    <span class="n">layer_loss</span> <span class="o">=</span> <span class="n">layer_loss</span><span class="p">(</span><span class="n">X_after</span><span class="o">=</span><span class="n">X_g</span><span class="p">)</span>
+    
+    <span class="c1"># update layer loss</span>
+    <span class="n">info_losses</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">index_update</span><span class="p">(</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">info_loss</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">ilayer</span><span class="p">,</span> <span class="n">layer_loss</span>
+            <span class="p">)</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">InfoLossState</span><span class="p">(</span>
+        <span class="n">max_layers</span><span class="o">=</span><span class="n">max_layers</span><span class="p">,</span>
+        <span class="n">ilayer</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">ilayer</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">info_loss</span><span class="o">=</span><span class="n">info_losses</span>
+    <span class="p">)</span>
+  
+    
+<span class="n">info_losses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">info_loss</span><span class="p">[:</span><span class="n">state</span><span class="o">.</span><span class="n">ilayer</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 546 ms, sys: 59.2 ms, total: 605 ms
+Wall time: 395 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">info_losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Information Reduction&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/1.4_stopping_criteria_40_0.png" src="../../../_images/1.4_stopping_criteria_40_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="total-correlation">
+<h3>Total Correlation<a class="headerlink" href="#total-correlation" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">info_losses</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_corr</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Total Correlation&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Layers&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/1.4_stopping_criteria_43_0.png" src="../../../_images/1.4_stopping_criteria_43_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Correlation: </span><span class="si">{</span><span class="n">info_losses</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total Correlation: 1.0715
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="optimal-gaussianization">
+<h2>Optimal Gaussianization<a class="headerlink" href="#optimal-gaussianization" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">info_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">layers</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="n">n_layers</span> <span class="o">=</span> <span class="mi">15</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">info_losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">ilayer</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">X_g</span> <span class="o">=</span> <span class="n">X</span>
+
+<span class="k">while</span> <span class="n">ilayer</span> <span class="o">&lt;</span> <span class="n">n_layers</span><span class="p">:</span>
+    
+    <span class="n">layer_loss</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">loss_f_jitted</span><span class="p">,</span> <span class="n">X_before</span><span class="o">=</span><span class="n">X_g</span><span class="p">)</span>
+    
+    <span class="c1"># compute </span>
+    <span class="n">X_g</span><span class="p">,</span> <span class="n">layer_params</span> <span class="o">=</span> <span class="n">fit_transform_func_jitted</span><span class="p">(</span><span class="n">X_g</span><span class="p">)</span>
+    
+    <span class="n">info_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer_loss</span><span class="p">(</span><span class="n">X_after</span><span class="o">=</span><span class="n">X_g</span><span class="p">))</span>
+        
+    <span class="c1"># increment</span>
+    <span class="n">ilayer</span> <span class="o">+=</span> <span class="mi">1</span>   
+    
+<span class="n">info_losses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">info_losses</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 98.1 ms, sys: 27.2 ms, total: 125 ms
+Wall time: 35.8 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">info_losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Information Reduction&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Layers&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/1.4_stopping_criteria_48_0.png" src="../../../_images/1.4_stopping_criteria_48_0.png" />
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-.conda-jax_py38-py"
+        },
+        kernelOptions: {
+            kernelName: "conda-env-.conda-jax_py38-py",
+            path: "./content/iterative/details"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-.conda-jax_py38-py'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="1.3.1_demo_layers.html" title="previous page">1.3.1 IterativeGaussianization</a>
+    <a class='right-next' id="next-link" href="../info_theory/overview.html" title="next page">Information Theory Measures</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By IPL-UV<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../../../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>
