@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RBIG using Jax &#8212; Gaussianization</title>
+    <title>Iterative and Parametric Gaussianization with Jax &#8212; Gaussianization</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -85,7 +85,7 @@
     <ul class="nav sidenav_l1">
  <li class="toctree-l1 current active">
   <a class="reference internal" href="#">
-   RBIG using Jax
+   Iterative and Parametric Gaussianization with Jax
   </a>
  </li>
 </ul>
@@ -108,26 +108,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="content/iterative/demos/1.2_better_sampling.html">
      Better Sampling
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="content/iterative/details/1.2_marginal_gaussinization.html">
-     Marginal Gaussianization
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="content/iterative/details/1.3_iterative_gaussianization.html">
-     Iterative Gaussianization
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="content/iterative/details/1.3.1_demo_layers.html">
-     Demo Layers
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="content/iterative/details/1.4_stopping_criteria.html">
-     Stopping Criteria
     </a>
    </li>
   </ul>
@@ -183,6 +163,38 @@
   </ul>
   <i class="fas fa-chevron-down">
   </i>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  RBIG From Scratch
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="content/iterative/details/overview.html">
+   Details
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="content/iterative/details/1.2_marginal_gaussinization.html">
+   Marginal Gaussianization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="content/iterative/details/1.3_iterative_gaussianization.html">
+   Iterative Gaussianization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="content/iterative/details/1.3.1_demo_layers.html">
+   Demo Layers
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="content/iterative/details/1.4_stopping_criteria.html">
+   Stopping Criteria
+  </a>
  </li>
 </ul>
 
@@ -298,13 +310,19 @@
         
               <div>
                 
-  <div class="section" id="rbig-using-jax">
-<h1>RBIG using Jax<a class="headerlink" href="#rbig-using-jax" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="iterative-and-parametric-gaussianization-with-jax">
+<h1>Iterative and Parametric Gaussianization with Jax<a class="headerlink" href="#iterative-and-parametric-gaussianization-with-jax" title="Permalink to this headline">¶</a></h1>
 <p>This package implements the Rotation-Based Iterative Gaussianization (RBIG) algorithm using Jax. It is a normalizing flow algorithm that can transform any multi-dimensional distribution into a Gaussian distribution using a sequence of simple marginal Gaussianization transforms (e.g. histogram) and rotations (e.g. PCA). It is invertible which means you can calculate probabilities as well as sample from your distribution. Seen the example below for details.</p>
 <hr class="docutils" />
 <div class="section" id="density-estimation-demo">
 <h2>Density Estimation Demo<a class="headerlink" href="#density-estimation-demo" title="Permalink to this headline">¶</a></h2>
-<p><strong>Demo Colab Notebook</strong> - <a class="reference external" href="https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/3.0_simple_rbig.ipynb"><img alt="Open In Collab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p><strong>Demo Colab Notebooks</strong></p>
+<ul class="simple">
+<li><p>Iterative Gaussianization - <a class="reference external" href="https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/iterative/1.0_simple_rbig.ipynb"><img alt="Open In Collab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p></li>
+<li><p>Parametric Gaussianization - <a class="reference external" href="https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/parametric/1.0_Demo_GaussFlows.ipynb"><img alt="Open In Collab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p></li>
+</ul>
+<details>
+  <summary>Demo</summary>
 <table class="colwidths-auto table">
 <thead>
 <tr class="row-odd"><th class="text-align:center head"><p>Original Data</p></th>
@@ -313,9 +331,9 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td class="text-align:center"><p><img alt="" src="docs/pics/rbig_original.png" /></p></td>
-<td class="text-align:center"><p><img alt="" src="docs/pics/rbig_gaussian.png" /></p></td>
-<td class="text-align:center"><p><img alt="" src="docs/pics/rbig_inverse.png" /></p></td>
+<tr class="row-even"><td class="text-align:center"><p><img alt="" src="_images/rbig_original.png" /></p></td>
+<td class="text-align:center"><p><img alt="" src="_images/rbig_gaussian.png" /></p></td>
+<td class="text-align:center"><p><img alt="" src="_images/rbig_inverse.png" /></p></td>
 </tr>
 </tbody>
 </table>
@@ -326,11 +344,12 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td class="text-align:center"><p><img alt="" src="docs/pics/rbig_samples.png" /></p></td>
-<td class="text-align:center"><p><img alt="" src="docs/pics/rbig_lprob.png" /></p></td>
+<tr class="row-even"><td class="text-align:center"><p><img alt="" src="_images/rbig_samples.png" /></p></td>
+<td class="text-align:center"><p><img alt="" src="_images/rbig_lprob.png" /></p></td>
 </tr>
 </tbody>
 </table>
+  </details>
 </div>
 <hr class="docutils" />
 <div class="section" id="information-theory-metrics-demo">
@@ -349,7 +368,7 @@
 <ol class="simple">
 <li><p>Clone the repository.</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/jejjohnson/rbig_jax
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/IPL-UV/rbig_jax
 </pre></div>
 </div>
 <ol class="simple">
@@ -376,6 +395,8 @@ conda env update --file environment.yml
 <li><p>Original Python Code - <a class="reference external" href="https://github.com/spencerkent/pyRBIG">github</a></p></li>
 <li><p><a class="reference external" href="https://arxiv.org/abs/1602.00229">Paper</a> - Iterative Gaussianization: from ICA to Random Rotations</p></li>
 </ul>
+<div class="toctree-wrapper compound">
+</div>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">

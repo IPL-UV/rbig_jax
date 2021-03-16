@@ -1,23 +1,32 @@
-# RBIG using Jax
+# Iterative and Parametric Gaussianization with Jax
 
 This package implements the Rotation-Based Iterative Gaussianization (RBIG) algorithm using Jax. It is a normalizing flow algorithm that can transform any multi-dimensional distribution into a Gaussian distribution using a sequence of simple marginal Gaussianization transforms (e.g. histogram) and rotations (e.g. PCA). It is invertible which means you can calculate probabilities as well as sample from your distribution. Seen the example below for details.
 
 ---
 ## Density Estimation Demo
 
-**Demo Colab Notebook** - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/3.0_simple_rbig.ipynb)
+**Demo Colab Notebooks**
+
+* Iterative Gaussianization - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/iterative/1.0_simple_rbig.ipynb)
+* Parametric Gaussianization - [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/master/notebooks/parametric/1.0_Demo_GaussFlows.ipynb)
 
 
+<details>
+  <summary>Demo</summary>
+  
+  
 
 
-|          Original Data           |        Gaussian Transform        |        Inverse Transform        |
-| :------------------------------: | :------------------------------: | :-----------------------------: |
-| ![](docs/pics/rbig_original.png) | ![](docs/pics/rbig_gaussian.png) | ![](docs/pics/rbig_inverse.png) |
+|         Original Data         |      Gaussian Transform       |      Inverse Transform       |
+| :---------------------------: | :---------------------------: | :--------------------------: |
+| ![](./pics/rbig_original.png) | ![](./pics/rbig_gaussian.png) | ![](./pics/rbig_inverse.png) |
 
-|          Samples Drawn          |         Probabilities         |
-| :-----------------------------: | :---------------------------: |
-| ![](docs/pics/rbig_samples.png) | ![](docs/pics/rbig_lprob.png) |
+|        Samples Drawn         |       Probabilities        |
+| :--------------------------: | :------------------------: |
+| ![](./pics/rbig_samples.png) | ![](./pics/rbig_lprob.png) |
 
+  </details>
+  
 ---
 ## Information Theory Metrics Demo
 
@@ -37,7 +46,7 @@ This repo uses the most updated `jax` library on github so this is absolutely es
 1. Clone the repository.
 
 ```bash
-git clone https://github.com/jejjohnson/rbig_jax
+git clone https://github.com/IPL-UV/rbig_jax
 ```
 
 2. Install using conda.
