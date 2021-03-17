@@ -6,7 +6,7 @@ import objax
 import pytest
 from jax import random
 
-from rbig_jax.transforms.mixture.gaussian import (
+from rbig_jax.transforms.parametric.mixture.gaussian import (
     mixture_gaussian_cdf,
     mixture_gaussian_invcdf,
     mixture_gaussian_invcdf_vectorized,
@@ -15,12 +15,13 @@ from rbig_jax.transforms.mixture.gaussian import (
     mixture_gaussian_log_pdf_vectorized,
 )
 
-from rbig_jax.transforms.mixture import MixtureGaussianCDF
+from rbig_jax.transforms.parametric.mixture import MixtureGaussianCDF
 
 seed = 123
 rng = onp.random.RandomState(123)
 generator = objax.random.Generator(123)
 
+KEY = jax.random.PRNGKey(seed)
 
 # ====================================================
 # MIXTURE GAUSSIAN CDF
@@ -31,14 +32,17 @@ generator = objax.random.Generator(123)
 @pytest.mark.parametrize("n_components", [1, 3, 10, 100])
 def test_mixture_gaussian_cdf_shape(n_features, n_components):
 
-    x = objax.random.normal((n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
 
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
+    x = jax.random.normal(data_rng, shape=(n_features,))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
 
     # transformation
-    z = mixture_gaussian_cdf(x, prior_logits, mean, scale)
+    z = mixture_gaussian_cdf(x, prior_logits, means, np.exp(log_scales))
 
     # checks
     chex.assert_equal_shape([z, x])
@@ -49,54 +53,17 @@ def test_mixture_gaussian_cdf_shape(n_features, n_components):
 @pytest.mark.parametrize("n_components", [1, 10])
 def test_mixture_gaussian_cdf_vmap_shape(n_samples, n_features, n_components):
 
-    x = objax.random.normal((n_samples, n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
 
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
+    x = jax.random.normal(data_rng, shape=(n_samples, n_features))
 
-    # transformation
-    z = mixture_gaussian_cdf_vectorized(x, prior_logits, mean, scale)
-
-    # checks
-    chex.assert_equal_shape([z, x])
-
-
-# ====================================================
-# INVERSE MIXTURE GAUSSIAN CDF
-# ====================================================
-
-
-@pytest.mark.parametrize("n_features", [1, 3, 10])
-@pytest.mark.parametrize("n_components", [1, 3, 10, 100])
-def test_gaussian_log_invcdf_shape(n_features, n_components):
-
-    z = objax.random.uniform((n_features,), generator=generator)
-
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
 
     # transformation
-    x = mixture_gaussian_invcdf(z, prior_logits, mean, scale)
-
-    # checks
-    chex.assert_equal_shape([z, x])
-
-
-@pytest.mark.parametrize("n_samples", [1, 5, 10])
-@pytest.mark.parametrize("n_features", [1, 5, 10])
-@pytest.mark.parametrize("n_components", [1, 10])
-def test_mixture_gaussian_invcdf_vmap_shape(n_samples, n_features, n_components):
-
-    z = objax.random.uniform((n_samples, n_features,), generator=generator)
-
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
-
-    # transformation
-    x = mixture_gaussian_invcdf_vectorized(z, prior_logits, mean, scale)
+    z = mixture_gaussian_cdf_vectorized(x, prior_logits, means, np.exp(log_scales))
 
     # checks
     chex.assert_equal_shape([z, x])
@@ -111,14 +78,17 @@ def test_mixture_gaussian_invcdf_vmap_shape(n_samples, n_features, n_components)
 @pytest.mark.parametrize("n_components", [1, 3, 10, 100])
 def test_mixture_gaussian_pdf_shape(n_features, n_components):
 
-    x = objax.random.normal((n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
 
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
+    x = jax.random.normal(data_rng, shape=(n_features,))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
 
     # transformation
-    z = mixture_gaussian_log_pdf(x, prior_logits, mean, scale)
+    z = mixture_gaussian_log_pdf(x, prior_logits, means, np.exp(log_scales))
 
     # checks
     chex.assert_equal_shape([z, x])
@@ -129,14 +99,62 @@ def test_mixture_gaussian_pdf_shape(n_features, n_components):
 @pytest.mark.parametrize("n_components", [1, 10])
 def test_mixture_gaussian_pdf_vmap_shape(n_samples, n_features, n_components):
 
-    x = objax.random.normal((n_samples, n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
 
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
+    x = jax.random.normal(data_rng, shape=(n_samples, n_features))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
 
     # transformation
-    z = mixture_gaussian_log_pdf_vectorized(x, prior_logits, mean, scale)
+    z = mixture_gaussian_log_pdf_vectorized(x, prior_logits, means, np.exp(log_scales))
+    # checks
+    chex.assert_equal_shape([z, x])
+
+
+# ====================================================
+# INVERSE MIXTURE GAUSSIAN CDF
+# ====================================================
+
+
+@pytest.mark.parametrize("n_features", [1, 3, 10])
+@pytest.mark.parametrize("n_components", [1, 3, 10, 100])
+def test_gaussian_log_invcdf_shape(n_features, n_components):
+
+    params_rng, data_rng = jax.random.split(KEY, 2)
+
+    z = jax.random.normal(data_rng, shape=(n_features,))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
+
+    # transformation
+    x = mixture_gaussian_invcdf(z, prior_logits, means, np.exp(log_scales))
+
+    # checks
+    chex.assert_equal_shape([z, x])
+
+
+@pytest.mark.parametrize("n_samples", [1, 5, 10])
+@pytest.mark.parametrize("n_features", [1, 5, 10])
+@pytest.mark.parametrize("n_components", [1, 10])
+def test_mixture_gaussian_invcdf_vmap_shape(n_samples, n_features, n_components):
+
+    params_rng, data_rng = jax.random.split(KEY, 2)
+
+    z = jax.random.normal(data_rng, shape=(n_samples, n_features))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
+
+    # transformation
+    x = mixture_gaussian_invcdf_vectorized(z, prior_logits, means, np.exp(log_scales))
 
     # checks
     chex.assert_equal_shape([z, x])
@@ -152,20 +170,25 @@ def test_mixture_gaussian_pdf_vmap_shape(n_samples, n_features, n_components):
 @pytest.mark.parametrize("n_components", [1, 10])
 def test_mixturegausscdf_bijector_shape(n_samples, n_features, n_components):
 
-    x = objax.random.normal((n_samples, n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
+
+    x = jax.random.normal(data_rng, shape=(n_samples, n_features))
 
     # create layer
-    model = MixtureGaussianCDF(n_features, n_components)
+    init_func = MixtureGaussianCDF(n_components=n_components)
+
+    # create layer
+    params, forward_f, inverse_f = init_func(rng=params_rng, n_features=n_features)
 
     # forward transformation
-    z, log_abs_det = model(x)
+    z, log_abs_det = forward_f(params, x)
 
     # checks
     chex.assert_equal_shape([z, x])
     chex.assert_shape(log_abs_det, (n_samples,))
 
     # forward transformation
-    x_approx = model.inverse(z)
+    x_approx, log_abs_det = inverse_f(params, z)
 
     # checks
     chex.assert_equal_shape([x, x_approx])
@@ -176,16 +199,21 @@ def test_mixturegausscdf_bijector_shape(n_samples, n_features, n_components):
 @pytest.mark.parametrize("n_components", [1, 10])
 def test_mixturegausscdf_bijector_approx(n_samples, n_features, n_components):
 
-    x = objax.random.normal((n_samples, n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
+
+    x = jax.random.normal(data_rng, shape=(n_samples, n_features))
 
     # create layer
-    model = MixtureGaussianCDF(n_features, n_components)
+    init_func = MixtureGaussianCDF(n_components=n_components)
+
+    # create layer
+    params, forward_f, inverse_f = init_func(rng=params_rng, n_features=n_features)
 
     # forward transformation
-    z, _ = model(x)
+    z, _ = forward_f(params, x)
 
     # forward transformation
-    x_approx = model.inverse(z)
+    x_approx, _ = inverse_f(params, z)
 
     # checks
     chex.assert_tree_all_close(x, x_approx, rtol=1e-3)

@@ -1,6 +1,11 @@
-from rbig_jax.transforms.mixture.logistic import (
-    logistic_log_cdf,
-    logistic_log_pdf,
+import chex
+import jax
+import jax.numpy as np
+import numpy as onp
+import pytest
+
+from rbig_jax.transforms.parametric.mixture.logistic import (
+    MixtureLogisticCDF,
     mixture_logistic_cdf,
     mixture_logistic_invcdf,
     mixture_logistic_invcdf_vectorized,
@@ -8,59 +13,34 @@ from rbig_jax.transforms.mixture.logistic import (
     mixture_logistic_log_pdf,
     mixture_logistic_log_pdf_vectorized,
 )
-import chex
-import jax
-import jax.numpy as np
-import numpy as onp
-import objax
-import pytest
-from jax import random
 
-from rbig_jax.transforms.mixture import MixtureLogisticCDF
 
 seed = 123
 rng = onp.random.RandomState(123)
-generator = objax.random.Generator(123)
+# generator = objax.random.Generator(123)
 
-# TODO: test naive mixture gaussian shape
-# TODO: test naive mixture gaussian approximation
-# TODO: test naive mixture gaussian vmap shape
-# TODO: test naive mixture gaussian vmap approximation
-
+KEY = jax.random.PRNGKey(seed)
 
 # ====================================================
-# MIXTURE LOGISTIC CDF
+# MIXTURE GAUSSIAN CDF
 # ====================================================
-
-
-@pytest.mark.parametrize("n_features", [1, 3, 10])
-@pytest.mark.parametrize("n_components", [1, 3, 10, 100])
-def test_logistic_log_cdf_shape(n_features, n_components):
-
-    x = objax.random.normal((n_features, 1), generator=generator)
-
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
-
-    # transformation
-    z = logistic_log_cdf(x, mean, scale)
-
-    # checks
-    chex.assert_equal_shape([z, mean, scale])
 
 
 @pytest.mark.parametrize("n_features", [1, 3, 10])
 @pytest.mark.parametrize("n_components", [1, 3, 10, 100])
 def test_mixture_logistic_cdf_shape(n_features, n_components):
 
-    x = objax.random.normal((n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
 
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
+    x = jax.random.normal(data_rng, shape=(n_features,))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
 
     # transformation
-    z = mixture_logistic_cdf(x, prior_logits, mean, scale)
+    z = mixture_logistic_cdf(x, prior_logits, means, np.exp(log_scales))
 
     # checks
     chex.assert_equal_shape([z, x])
@@ -71,92 +51,42 @@ def test_mixture_logistic_cdf_shape(n_features, n_components):
 @pytest.mark.parametrize("n_components", [1, 10])
 def test_mixture_logistic_cdf_vmap_shape(n_samples, n_features, n_components):
 
-    x = objax.random.normal((n_samples, n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
 
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
+    x = jax.random.normal(data_rng, shape=(n_samples, n_features))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
 
     # transformation
-    z = mixture_logistic_cdf_vectorized(x, prior_logits, mean, scale)
+    z = mixture_logistic_cdf_vectorized(x, prior_logits, means, np.exp(log_scales))
 
     # checks
     chex.assert_equal_shape([z, x])
 
 
 # ====================================================
-# INVERSE MIXTURE LOGISTIC CDF
+# MIXTURE GAUSSIAN PDF
 # ====================================================
-
-
-@pytest.mark.parametrize("n_features", [1, 3, 10])
-@pytest.mark.parametrize("n_components", [1, 3, 10, 100])
-def test_logistic_log_invcdf_shape(n_features, n_components):
-
-    z = objax.random.uniform((n_features,), generator=generator)
-
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
-
-    # transformation
-    x = mixture_logistic_invcdf(z, prior_logits, mean, scale)
-
-    # checks
-    chex.assert_equal_shape([z, x])
-
-
-@pytest.mark.parametrize("n_samples", [1, 5, 10])
-@pytest.mark.parametrize("n_features", [1, 5, 10])
-@pytest.mark.parametrize("n_components", [1, 10])
-def test_mixture_logistic_invcdf_vmap_shape(n_samples, n_features, n_components):
-
-    z = objax.random.uniform((n_samples, n_features,), generator=generator)
-
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
-
-    # transformation
-    x = mixture_logistic_invcdf_vectorized(z, prior_logits, mean, scale)
-
-    # checks
-    chex.assert_equal_shape([z, x])
-
-
-# ====================================================
-# MIXTURE LOGISTIC PDF
-# ====================================================
-
-
-@pytest.mark.parametrize("n_features", [1, 3, 10])
-@pytest.mark.parametrize("n_components", [1, 3, 10, 100])
-def test_logistic_log_pdf_shape(n_features, n_components):
-
-    x = objax.random.normal((n_features, 1), generator=generator)
-
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
-
-    # transformation
-    z = logistic_log_pdf(x, mean, scale)
-
-    # checks
-    chex.assert_equal_shape([z, mean, scale])
 
 
 @pytest.mark.parametrize("n_features", [1, 3, 10])
 @pytest.mark.parametrize("n_components", [1, 3, 10, 100])
 def test_mixture_logistic_pdf_shape(n_features, n_components):
 
-    x = objax.random.normal((n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
 
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
+    x = jax.random.normal(data_rng, shape=(n_features,))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
 
     # transformation
-    z = mixture_logistic_log_pdf(x, prior_logits, mean, scale)
+    z = mixture_logistic_log_pdf(x, prior_logits, means, np.exp(log_scales))
 
     # checks
     chex.assert_equal_shape([z, x])
@@ -167,21 +97,69 @@ def test_mixture_logistic_pdf_shape(n_features, n_components):
 @pytest.mark.parametrize("n_components", [1, 10])
 def test_mixture_logistic_pdf_vmap_shape(n_samples, n_features, n_components):
 
-    x = objax.random.normal((n_samples, n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
 
-    prior_logits = objax.random.normal((n_features, n_components))
-    mean = objax.random.normal((n_features, n_components))
-    scale = objax.random.normal((n_features, n_components))
+    x = jax.random.normal(data_rng, shape=(n_samples, n_features))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
 
     # transformation
-    z = mixture_logistic_log_pdf_vectorized(x, prior_logits, mean, scale)
+    z = mixture_logistic_log_pdf_vectorized(x, prior_logits, means, np.exp(log_scales))
+    # checks
+    chex.assert_equal_shape([z, x])
+
+
+# ====================================================
+# INVERSE MIXTURE GAUSSIAN CDF
+# ====================================================
+
+
+@pytest.mark.parametrize("n_features", [1, 3, 10])
+@pytest.mark.parametrize("n_components", [1, 3, 10, 100])
+def test_logistic_log_invcdf_shape(n_features, n_components):
+
+    params_rng, data_rng = jax.random.split(KEY, 2)
+
+    z = jax.random.normal(data_rng, shape=(n_features,))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
+
+    # transformation
+    x = mixture_logistic_invcdf(z, prior_logits, means, np.exp(log_scales))
+
+    # checks
+    chex.assert_equal_shape([z, x])
+
+
+@pytest.mark.parametrize("n_samples", [1, 5, 10])
+@pytest.mark.parametrize("n_features", [1, 5, 10])
+@pytest.mark.parametrize("n_components", [1, 10])
+def test_mixture_logistic_invcdf_vmap_shape(n_samples, n_features, n_components):
+
+    params_rng, data_rng = jax.random.split(KEY, 2)
+
+    z = jax.random.normal(data_rng, shape=(n_samples, n_features))
+
+    # initialize mixture
+    means = jax.random.normal(key=params_rng, shape=(n_features, n_components))
+    log_scales = np.zeros((n_features, n_components))
+    prior_logits = np.zeros((n_features, n_components))
+
+    # transformation
+    x = mixture_logistic_invcdf_vectorized(z, prior_logits, means, np.exp(log_scales))
 
     # checks
     chex.assert_equal_shape([z, x])
 
 
 # ====================================================
-# MIXTURE LOGISTIC CDF BIJECTOR
+# MIXTURE GAUSSIAN CDF BIJECTOR
 # ====================================================
 
 
@@ -190,20 +168,25 @@ def test_mixture_logistic_pdf_vmap_shape(n_samples, n_features, n_components):
 @pytest.mark.parametrize("n_components", [1, 10])
 def test_mixture_logistic_cdf_bijector_shape(n_samples, n_features, n_components):
 
-    x = objax.random.normal((n_samples, n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
+
+    x = jax.random.normal(data_rng, shape=(n_samples, n_features))
 
     # create layer
-    model = MixtureLogisticCDF(n_features, n_components)
+    init_func = MixtureLogisticCDF(n_components=n_components)
+
+    # create layer
+    params, forward_f, inverse_f = init_func(rng=params_rng, n_features=n_features)
 
     # forward transformation
-    z, log_abs_det = model(x)
+    z, log_abs_det = forward_f(params, x)
 
     # checks
     chex.assert_equal_shape([z, x])
     chex.assert_shape(log_abs_det, (n_samples,))
 
     # forward transformation
-    x_approx = model.inverse(z)
+    x_approx, log_abs_det = inverse_f(params, z)
 
     # checks
     chex.assert_equal_shape([x, x_approx])
@@ -212,18 +195,23 @@ def test_mixture_logistic_cdf_bijector_shape(n_samples, n_features, n_components
 @pytest.mark.parametrize("n_samples", [1, 5, 10])
 @pytest.mark.parametrize("n_features", [1, 5, 10])
 @pytest.mark.parametrize("n_components", [1, 10])
-def test_mixture_logisticcdf_bijector_approx(n_samples, n_features, n_components):
+def test_mixture_logistic_cdf_bijector_approx(n_samples, n_features, n_components):
 
-    x = objax.random.normal((n_samples, n_features,), generator=generator)
+    params_rng, data_rng = jax.random.split(KEY, 2)
+
+    x = jax.random.normal(data_rng, shape=(n_samples, n_features))
 
     # create layer
-    model = MixtureLogisticCDF(n_features, n_components)
+    init_func = MixtureLogisticCDF(n_components=n_components)
+
+    # create layer
+    params, forward_f, inverse_f = init_func(rng=params_rng, n_features=n_features)
 
     # forward transformation
-    z, _ = model(x)
+    z, _ = forward_f(params, x)
 
     # forward transformation
-    x_approx = model.inverse(z)
+    x_approx, _ = inverse_f(params, z)
 
     # checks
     chex.assert_tree_all_close(x, x_approx, rtol=1e-3)

@@ -4,7 +4,7 @@ from jax.lax import conv_general_dilated
 import numpy as np
 from objax.typing import JaxArray
 import objax
-from rbig_jax.transforms.linear import (
+from rbig_jax.transforms.parametric.householder import (
     householder_transform,
     householder_inverse_transform,
 )

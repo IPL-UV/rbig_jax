@@ -1,43 +1,43 @@
+from typing import Tuple, Callable, Optional
+
 import jax.numpy as np
-import objax
-from jax.nn import log_softmax, sigmoid, softplus
-from objax import StateVar, TrainRef, TrainVar
-from objax.typing import JaxArray
-
-from rbig_jax.transforms.base import Transform
+from jax.random import PRNGKey
+from jax.nn import sigmoid, softplus
+from chex import dataclass, Array
 
 
-class Logit(Transform):
-    def __init__(self, temperature=1, eps=1e-6, learn_temperature=False):
-        super().__init__()
-        self.eps = StateVar(np.array(eps))
-        if learn_temperature:
-            self.temperature = TrainVar(np.array(float(temperature)))
-        else:
-            self.temperature = StateVar(np.array(float(temperature)))
+def Logit(eps: float = 1e-5, temperature: float = 1.0):
+    def init_func(rng: PRNGKey, n_features: int, **kwargs):
+        def forward_func(
+            params: Optional[dataclass], inputs: Array, **kwargs
+        ) -> Tuple[Array, Array]:
 
-    def __call__(self, inputs):
+            inputs = np.clip(inputs, eps, 1 - eps)
 
-        inputs = np.clip(inputs, self.eps.value, 1 - self.eps.value)
+            outputs = (1 / temperature) * (np.log(inputs) - np.log1p(-inputs))
+            logabsdet = -(
+                np.log(temperature)
+                - softplus(-temperature * outputs)
+                - softplus(temperature * outputs)
+            )
 
-        outputs = (1 / self.temperature.value) * (np.log(inputs) - np.log1p(-inputs))
-        logabsdet = -(
-            np.log(self.temperature.value)
-            - softplus(-self.temperature.value * outputs)
-            - softplus(self.temperature.value * outputs)
-        )
-        return outputs, logabsdet.sum(axis=1)
+            return outputs, logabsdet.sum(axis=1)
 
-    def transform(self, inputs):
+        def inverse_func(
+            params: Optional[dataclass], inputs: Array, **kwargs
+        ) -> Tuple[Array, Array]:
 
-        inputs = np.clip(inputs, self.eps.value, 1 - self.eps.value)
+            inputs = inputs * temperature
+            outputs = sigmoid(inputs)
 
-        outputs = (1 / self.temperature.value) * (np.log(inputs) - np.log1p(-inputs))
-        return outputs
+            logabsdet = -(
+                np.log(temperature)
+                - softplus(-temperature * outputs)
+                - softplus(temperature * outputs)
+            )
 
-    def inverse(self, inputs: JaxArray) -> JaxArray:
-        inputs = inputs * self.temperature.value
-        outputs = sigmoid(inputs)
+            return outputs, logabsdet.sum(axis=1)
 
-        # logabsdet = np.log(self.temperature) - softplus(-inputs) - softplus(inputs)
-        return outputs
+        return (), forward_func, inverse_func
+
+    return init_func

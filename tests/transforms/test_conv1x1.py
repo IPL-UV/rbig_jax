@@ -5,7 +5,7 @@ import numpy as onp
 import objax
 import pytest
 
-from rbig_jax.transforms.conv import Conv1x1
+from rbig_jax.transforms.parametric.conv import Conv1x1
 
 seed = 123
 rng = onp.random.RandomState(123)
