@@ -2,7 +2,6 @@ import chex
 import jax
 import jax.numpy as np
 import numpy as onp
-import objax
 import pytest
 from jax import random
 
@@ -12,19 +11,6 @@ seed = 123
 rng = onp.random.RandomState(123)
 
 KEY = jax.random.PRNGKey(seed)
-
-
-# def test_hist_params_transform():
-
-#     X_u = rng.uniform(100)
-
-#     model = Logit()
-
-#     X_g = model(X_u)
-
-#     X_approx = model.inverse(X_g)
-
-#     chex.assert_tree_all_close(X_u, X_approx)
 
 
 @pytest.mark.parametrize("n_features", [1, 3, 10])

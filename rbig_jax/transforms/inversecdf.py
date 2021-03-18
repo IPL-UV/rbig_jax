@@ -1,39 +1,37 @@
-from typing import Tuple
+from typing import Callable, Optional, Tuple
 
 import jax
 import jax.numpy as np
-from objax import StateVar
-from chex import Array
-
-from rbig_jax.transforms.base import Transform
+from jax.random import PRNGKey
+from chex import Array, dataclass
 
 
-class InverseGaussCDF(Transform):
-    def __init__(
-        self, eps=1e-6,
-    ):
-        super().__init__()
-        self.eps = StateVar(np.array(eps))
+def InverseGaussCDF(eps: float = 1e-5) -> Callable:
+    def init_func(rng: PRNGKey, n_features: int, **kwargs):
+        def forward_func(
+            params: Optional[dataclass], inputs: Array, **kwargs
+        ) -> Tuple[Array, Array]:
+            inputs = np.clip(inputs, eps, 1 - eps)
 
-    def __call__(self, inputs: Array) -> Tuple[Array, Array]:
+            outputs = invgausscdf_forward_transform(inputs)
 
-        inputs = np.clip(inputs, self.eps.value, 1 - self.eps.value)
+            logabsdet = -jax.scipy.stats.norm.logpdf(outputs)
 
-        outputs = jax.scipy.stats.norm.ppf(inputs)
+            return outputs, logabsdet.sum(axis=1)
 
-        logabsdet = -jax.scipy.stats.norm.logpdf(outputs)
+        def inverse_func(
+            params: Optional[dataclass], inputs: Array, **kwargs
+        ) -> Tuple[Array, Array]:
 
-        return outputs, logabsdet.sum(axis=1)
+            outputs = invgausscdf_inverse_transform(inputs)
 
-    def transform(self, inputs: Array) -> Array:
+            logabsdet = -jax.scipy.stats.norm.logpdf(outputs)
 
-        inputs = np.clip(inputs, self.eps.value, 1 - self.eps.value)
+            return outputs, logabsdet.sum(axis=1)
 
-        outputs = jax.scipy.stats.norm.ppf(inputs)
-        return outputs
+        return (), forward_func, inverse_func
 
-    def inverse(self, inputs: Array) -> Array:
-        return jax.scipy.stats.norm.cdf(inputs)
+    return init_func
 
 
 def InitInverseGaussCDF(eps: float = 1e-5,) -> Tuple:
