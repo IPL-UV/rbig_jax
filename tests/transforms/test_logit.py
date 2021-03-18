@@ -10,7 +10,6 @@ from rbig_jax.transforms.logit import Logit
 
 seed = 123
 rng = onp.random.RandomState(123)
-generator = objax.random.Generator(123)
 
 KEY = jax.random.PRNGKey(seed)
 

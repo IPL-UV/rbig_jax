@@ -49,29 +49,3 @@ def CompositeTransform(bijectors: Sequence[Callable]):
         return all_params, forward_func, inverse_func
 
     return init_fun
-
-
-# class CompositeTransform(Transform):
-#     def __init__(self, transforms: List[Module]) -> None:
-#         super().__init__()
-#         self._transforms = objax.ModuleList(transforms)
-
-#     def __call__(self, inputs: JaxArray) -> Tuple[JaxArray, JaxArray]:
-#         outputs = inputs
-#         total_logabsdet = np.zeros_like(outputs.shape[0])
-#         for transform in self._transforms:
-#             outputs, logabsdet = transform(outputs)
-#             total_logabsdet += logabsdet
-#         return outputs, total_logabsdet
-
-#     def transform(self, inputs: JaxArray) -> Tuple[JaxArray, JaxArray]:
-#         outputs = inputs
-#         for itransform in self._transforms:
-#             outputs = itransform.transform(outputs)
-#         return outputs
-
-#     def inverse(self, inputs: JaxArray) -> Tuple[JaxArray, JaxArray]:
-#         outputs = inputs
-#         for itransform in self._transforms[::-1]:
-#             outputs = itransform.inverse(outputs)
-#         return outputs

@@ -1,18 +1,23 @@
-from typing import Tuple
+from typing import Callable, Tuple
 import jax
 from jax.lax import conv_general_dilated
 import numpy as np
-from objax.typing import JaxArray
-import objax
 from rbig_jax.transforms.parametric.householder import (
     householder_transform,
     householder_inverse_transform,
 )
+from chex import Array, dataclass
+from jax.random import PRNGKey
 
 
-class Conv1x1(objax.Module):
+@dataclass
+class Conv1x1Params:
+    weight: Array
+
+
+def Conv1x1(n_channels: int) -> None:
     """1x1 Convolution
-    This class will perform a 1x1 convolutions given an input
+    This function will perform a 1x1 convolutions given an input
     array and a kernel. The output will be the same size as the input
     array. This will do the __call__ transformation (with the logabsdet)
     as well as the forward transformation (just the input) and the
@@ -23,76 +28,83 @@ class Conv1x1(objax.Module):
     n_channels : int
         the input channels for the image to be used
     
-    Attributes
-    ----------
-    weight : objax.TrainVar
-        the kernel weight matrix of size (n_channels, n_channels)
     """
 
-    def __init__(self, n_channels: int):
-        self.weight = objax.TrainVar(objax.nn.init.orthogonal((n_channels, n_channels)))
+    def init_func(
+        rng: PRNGKey, n_features: int, **kwargs
+    ) -> Tuple[Conv1x1Params, Callable, Callable]:
 
-    def __call__(self, inputs: JaxArray) -> Tuple[JaxArray, JaxArray]:
-        """Forward transformation with the logabsdet.
-        This does the forward transformation and returns the transformed
-        variable as well as the log absolute determinant. This is useful
-        in a larger normalizing flow and for calculating the density.
+        # initialize the householder rotation matrix
+        V = jax.nn.initializers.orthogonal()(key=rng, shape=(n_channels, n_channels))
 
-        Parameters
-        ----------
-        inputs : JaxArray
-            input array of size (n_samples, n_channels, height, width)
-        Returns
-        -------
-        outputs: JaxArray
-            output array of size (n_samples, n_channels, height, width)
-        logabsdet : Jaxarray
-            the log absolute determinant of size (n_samples,)
-        """
-        n_samples, height, width, _ = inputs.shape
+        init_params = Conv1x1Params(weight=V)
 
-        # forward transformation
-        outputs = convolutions_1x1(x=inputs, kernel=self.weight.value)
+        def forward_func(
+            params: dataclass, inputs: Array, **kwargs
+        ) -> Tuple[Array, Array]:
+            """Forward transformation with the logabsdet.
+            This does the forward transformation and returns the transformed
+            variable as well as the log absolute determinant. This is useful
+            in a larger normalizing flow and for calculating the density.
 
-        # calculate log determinant jacobian
-        log_abs_det = np.ones(n_samples)
-        log_abs_det = (
-            log_abs_det * height * width * np.linalg.slogdet(self.weight.value)[1]
-        )
+            Parameters
+            ----------
+            inputs : Array
+                input array of size (n_samples, n_channels, height, width)
+            Returns
+            -------
+            outputs: Array
+                output array of size (n_samples, n_channels, height, width)
+            logabsdet : Array
+                the log absolute determinant of size (n_samples,)
+            """
+            n_samples, height, width, _ = inputs.shape
 
-        return outputs, log_abs_det
+            # forward transformation
+            outputs = convolutions_1x1(x=inputs, kernel=params.weight)
 
-    def transform(self, inputs: JaxArray) -> JaxArray:
-        """Forward transformation w/o
-        Parameters
-        ----------
-        inputs : JaxArray
-            input array of size (n_samples, n_channels, height, width)
-        Returns
-        -------
-        outputs: JaxArray
-            output array of size (n_samples, n_channels, height, width)
-        """
-        outputs = convolutions_1x1(x=inputs, kernel=self.weight.value)
-        return outputs
+            # calculate log determinant jacobian
+            log_abs_det = np.ones(n_samples)
+            log_abs_det = (
+                log_abs_det * height * width * np.linalg.slogdet(params.weight)[1]
+            )
 
-    def inverse(self, inputs: JaxArray) -> JaxArray:
-        """Inverse transformation
-        Parameters
-        ----------
-        inputs : JaxArray
-            input array of size (n_samples, n_channels, height, width)
-        Returns
-        -------
-        outputs: JaxArray
-            output array of size (n_samples, n_channels, height, width)
-        """
-        outputs = convolutions_1x1(x=inputs, kernel=self.weight.value.T)
-        return outputs
+            return outputs, log_abs_det
+
+        def inverse_func(
+            params: dataclass, inputs: Array, **kwargs
+        ) -> Tuple[Array, Array]:
+            """Inverse transformation
+            Parameters
+            ----------
+            inputs : Array
+                input array of size (n_samples, n_channels, height, width)
+            Returns
+            -------
+            outputs: Array
+                output array of size (n_samples, n_channels, height, width)
+            logabsdet : Array
+                the log absolute determinant of size (n_samples,)
+            """
+            n_samples, height, width, _ = inputs.shape
+
+            outputs = convolutions_1x1(x=inputs, kernel=params.weight.T)
+
+            # calculate log determinant jacobian
+            log_abs_det = np.ones(n_samples)
+            log_abs_det = (
+                log_abs_det * height * width * np.linalg.slogdet(params.weight)[1]
+            )
+
+            return outputs, log_abs_det
+
+        return init_params, forward_func, inverse_func
+
+    return init_func
 
 
-class Conv1x1Householder(objax.Module):
-    """1x1 Convolution
+def Conv1x1Householder(n_reflections: int, n_channels: int):
+    """1x1 Convolution w/ Orthogonal Constraint
     This class will perform a 1x1 convolutions given an input
     array and a kernel. The output will be the same size as the input
     array. This will do the __call__ transformation (with the logabsdet)
@@ -103,85 +115,79 @@ class Conv1x1Householder(objax.Module):
     ----------
     n_channels : int
         the input channels for the image to be used
-    
-    Attributes
-    ----------
-    weight : objax.TrainVar
-        the kernel weight matrix of size (n_channels, n_channels)
+
     """
 
-    def __init__(self, n_channels: int, n_reflections: int = 10):
+    def init_func(
+        rng: PRNGKey, n_features: int, **kwargs
+    ) -> Tuple[Conv1x1Params, Callable, Callable]:
 
-        self.weight = objax.TrainVar(
-            objax.nn.init.orthogonal((n_reflections, n_channels))
-        )
-        self.weight_init = np.eye(n_channels)
+        # initialize the householder rotation matrix
+        V = jax.nn.initializers.orthogonal()(key=rng, shape=(n_reflections, n_channels))
 
-    def __call__(self, inputs: JaxArray) -> Tuple[JaxArray, JaxArray]:
-        """Forward transformation with the logabsdet.
-        This does the forward transformation and returns the transformed
-        variable as well as the log absolute determinant. This is useful
-        in a larger normalizing flow and for calculating the density.
+        init_params = Conv1x1Params(weight=V)
 
-        Parameters
-        ----------
-        inputs : JaxArray
-            input array of size (n_samples, n_channels, height, width)
-        Returns
-        -------
-        outputs: JaxArray
-            output array of size (n_samples, n_channels, height, width)
-        logabsdet : Jaxarray
-            the log absolute determinant of size (n_samples,)
-        """
-        # initialize logabsdet with batch dimension
-        log_abs_det = np.zeros(inputs.shape[0])
+        weight_init = np.eye(n_channels)
 
-        # weight matrix, householder product
-        kernel = householder_transform(self.weight_init, self.weight.value)
+        def forward_func(
+            params: dataclass, inputs: Array, **kwargs
+        ) -> Tuple[Array, Array]:
+            """Forward transformation with the logabsdet.
+            This does the forward transformation and returns the transformed
+            variable as well as the log absolute determinant. This is useful
+            in a larger normalizing flow and for calculating the density.
 
-        # forward transformation
-        outputs = convolutions_1x1(x=inputs, kernel=kernel)
+            Parameters
+            ----------
+            inputs : Array
+                input array of size (n_samples, n_channels, height, width)
+            Returns
+            -------
+            outputs: Array
+                output array of size (n_samples, n_channels, height, width)
+            logabsdet : Array
+                the log absolute determinant of size (n_samples,)
+            """
+            # initialize logabsdet with batch dimension
+            log_abs_det = np.zeros(inputs.shape[0])
 
-        return outputs, log_abs_det
+            # weight matrix, householder product
+            kernel = householder_transform(weight_init, params.weight)
 
-    def transform(self, inputs: JaxArray) -> JaxArray:
-        """Forward transformation w/o
-        Parameters
-        ----------
-        inputs : JaxArray
-            input array of size (n_samples, n_channels, height, width)
-        Returns
-        -------
-        outputs: JaxArray
-            output array of size (n_samples, n_channels, height, width)
-        """
-        # weight matrix, householder product
-        kernel = householder_transform(self.weight_init, self.weight.value)
+            # forward transformation
+            outputs = convolutions_1x1(x=inputs, kernel=kernel)
 
-        outputs = convolutions_1x1(x=inputs, kernel=kernel)
-        return outputs
+            return outputs, log_abs_det
 
-    def inverse(self, inputs: JaxArray) -> JaxArray:
-        """Inverse transformation
-        Parameters
-        ----------
-        inputs : JaxArray
-            input array of size (n_samples, n_channels, height, width)
-        Returns
-        -------
-        outputs: JaxArray
-            output array of size (n_samples, n_channels, height, width)
-        """
-        # weight matrix, householder inverse product
-        kernel = householder_inverse_transform(self.weight_init, self.weight.value)
+        def inverse_func(
+            params: dataclass, inputs: Array, **kwargs
+        ) -> Tuple[Array, Array]:
+            """Inverse transformation
+            Parameters
+            ----------
+            inputs : Array
+                input array of size (n_samples, n_channels, height, width)
+            Returns
+            -------
+            outputs: Array
+                output array of size (n_samples, n_channels, height, width)
+            logabsdet : Array
+                the log absolute determinant of size (n_samples,)
+            """
+            kernel = householder_inverse_transform(weight_init, params.weight)
 
-        outputs = convolutions_1x1(x=inputs, kernel=kernel)
+            outputs = convolutions_1x1(x=inputs, kernel=kernel)
 
-        return outputs
+            log_abs_det = np.zeros(inputs.shape[0])
+
+            return outputs, log_abs_det
+
+        return init_params, forward_func, inverse_func
+
+    return init_func
 
 
-def convolutions_1x1(x: JaxArray, kernel: JaxArray) -> JaxArray:
+def convolutions_1x1(x: Array, kernel: Array) -> Array:
     """1x1 Convolution function
     This function will perform a 1x1 convolutions given an input
     array and a kernel. The output will be the same size as the input
@@ -189,14 +195,14 @@ def convolutions_1x1(x: JaxArray, kernel: JaxArray) -> JaxArray:
 
     Parameters
     ----------
-    x: JaxArray
+    x: Array
         input array for convolutions of shape
         (n_samples, height, width, n_channels)
-    kernel: JaxArray
+    kernel: Array
         input kernel of shape (n_channels, n_channels)
     Returns
     -------
-    output: JaxArray
+    output: Array
         the output array after the convolutions of shape
         (n_samples, height, width, n_channels)
 
