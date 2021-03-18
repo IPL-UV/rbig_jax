@@ -51,32 +51,32 @@ KEY = jax.random.PRNGKey(seed)
 #     chex.assert_shape(logabsdet, (n_samples,))
 
 
-@pytest.mark.parametrize("n_samples", [1, 10, 100])
-@pytest.mark.parametrize("n_bins", [1, 10, 100])
-@pytest.mark.parametrize("n_features", [1, 10, 100])
-@pytest.mark.parametrize("bounds", [10, 20, 30])
-def test_splines_approx(n_samples, n_features, n_bins, bounds):
+# @pytest.mark.parametrize("n_samples", [1, 10, 100])
+# @pytest.mark.parametrize("n_bins", [1, 10, 100])
+# @pytest.mark.parametrize("n_features", [1, 10, 100])
+# @pytest.mark.parametrize("bounds", [10, 20, 30])
+# def test_splines_approx(n_samples, n_features, n_bins, bounds):
 
-    # initialize function
+#     # initialize function
 
-    data_rng, *spline_rng = jax.random.split(KEY, 2)
+#     data_rng, *spline_rng = jax.random.split(KEY, 2)
 
-    x = jax.random.normal(data_rng, shape=(n_samples, n_features))
+#     x = jax.random.normal(data_rng, shape=(n_samples, n_features))
 
-    # initialize the parameters
-    widths = jax.random.normal(spline_rng[0], shape=(1, n_features, n_bins))
-    heights = jax.random.normal(spline_rng[1], shape=(1, n_features, n_bins))
-    derivatives = jax.random.normal(spline_rng[2], shape=(1, n_features, n_bins))
+#     # initialize the parameters
+#     widths = jax.random.normal(spline_rng[0], shape=(1, n_features, n_bins))
+#     heights = jax.random.normal(spline_rng[1], shape=(1, n_features, n_bins))
+#     derivatives = jax.random.normal(spline_rng[2], shape=(1, n_features, n_bins))
 
-    # create layer
-    z, _ = rational_quadratic_spline(
-        x, widths, heights, derivatives, bounds, inverse=False
-    )
+#     # create layer
+#     z, _ = rational_quadratic_spline(
+#         x, widths, heights, derivatives, bounds, inverse=False
+#     )
 
-    # inverse transformation
-    x_approx, _ = rational_quadratic_spline(
-        z, widths, heights, derivatives, bounds, inverse=True
-    )
+#     # inverse transformation
+#     x_approx, _ = rational_quadratic_spline(
+#         z, widths, heights, derivatives, bounds, inverse=True
+#     )
 
-    # checks
-    chex.assert_tree_all_close(x, x_approx, atol=1e-5)
+#     # checks
+#     chex.assert_tree_all_close(x, x_approx, atol=1e-5)
