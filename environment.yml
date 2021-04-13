@@ -1,4 +1,4 @@
-name: rbigjax
+name: rbig_jax
 channels:
 - defaults
 - conda-forge
