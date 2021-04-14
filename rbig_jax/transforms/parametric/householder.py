@@ -3,7 +3,7 @@ from functools import partial
 from typing import Tuple, Callable
 
 import jax
-import jax.numpy as np
+import jax.numpy as jnp
 from jax.random import PRNGKey
 from chex import Array, dataclass
 
@@ -45,7 +45,7 @@ def HouseHolder(n_reflections: int) -> Callable:
             )
 
             # log abs det, all zeros
-            logabsdet = np.zeros(inputs.shape[0])
+            logabsdet = jnp.zeros(inputs.shape[0])
 
             return outputs, logabsdet
 
@@ -56,7 +56,7 @@ def HouseHolder(n_reflections: int) -> Callable:
             )
 
             # log abs det, all zeros
-            logabsdet = np.zeros(inputs.shape[0])
+            logabsdet = jnp.zeros(inputs.shape[0])
 
             return outputs, logabsdet
 
@@ -77,11 +77,11 @@ def householder_product(inputs: Array, q_vector: Array) -> Array:
         outputs (Array) : outputs after the householder product
     """
     # norm for q_vector
-    squared_norm = np.sum(q_vector ** 2)
+    squared_norm = jnp.sum(q_vector ** 2)
     # inner product
-    temp = np.dot(inputs, q_vector)
+    temp = jnp.dot(inputs, q_vector)
     # outer product
-    temp = np.outer(temp, (2.0 / squared_norm) * q_vector).squeeze()
+    temp = jnp.outer(temp, (2.0 / squared_norm) * q_vector).squeeze()
     # update
     output = inputs - temp
     return output
