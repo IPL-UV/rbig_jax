@@ -9,6 +9,7 @@ from rbig_jax.transforms.block import InitRBIGBlock, RBIGBlockParams
 from rbig_jax.utils import get_minimum_zeroth_element, reverse_dataclass_params
 from rbig_jax.information.total_corr import init_information_reduction_loss
 from rbig_jax.transforms.rotation import InitPCARotation
+from rbig_jax.transforms.histogram import get_hist_params
 
 
 @dataclass
@@ -220,7 +221,6 @@ def get_default_mg(n_samples: int, return_params: bool = True):
     alpha = 1e-5
     precision = 100
     nbins = int(np.sqrt(n_samples))
-    return_params = return_params
 
     uniformize_transform = jax.partial(
         get_hist_params,
