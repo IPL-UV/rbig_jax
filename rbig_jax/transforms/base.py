@@ -4,17 +4,24 @@ import jax
 import jax.numpy as np
 import objax
 from objax.module import Module
-from objax.typing import JaxArray
+from chex import Array, dataclass
 from jax.random import PRNGKey
+
+
+@dataclass
+class TransformInfo:
+    name: str
+    input_shape: Tuple
+    output_shape: Tuple
 
 
 class Transform(Module):
     """Base class for all transformation"""
 
-    def forward(self, inputs: JaxArray) -> Tuple[JaxArray, JaxArray]:
+    def forward(self, inputs: Array) -> Tuple[Array, Array]:
         raise NotImplementedError()
 
-    def inverse(self, inputs: JaxArray) -> JaxArray:
+    def inverse(self, inputs: Array) -> Array:
         raise NotImplementedError
 
 
