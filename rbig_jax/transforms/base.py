@@ -12,9 +12,6 @@ from chex import Array, dataclass
 
 
 class Bijector(jittable.Jittable, metaclass=abc.ABCMeta):
-    def __init__(self):
-        pass
-
     def init_params(self, rng: PRNGKey, n_features: int) -> dataclass:
         """Computes y = f(x) and log|det J(f)(x)|."""
 
@@ -107,7 +104,8 @@ class Transform(Module):
 #             log_det += ld
 #         return y, log_det
 
-def Chain
+# def Chain
+
 
 def CompositeTransform(bijectors: Sequence[Callable]):
     def init_fun(rng: PRNGKey, n_features: int, **kwargs):
