@@ -18,10 +18,14 @@ MLOutputs = tjax.Array2[Batch, Features]
 Outputs = Union[ImageOutput, MLOutputs]
 
 
-def Squeeze(filter_shape: Tuple[int, int], collapse: Optional[str] = None):
+def Squeeze(
+    filter_shape: Tuple[int, int],
+    collapse: Optional[str] = None,
+    return_outputs: bool = False,
+):
     collapse_shape = _get_collapse_shape(collapse)
 
-    def init_func(rng: PRNGKey, shape: Tuple, **kwargs):
+    def init_func(rng: PRNGKey, shape: Tuple, inputs: Optional[Array] = None, **kwargs):
         _, H, W, C = shape
 
         # extract coordinates
@@ -46,7 +50,7 @@ def Squeeze(filter_shape: Tuple[int, int], collapse: Optional[str] = None):
             # forward rearrange
             outputs = rearrange(
                 inputs,
-                "B (Hn fh) (Wn fw) C -> B (C Hn Wn) fh fw",
+                "B (Hn fh) (Wn fw) C -> B fh fw (C Hn Wn)",
                 B=B,
                 C=C,
                 Hn=Hn,
@@ -56,11 +60,11 @@ def Squeeze(filter_shape: Tuple[int, int], collapse: Optional[str] = None):
             )
 
             if collapse_shape is not None:
-                B_, C_, H_, W_ = outputs.shape
+                B_, H_, W_, C_ = outputs.shape
 
                 # collapse dimensions
                 outputs = rearrange(
-                    outputs, "B C H W ->" + collapse_shape, B=B_, C=C_, H=H_, W=W_,
+                    outputs, "B H W C ->" + collapse_shape, B=B_, C=C_, H=H_, W=W_,
                 )
 
             # logdet empty
@@ -75,7 +79,7 @@ def Squeeze(filter_shape: Tuple[int, int], collapse: Optional[str] = None):
             if collapse_shape is not None:
                 # un-collapse dimensions
                 inputs = rearrange(
-                    inputs, collapse_shape + "-> B C H W", C=C * Hn * Wn, H=fh, W=fw,
+                    inputs, collapse_shape + "-> B H W C", C=C * Hn * Wn, H=fh, W=fw,
                 )
 
             B, *_ = inputs.shape
@@ -83,7 +87,7 @@ def Squeeze(filter_shape: Tuple[int, int], collapse: Optional[str] = None):
             # undo squeeze
             outputs = rearrange(
                 inputs,
-                "B (C Hn Wn) fh fw -> B (Hn fh) (Wn fw) C",
+                "B fh fw (C Hn Wn) -> B (Hn fh) (Wn fw) C",
                 B=B,
                 C=C,
                 Hn=Hn,
@@ -96,7 +100,11 @@ def Squeeze(filter_shape: Tuple[int, int], collapse: Optional[str] = None):
             log_det = jnp.zeros_like(outputs)
             return outputs, log_det
 
-        return (), forward_and_log_det, inverse_and_log_det
+        if return_outputs:
+            z, _ = forward_and_log_det((), inputs)
+            return z, (), forward_and_log_det, inverse_and_log_det
+        else:
+            return (), forward_and_log_det, inverse_and_log_det
 
     return init_func
 
@@ -120,3 +128,26 @@ def _get_collapse_shape(collapse: Optional[str] = None):
         raise ValueError(f"Unrecognized collapse shape: {collapse}")
 
     return collapse_shape
+
+
+def _get_new_shapes(
+    height: int, width: int, channels: int, filter_shape: Tuple[int, int]
+):
+
+    # extract coordinates
+    fh, fw = filter_shape
+
+    # check for no remainders
+    assert height % fh == 0
+    assert width % fw == 0
+
+    # new height and width
+    height_n = height // fh
+    width_n = width // fw
+
+    # calculate new height, width, channels
+    height = fh
+    width = fw
+    channels *= height_n * width_n
+
+    return height, width, channels
