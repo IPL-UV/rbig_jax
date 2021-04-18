@@ -59,12 +59,12 @@ def PiecewiseRationalQuadraticCDF(
             f"Minimum knot slope must be positive; " f"Got {min_knot_slope}"
         )
 
-    def init_func(rng: PRNGKey, n_features: int, **kwargs) -> Bijector:
+    def init_func(rng: PRNGKey, shape: int, **kwargs) -> Bijector:
 
         return init_spline_params(
             n_bins=n_bins,
             rng=rng,
-            n_features=n_features,
+            shape=shape,
             identity_init=identity_init,
             min_knot_slope=min_knot_slope,
             range_min=range_min,
@@ -78,7 +78,7 @@ def PiecewiseRationalQuadraticCDF(
 def init_spline_params(
     n_bins: int,
     rng: PRNGKey,
-    n_features: Tuple[int],
+    shape: Tuple[int],
     range_min: float,
     range_max: float,
     identity_init: bool = False,
@@ -87,33 +87,33 @@ def init_spline_params(
     min_knot_slope: float = 1e-4,
     dtype: type = jnp.float32,
 ):
-    if isinstance(n_features, int):
-        n_features = (n_features,)
+    if isinstance(shape, int):
+        shape = (shape,)
 
     if identity_init:
         # initialize widths and heights
-        unnormalized_widths = jnp.zeros(shape=(*n_features, n_bins), dtype=dtype)
-        unnormalized_heights = jnp.zeros(shape=(*n_features, n_bins), dtype=dtype)
+        unnormalized_widths = jnp.zeros(shape=(*shape, n_bins), dtype=dtype)
+        unnormalized_heights = jnp.zeros(shape=(*shape, n_bins), dtype=dtype)
 
         # initialize derivatives
         constant = jnp.log(jnp.exp(1 - min_knot_slope) - 1)
         unnormalized_derivatives = constant * jnp.ones(
-            shape=(*n_features, n_bins + 1), dtype=dtype
+            shape=(*shape, n_bins + 1), dtype=dtype
         )
     else:
         init_key = jr.split(rng, num=3)
 
         # initialize widths and heights
         unnormalized_widths = jr.uniform(
-            key=init_key[0], minval=0, maxval=1, shape=(*n_features, n_bins)
+            key=init_key[0], minval=0, maxval=1, shape=(*shape, n_bins)
         )
         unnormalized_heights = jr.uniform(
-            key=init_key[1], minval=0, maxval=1, shape=(*n_features, n_bins)
+            key=init_key[1], minval=0, maxval=1, shape=(*shape, n_bins)
         )
 
         # initialize derivatives
         unnormalized_derivatives = jr.uniform(
-            key=init_key[2], minval=0, maxval=1, shape=(*n_features, n_bins + 1)
+            key=init_key[2], minval=0, maxval=1, shape=(*shape, n_bins + 1)
         )
     params = jnp.concatenate(
         [unnormalized_widths, unnormalized_heights, unnormalized_derivatives], axis=-1
