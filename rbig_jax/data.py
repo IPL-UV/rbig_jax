@@ -3,7 +3,7 @@ from typing import Tuple
 import jax.numpy as jnp
 import numpy as np
 from chex import Array
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 # import torch.multiprocessing as multiprocessing
 

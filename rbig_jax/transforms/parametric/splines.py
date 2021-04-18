@@ -2,18 +2,20 @@
 https://github.com/jfcrenshaw/pzflow/blob/main/pzflow/bijectors/neural_splines.py
 """
 
-from rbig_jax.transforms.base import Bijector
-from typing import Tuple, Callable
-from jax.random import PRNGKey
-import jax.random as jr
+
+from typing import Callable, Tuple
+
 import jax.numpy as jnp
-from jax.nn import softmax, softplus
-from chex import dataclass, Array
+import jax.random as jr
+from chex import Array, dataclass
+from distrax._src.bijectors.rational_quadratic_spline import \
+    RationalQuadraticSpline as distrax_rqs
 from distrax._src.bijectors.rational_quadratic_spline import (
-    RationalQuadraticSpline as distrax_rqs,
-    _rational_quadratic_spline_fwd,
-    _rational_quadratic_spline_inv,
-)
+    _rational_quadratic_spline_fwd, _rational_quadratic_spline_inv)
+from jax.nn import softmax, softplus
+from jax.random import PRNGKey
+
+from rbig_jax.transforms.base import Bijector
 
 
 @dataclass
@@ -37,7 +39,7 @@ class RationalQuadraticSpline(Bijector):
         return outputs, log_det
 
 
-def PiecewiseRationalQuadraticCDF(
+def InitPiecewiseRationalQuadraticCDF(
     n_bins: int,
     range_min: float,
     range_max: float,
@@ -131,4 +133,3 @@ def init_spline_params(
         x_pos=clf.x_pos, y_pos=clf.y_pos, knot_slopes=clf.knot_slopes
     )
     return init_rqs_bijector
-

@@ -1,12 +1,11 @@
-from typing import Callable, List, Sequence, Tuple
+import abc
+from typing import Callable, Iterable, List, Sequence, Tuple
 
 import jax
-import jax.numpy as np
-import objax
-from objax.module import Module
+import jax.numpy as jnp
 from chex import Array, dataclass
 from jax.random import PRNGKey
-import abc
+from objax.module import Module
 
 
 @dataclass
@@ -49,14 +48,37 @@ class Bijector:
         )
 
 
-class Transform(Module):
-    """Base class for all transformation"""
+@dataclass
+class BijectorChain(Bijector):
+    bijectors: Iterable[Bijector]
 
-    def forward(self, inputs: Array) -> Tuple[Array, Array]:
-        raise NotImplementedError()
+    def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+        outputs = inputs
+        total_logabsdet = jnp.zeros_like(outputs)
+        for ibijector in self.bijectors:
+            outputs, logabsdet = ibijector.forward_and_log_det(outputs)
+            total_logabsdet += logabsdet
+        return outputs, total_logabsdet
+
+    def inverse_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+        outputs = inputs
+        total_logabsdet = jnp.zeros_like(outputs)
+        for ibijector in reversed(self.bijectors):
+            outputs, logabsdet = ibijector.inverse_and_log_det(outputs)
+            total_logabsdet += logabsdet
+        return outputs, total_logabsdet
+
+    def forward(self, inputs: Array) -> Array:
+        outputs = inputs
+        for ibijector in self.bijectors:
+            outputs = ibijector.forward(outputs)
+        return outputs
 
     def inverse(self, inputs: Array) -> Array:
-        raise NotImplementedError
+        outputs = inputs
+        for ibijector in reversed(self.bijectors):
+            outputs = ibijector.inverse(outputs)
+        return outputs
 
 
 def CompositeTransform(bijectors: Sequence[Callable]):
@@ -75,7 +97,7 @@ def CompositeTransform(bijectors: Sequence[Callable]):
             inverse_funs.append(inverse_f)
 
         def bijector_chain(params, bijectors, inputs, **kwargs):
-            logabsdet = np.zeros(inputs.shape[0])
+            logabsdet = jnp.zeros(inputs.shape[0])
             for bijector, param in zip(bijectors, params):
                 inputs, ilogabsdet = bijector(param, inputs, **kwargs)
                 logabsdet += ilogabsdet
@@ -90,3 +112,25 @@ def CompositeTransform(bijectors: Sequence[Callable]):
         return all_params, forward_func, inverse_func
 
     return init_fun
+
+
+def cascade_forward_and_log_det(
+    bijectors: dataclass, inputs: Array
+) -> Tuple[Array, Array]:
+    outputs = inputs
+    total_logabsdet = jnp.zeros_like(outputs)
+    for ibijector in bijectors:
+        outputs, logabsdet = ibijector.forward_and_log_det(outputs)
+        total_logabsdet += logabsdet
+    return outputs, total_logabsdet
+
+
+def cascade_inverse_and_log_det(
+    bijectors: dataclass, inputs: Array
+) -> Tuple[Array, Array]:
+    outputs = inputs
+    total_logabsdet = jnp.zeros_like(outputs)
+    for ibijector in bijectors[::-1]:
+        outputs, logabsdet = ibijector.inverse_and_log_det(outputs)
+        total_logabsdet += logabsdet
+    return outputs, total_logabsdet

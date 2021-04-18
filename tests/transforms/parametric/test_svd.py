@@ -5,7 +5,6 @@ import numpy as onp
 import objax
 import pytest
 
-
 from rbig_jax.transforms.parametric.svd import SVD
 
 seed = 123

@@ -1,6 +1,38 @@
-import sys, os
+# jax packages
+import itertools
+import os
+import sys
+from argparse import ArgumentParser
+from functools import partial
+
+import chex
+import jax
+import jax.numpy as np
+# plot methods
+import matplotlib.pyplot as plt
+import numpy as onp
+import objax
+import seaborn as sns
+# logging
+import tqdm
+import wandb
+from celluloid import Camera
+from jax import device_put, random
+from jax.config import config
 from pyprojroot import here
+from sklearn import datasets
+from sklearn.preprocessing import StandardScaler
 from wandb.sdk import wandb_config
+
+# library functions
+from rbig_jax.data import generate_2d_grid, get_classic
+from rbig_jax.information.entropy import histogram_entropy
+from rbig_jax.models import IterativeGaussianization
+from rbig_jax.plots import plot_info_loss, plot_joint, plot_joint_prob
+from rbig_jax.transforms.block import get_default_rbig_block
+from rbig_jax.transforms.histogram import InitUniHistUniformize
+from rbig_jax.transforms.kde import InitKDEUniformize
+from rbig_jax.transforms.rotation import InitPCARotation
 
 # spyder up to find the root
 root = here(project_files=[".here"])
@@ -8,48 +40,17 @@ root = here(project_files=[".here"])
 # append to path
 sys.path.append(str(here()))
 
-# jax packages
-import itertools
 
-import jax
-import jax.numpy as np
-from jax.config import config
-from jax import device_put
-from jax import random
 
 # import chex
 config.update("jax_enable_x64", False)
 
-import objax
-import chex
-import numpy as onp
-from functools import partial
-from sklearn.preprocessing import StandardScaler
-from sklearn import datasets
 
-# library functions
-from rbig_jax.data import generate_2d_grid, get_classic
-from rbig_jax.plots import plot_joint, plot_joint_prob, plot_info_loss
-from rbig_jax.transforms.block import get_default_rbig_block
-from rbig_jax.transforms.histogram import InitUniHistUniformize
-from rbig_jax.transforms.rotation import InitPCARotation
-from rbig_jax.transforms.kde import InitKDEUniformize
-from rbig_jax.information.entropy import histogram_entropy
-from rbig_jax.models import IterativeGaussianization
 
-# logging
-import tqdm
-import wandb
 
-# plot methods
-import matplotlib.pyplot as plt
-import seaborn as sns
-from celluloid import Camera
 
 sns.reset_defaults()
 sns.set_context(context="talk", font_scale=0.7)
-from argparse import ArgumentParser
-import wandb
 
 # ==========================
 # PARAMETERS

@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 import numpy as onp
 import seaborn as sns
 import tqdm
+import wandb
 from jax.config import config
 from scipy.stats import beta
 
-import wandb
 from rbig_jax.data import get_classic
 from rbig_jax.transforms.gaussian import get_gauss_params, init_params_hist
 from rbig_jax.transforms.linear import init_pca_params

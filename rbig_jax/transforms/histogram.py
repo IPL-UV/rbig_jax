@@ -4,8 +4,9 @@ from typing import Optional, Union
 import jax
 import jax.numpy as np
 from chex import Array, dataclass
-from rbig_jax.utils import get_domain_extension
 from objax.typing import JaxArray
+
+from rbig_jax.utils import get_domain_extension
 
 
 @dataclass

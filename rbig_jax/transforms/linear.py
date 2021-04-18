@@ -6,6 +6,7 @@ import jax
 import jax.numpy as np
 import objax
 from objax.typing import JaxArray
+
 from rbig_jax.transforms.base import Transform
 
 RotParams = collections.namedtuple("Params", ["projection"])

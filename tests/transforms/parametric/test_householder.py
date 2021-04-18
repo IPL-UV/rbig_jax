@@ -5,12 +5,8 @@ import numpy as onp
 import objax
 import pytest
 
-
 from rbig_jax.transforms.parametric.householder import (
-    HouseHolder,
-    householder_transform,
-    householder_inverse_transform,
-)
+    HouseHolder, householder_inverse_transform, householder_transform)
 
 seed = 123
 rng = onp.random.RandomState(123)

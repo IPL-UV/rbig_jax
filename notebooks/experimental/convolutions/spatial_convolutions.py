@@ -1,8 +1,40 @@
 #%%
 
+import os
+import sys
+from functools import partial
 from pathlib import Path
-import sys, os
+from pprint import pprint
+
+import chex
+# jax packages
+import jax
+import jax.numpy as jnp
+# plot methods
+import matplotlib.pyplot as plt
+import numpy as np
+import objax
+import seaborn as sns
+# logging
+import tqdm
+import wandb
+from einops import rearrange
+from jax.config import config
+from jax.lax import conv_general_dilated
 from pyprojroot import here
+from sklearn import datasets
+from sklearn.preprocessing import StandardScaler
+
+# library functions
+from rbig_jax.data import get_classic
+from rbig_jax.models.gaussflow import GaussianizationFlow
+from rbig_jax.plots import plot_info_loss, plot_joint, plot_joint_prob
+from rbig_jax.transforms.base import CompositeTransform
+from rbig_jax.transforms.inversecdf import InverseGaussCDF
+from rbig_jax.transforms.logit import Logit
+from rbig_jax.transforms.parametric import HouseHolder
+from rbig_jax.transforms.parametric.householder import householder_transform
+from rbig_jax.transforms.parametric.mixture import MixtureGaussianCDF
 
 # spyder up to find the root
 root = here(project_files=[".here"])
@@ -10,38 +42,14 @@ root = here(project_files=[".here"])
 # append to path
 sys.path.append(str(root))
 
-# jax packages
-import jax
-import jax.numpy as jnp
-from jax.config import config
 
 # import chex
 config.update("jax_enable_x64", False)
 
-import numpy as np
-from functools import partial
-import objax
-import chex
-from pprint import pprint
-
-# library functions
-from rbig_jax.data import get_classic
-from rbig_jax.plots import plot_joint, plot_joint_prob, plot_info_loss
-from rbig_jax.transforms.parametric.mixture import MixtureGaussianCDF
-from rbig_jax.transforms.logit import Logit
-from rbig_jax.transforms.inversecdf import InverseGaussCDF
-from rbig_jax.transforms.parametric import HouseHolder
-from rbig_jax.transforms.base import CompositeTransform
-from rbig_jax.models.gaussflow import GaussianizationFlow
 
 
-# logging
-import tqdm
-import wandb
 
-# plot methods
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 sns.reset_defaults()
 sns.set_context(context="talk", font_scale=0.7)
@@ -51,7 +59,6 @@ sns.set_context(context="talk", font_scale=0.7)
 Source: https://www.openml.org/d/40927
 """
 
-from sklearn import datasets
 
 save_dir = str(Path(root).joinpath("datasets/cifar10"))
 
@@ -64,8 +71,6 @@ y = y_.copy()
 
 
 #%%
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 fig, ax = plt.subplots()
 plt.imshow(X[0].reshape(3, 32, 32).transpose(1, 2, 0).astype(np.uint8))
@@ -82,7 +87,6 @@ X_subsample, y_subsample = X[:n_subsamples], y[:n_subsamples]
 
 #%%
 """Reshape Images (REFACTORED)"""
-from einops import rearrange
 
 
 def tensor_2_image(tensor: np.ndarray) -> np.ndarray:
@@ -107,7 +111,6 @@ np.testing.assert_array_equal(X_tensor, X_subsample)
 
 # %%
 """Do some standard preprocessing"""
-from sklearn.preprocessing import StandardScaler
 
 
 def normalize_image(image: np.array) -> np.array:
@@ -165,7 +168,6 @@ kernel := 'IOHW'
 
 """
 
-from jax.lax import conv_general_dilated
 
 # convert to jax array
 X_image_jax = jnp.array(X_images_scaled, dtype=jnp.float32)
@@ -207,7 +209,6 @@ X_image_approx = conv_general_dilated(
     dimension_numbers=("NHWC", "IOHW", "NHWC"),
 )
 
-import chex
 
 chex.assert_tree_all_close(X_image_approx, X_image_jax)
 
@@ -221,10 +222,8 @@ chex.assert_tree_all_close(X_image_approx, X_image_jax)
 #%%
 """Ortogonal Convolution"""
 
-from rbig_jax.transforms.parametric.householder import householder_transform
 
 
-from jax.lax import conv_general_dilated
 
 # convert to jax array
 X_image_jax = jnp.array(X_image, dtype=jnp.float32)
@@ -261,7 +260,6 @@ X_image_approx = conv_general_dilated(
     dimension_numbers=("NHWC", "IOHW", "NHWC"),
 )
 
-import chex
 
 chex.assert_tree_all_close(X_image_approx, X_image_jax)
 

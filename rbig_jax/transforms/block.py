@@ -1,14 +1,14 @@
-from rbig_jax.transforms.histogram import InitUniHistUniformize
-from rbig_jax.transforms.rotation import InitPCARotation
-import jax.numpy as np
 from typing import Callable, Optional, Tuple
-from chex import dataclass, Array
+
+import jax.numpy as np
+from chex import Array, dataclass
+
+from rbig_jax.transforms.histogram import InitUniHistUniformize
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
-from rbig_jax.transforms.marginal import (
-    marginal_fit_transform,
-    marginal_gradient_transform,
-    marginal_transform,
-)
+from rbig_jax.transforms.marginal import (marginal_fit_transform,
+                                          marginal_gradient_transform,
+                                          marginal_transform)
+from rbig_jax.transforms.rotation import InitPCARotation
 
 
 @dataclass
@@ -139,4 +139,3 @@ def get_default_rbig_block(
     )
 
     return InitRBIGBlock(uni_uniformize, rot_transform, eps=eps)
-

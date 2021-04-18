@@ -5,7 +5,6 @@ import numpy as onp
 import objax
 import pytest
 
-
 from rbig_jax.transforms.parametric.splines import rational_quadratic_spline
 
 seed = 123

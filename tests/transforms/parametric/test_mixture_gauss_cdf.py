@@ -6,16 +6,11 @@ import objax
 import pytest
 from jax import random
 
-from rbig_jax.transforms.parametric.mixture.gaussian import (
-    mixture_gaussian_cdf,
-    mixture_gaussian_invcdf,
-    mixture_gaussian_invcdf_vectorized,
-    mixture_gaussian_cdf_vectorized,
-    mixture_gaussian_log_pdf,
-    mixture_gaussian_log_pdf_vectorized,
-)
-
 from rbig_jax.transforms.parametric.mixture import MixtureGaussianCDF
+from rbig_jax.transforms.parametric.mixture.gaussian import (
+    mixture_gaussian_cdf, mixture_gaussian_cdf_vectorized,
+    mixture_gaussian_invcdf, mixture_gaussian_invcdf_vectorized,
+    mixture_gaussian_log_pdf, mixture_gaussian_log_pdf_vectorized)
 
 seed = 123
 rng = onp.random.RandomState(123)

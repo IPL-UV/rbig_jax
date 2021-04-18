@@ -1,7 +1,13 @@
-from jax import scipy as jscipy
+import itertools
 from typing import Callable
-from distrax._src.distributions import distribution as dist_base
+
+import jax
+import jax.numpy as jnp
+import numpy as np
+import tqdm
 from chex import dataclass
+from distrax._src.distributions import distribution as dist_base
+from jax import scipy as jscipy
 
 DistributionLike = dist_base.DistributionLike
 
@@ -26,8 +32,6 @@ def init_log_prob(base_dist: DistributionLike) -> Callable:
     return log_prob
 
 
-import jax
-from chex import dataclass
 
 
 def init_train_op(
@@ -59,10 +63,6 @@ def init_train_op(
     return train_op, (opt_init, opt_state, get_params)
 
 
-import tqdm
-import numpy as np
-import jax.numpy as jnp
-import itertools
 
 
 def train_model(

@@ -1,8 +1,8 @@
 from typing import Callable, List, NamedTuple, Tuple, Union
 
-import jax
 import chex
-from chex import dataclass, Array
+import jax
+from chex import Array, dataclass
 
 
 def marginal_fit_transform(X: Array, f: Callable) -> Tuple[chex.Array, dataclass]:

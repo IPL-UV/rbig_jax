@@ -1,22 +1,51 @@
-from typing import Tuple, Callable
+from typing import Callable, Tuple
 
 import jax
 import jax.numpy as jnp
-from jax.nn import log_softmax
-from jax.scipy.special import logsumexp
 from chex import Array, dataclass
+from jax.nn import log_softmax
 from jax.random import PRNGKey
+from jax.scipy.special import logsumexp
+
+from rbig_jax.transforms.base import Bijector
 from rbig_jax.utils import bisection_search
 
 
 @dataclass
-class MixtureParams:
+class MixtureGaussianCDF(Bijector):
     means: Array
     log_scales: Array
     prior_logits: Array
 
+    def forward_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
 
-def MixtureGaussianCDF(n_components: int) -> Callable:
+        # forward transformation with batch dimension
+        outputs = mixture_gaussian_cdf_vectorized(
+            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+        )
+
+        # log abs det, all zeros
+        logabsdet = mixture_gaussian_log_pdf_vectorized(
+            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+        )
+
+        return outputs, logabsdet  # .sum(axis=1)
+
+    def inverse_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
+
+        # transformation
+        outputs = mixture_gaussian_invcdf_vectorized(
+            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+        )
+        # log abs det, all zeros
+        logabsdet = mixture_gaussian_log_pdf_vectorized(
+            outputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+        )
+
+        return outputs, logabsdet  # .sum(axis=1)
+
+
+def InitMixtureGaussianCDF(n_components: int) -> Callable:
     """Performs the householder transformation.
 
     This is a useful method to parameterize an orthogonal matrix.
@@ -29,93 +58,18 @@ def MixtureGaussianCDF(n_components: int) -> Callable:
         the number of householder reflections
     """
 
-    def init_func(
-        rng: PRNGKey, n_features: int, **kwargs
-    ) -> Tuple[MixtureParams, Callable, Callable]:
+    def init_func(rng: PRNGKey, n_features: int, **kwargs) -> MixtureGaussianCDF:
 
         # initialize mixture
         means = jax.random.normal(key=rng, shape=(n_features, n_components))
         log_scales = jnp.zeros((n_features, n_components))
         prior_logits = jnp.zeros((n_features, n_components))
 
-        init_params = MixtureParams(
+        return MixtureGaussianCDF(
             means=means, log_scales=log_scales, prior_logits=prior_logits
         )
 
-        def forward_func(
-            params: MixtureParams, inputs: Array, **kwargs
-        ) -> Tuple[Array, Array]:
-
-            # forward transformation with batch dimension
-            outputs = mixture_gaussian_cdf_vectorized(
-                inputs, params.prior_logits, params.means, jnp.exp(params.log_scales),
-            )
-
-            # log abs det, all zeros
-            logabsdet = mixture_gaussian_log_pdf_vectorized(
-                inputs, params.prior_logits, params.means, jnp.exp(params.log_scales),
-            )
-
-            return outputs, logabsdet.sum(axis=1)
-
-        def inverse_func(
-            params: MixtureParams, inputs: Array, **kwargs
-        ) -> Tuple[Array, Array]:
-
-            # transformation
-            outputs = mixture_gaussian_invcdf_vectorized(
-                inputs, params.prior_logits, params.means, jnp.exp(params.log_scales),
-            )
-            # log abs det, all zeros
-            logabsdet = mixture_gaussian_log_pdf_vectorized(
-                outputs, params.prior_logits, params.means, jnp.exp(params.log_scales),
-            )
-
-            return outputs, logabsdet.sum(axis=1)
-
-        return init_params, forward_func, inverse_func
-
     return init_func
-
-
-# class MixtureGaussianCDF(Transform):
-#     def __init__(self, n_features: int, n_components: int) -> None:
-
-#         # initialize variables
-#         self.means = TrainVar(objax.random.normal((n_features, n_components)))
-#         self.log_scales = TrainVar(jnp.zeros((n_features, n_components)))
-#         self.prior_logits = TrainVar(jnp.zeros((n_features, n_components)))
-
-#     def __call__(self, x: Array) -> Tuple[Array, Array]:
-
-#         # transformation
-#         z = mixture_gaussian_cdf_vectorized(
-#             x, self.prior_logits.value, self.means.value, jnp.exp(self.log_scales.value),
-#         )
-
-#         # get log_determinant jacobian
-#         log_abs_det = mixture_gaussian_log_pdf_vectorized(
-#             x, self.prior_logits.value, self.means.value, jnp.exp(self.log_scales.value),
-#         )
-
-#         return z, log_abs_det.sum(axis=1)
-
-#     def transform(self, x: Array) -> Tuple[Array, Array]:
-
-#         # transformation
-#         z = mixture_gaussian_cdf_vectorized(
-#             x, self.prior_logits.value, self.means.value, jnp.exp(self.log_scales.value),
-#         )
-
-#         return z
-
-#     def inverse(self, z: Array) -> Array:
-#         # transformation
-#         z = mixture_gaussian_invcdf_vectorized(
-#             z, self.prior_logits.value, self.means.value, jnp.exp(self.log_scales.value),
-#         )
-
-#         return z
 
 
 def mixture_gaussian_cdf(

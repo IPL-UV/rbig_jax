@@ -1,10 +1,12 @@
+from typing import Optional, Tuple, Union
+
 import jax.numpy as jnp
-from typing import Tuple, Optional, Union
-from jax.random import PRNGKey
-from chex import Array, dataclass
-from tensor_annotations import axes
 import tensor_annotations.jax as tjax
+from chex import Array, dataclass
 from einops import rearrange
+from jax.random import PRNGKey
+from tensor_annotations import axes
+
 from rbig_jax.transforms.base import TransformInfo
 
 Batch = axes.Batch

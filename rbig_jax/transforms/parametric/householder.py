@@ -1,21 +1,42 @@
 import collections
 from functools import partial
-from typing import Tuple, Callable
+from typing import Callable, Tuple
 
 import jax
 import jax.numpy as jnp
-from jax.random import PRNGKey
 from chex import Array, dataclass
+from jax.random import PRNGKey
+
+from rbig_jax.transforms.base import Bijector
 
 RotParams = collections.namedtuple("Params", ["projection"])
 
 
 @dataclass
-class HouseHolderParams:
+class HouseHolder(Bijector):
     V: Array
 
+    def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+        # forward transformation with batch dimension
+        outputs = jax.vmap(householder_transform, in_axes=(0, None))(inputs, self.V)
 
-def HouseHolder(n_reflections: int) -> Callable:
+        # log abs det, all zeros
+        logabsdet = jnp.zeros_like(inputs)
+
+        return outputs, logabsdet
+
+    def inverse_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+        outputs = jax.vmap(householder_inverse_transform, in_axes=(0, None))(
+            inputs, self.V
+        )
+
+        # log abs det, all zeros
+        logabsdet = jnp.zeros_like(inputs)
+
+        return outputs, logabsdet
+
+
+def InitHouseHolder(n_reflections: int) -> Callable:
     """Performs the householder transformation.
 
     This is a useful method to parameterize an orthogonal matrix.
@@ -28,39 +49,37 @@ def HouseHolder(n_reflections: int) -> Callable:
         the number of householder reflections
     """
 
-    def init_func(
-        rng: PRNGKey, n_features: int, **kwargs
-    ) -> Tuple[HouseHolderParams, Callable, Callable]:
+    def init_func(rng: PRNGKey, n_features: int, **kwargs) -> HouseHolder:
 
         # initialize the householder rotation matrix
         V = jax.nn.initializers.orthogonal()(key=rng, shape=(n_reflections, n_features))
 
-        init_params = HouseHolderParams(V=V)
+        init_params = HouseHolder(V=V)
 
-        def forward_func(params, inputs: Array, **kwargs) -> Tuple[Array, Array]:
+        # def forward_func(params, inputs: Array, **kwargs) -> Tuple[Array, Array]:
 
-            # forward transformation with batch dimension
-            outputs = jax.vmap(householder_transform, in_axes=(0, None))(
-                inputs, params.V
-            )
+        #     # forward transformation with batch dimension
+        #     outputs = jax.vmap(householder_transform, in_axes=(0, None))(
+        #         inputs, params.V
+        #     )
 
-            # log abs det, all zeros
-            logabsdet = jnp.zeros(inputs.shape[0])
+        #     # log abs det, all zeros
+        #     logabsdet = jnp.zeros(inputs.shape[0])
 
-            return outputs, logabsdet
+        #     return outputs, logabsdet
 
-        def inverse_func(params, inputs: Array, **kwargs) -> Tuple[Array, Array]:
+        # def inverse_func(params, inputs: Array, **kwargs) -> Tuple[Array, Array]:
 
-            outputs = jax.vmap(householder_inverse_transform, in_axes=(0, None))(
-                inputs, params.V
-            )
+        #     outputs = jax.vmap(householder_inverse_transform, in_axes=(0, None))(
+        #         inputs, params.V
+        #     )
 
-            # log abs det, all zeros
-            logabsdet = jnp.zeros(inputs.shape[0])
+        #     # log abs det, all zeros
+        #     logabsdet = jnp.zeros(inputs.shape[0])
 
-            return outputs, logabsdet
+        #     return outputs, logabsdet
 
-        return init_params, forward_func, inverse_func
+        return init_params  # , forward_func, inverse_func
 
     return init_func
 

@@ -5,15 +5,9 @@ import numpy as onp
 import pytest
 
 from rbig_jax.transforms.parametric.mixture.logistic import (
-    MixtureLogisticCDF,
-    mixture_logistic_cdf,
-    mixture_logistic_invcdf,
-    mixture_logistic_invcdf_vectorized,
-    mixture_logistic_cdf_vectorized,
-    mixture_logistic_log_pdf,
-    mixture_logistic_log_pdf_vectorized,
-)
-
+    MixtureLogisticCDF, mixture_logistic_cdf, mixture_logistic_cdf_vectorized,
+    mixture_logistic_invcdf, mixture_logistic_invcdf_vectorized,
+    mixture_logistic_log_pdf, mixture_logistic_log_pdf_vectorized)
 
 seed = 123
 rng = onp.random.RandomState(123)

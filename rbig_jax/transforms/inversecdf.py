@@ -2,8 +2,8 @@ from typing import Callable, Optional, Tuple
 
 import jax
 import jax.numpy as np
-from jax.random import PRNGKey
 from chex import Array, dataclass
+from jax.random import PRNGKey
 
 
 def InverseGaussCDF(eps: float = 1e-5) -> Callable:
@@ -78,4 +78,3 @@ def invgausscdf_forward_transform(X):
 
 def invgausscdf_inverse_transform(X):
     return jax.scipy.stats.norm.cdf(X)
-

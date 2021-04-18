@@ -9,7 +9,6 @@ from rbig_jax.transforms.logit import Logit
 from rbig_jax.transforms.parametric.householder import HouseHolder
 from rbig_jax.transforms.parametric.mixture import MixtureLogisticCDF
 
-
 seed = 123
 rng = onp.random.RandomState(123)
 

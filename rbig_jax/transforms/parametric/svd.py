@@ -1,14 +1,14 @@
 from typing import Callable, Tuple
+
 import jax
-from jax.lax import conv_general_dilated
-import numpy as np
 import jax.numpy as jnp
-from rbig_jax.transforms.parametric.householder import (
-    householder_transform,
-    householder_inverse_transform,
-)
+import numpy as np
 from chex import Array, dataclass
+from jax.lax import conv_general_dilated
 from jax.random import PRNGKey
+
+from rbig_jax.transforms.parametric.householder import (
+    householder_inverse_transform, householder_transform)
 
 
 @dataclass

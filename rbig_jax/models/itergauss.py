@@ -1,15 +1,16 @@
-from rbig_jax.transforms.histogram import InitUniHistUniformize
 from typing import Callable, Optional
 
 import jax
 import jax.numpy as np
 import objax
 from chex import Array, dataclass
-from rbig_jax.transforms.block import InitRBIGBlock, RBIGBlockParams
-from rbig_jax.utils import get_minimum_zeroth_element, reverse_dataclass_params
+
 from rbig_jax.information.total_corr import init_information_reduction_loss
+from rbig_jax.transforms.block import InitRBIGBlock, RBIGBlockParams
+from rbig_jax.transforms.histogram import (InitUniHistUniformize,
+                                           get_hist_params)
 from rbig_jax.transforms.rotation import InitPCARotation
-from rbig_jax.transforms.histogram import get_hist_params
+from rbig_jax.utils import get_minimum_zeroth_element, reverse_dataclass_params
 
 
 @dataclass

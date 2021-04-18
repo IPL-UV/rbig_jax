@@ -1,11 +1,10 @@
+from typing import List
+
+import jax
 import objax
 from objax import Module
-from typing import List
-import jax
+
 from rbig_jax.transforms.base import CompositeTransform
-
-
-from typing import List
 
 
 class GaussianizationFlow:

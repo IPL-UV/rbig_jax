@@ -5,14 +5,14 @@ from typing import Callable, Optional, Tuple
 import jax
 import jax.numpy as np
 from chex import Array, dataclass
-from rbig_jax.custom_types import InputData
 
+from rbig_jax.custom_types import InputData
+from rbig_jax.information.entropy import histogram_entropy
+from rbig_jax.transforms.block import InitRBIGBlock
+from rbig_jax.transforms.histogram import InitUniHistUniformize
 from rbig_jax.transforms.inversecdf import invgausscdf_forward_transform
 from rbig_jax.transforms.linear import svd_transform
-from rbig_jax.transforms.block import InitRBIGBlock
 from rbig_jax.transforms.rotation import InitPCARotation
-from rbig_jax.transforms.histogram import InitUniHistUniformize
-from rbig_jax.information.entropy import histogram_entropy
 
 
 @dataclass
@@ -218,4 +218,3 @@ def rbig_total_correlation(
     return total_correlation(
         X=X, uni_uniformize=uni_uniformize, rot_transform=rot_transform, **kwargs
     )
-
