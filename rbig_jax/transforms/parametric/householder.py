@@ -1,5 +1,4 @@
 import collections
-from functools import partial
 from typing import Callable, Tuple
 
 import jax
@@ -9,7 +8,7 @@ from jax.random import PRNGKey
 
 from rbig_jax.transforms.base import Bijector
 
-RotParams = collections.namedtuple("Params", ["projection"])
+# RotParams = collections.namedtuple("Params", ["projection"])
 
 
 @dataclass
@@ -56,30 +55,7 @@ def InitHouseHolder(n_reflections: int) -> Callable:
 
         init_params = HouseHolder(V=V)
 
-        # def forward_func(params, inputs: Array, **kwargs) -> Tuple[Array, Array]:
-
-        #     # forward transformation with batch dimension
-        #     outputs = jax.vmap(householder_transform, in_axes=(0, None))(
-        #         inputs, params.V
-        #     )
-
-        #     # log abs det, all zeros
-        #     logabsdet = jnp.zeros(inputs.shape[0])
-
-        #     return outputs, logabsdet
-
-        # def inverse_func(params, inputs: Array, **kwargs) -> Tuple[Array, Array]:
-
-        #     outputs = jax.vmap(householder_inverse_transform, in_axes=(0, None))(
-        #         inputs, params.V
-        #     )
-
-        #     # log abs det, all zeros
-        #     logabsdet = jnp.zeros(inputs.shape[0])
-
-        #     return outputs, logabsdet
-
-        return init_params  # , forward_func, inverse_func
+        return init_params
 
     return init_func
 

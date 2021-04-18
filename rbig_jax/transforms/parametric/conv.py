@@ -2,6 +2,7 @@ from typing import Callable, Tuple
 
 import jax
 import numpy as np
+import jax.numpy as jnp
 from chex import Array, dataclass
 from jax.lax import conv_general_dilated
 from jax.random import PRNGKey
@@ -14,7 +15,7 @@ from rbig_jax.transforms.parametric.householder import (
 
 
 @dataclass
-class Conv1x1HouseHolder(Bijector):
+class Conv1x1Householder(Bijector):
     weight: Array
 
     def forward_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
@@ -35,7 +36,7 @@ class Conv1x1HouseHolder(Bijector):
             the log absolute determinant of size (n_samples,)
         """
         *_, C = inputs.shape
-        weight_init = np.eye(C)
+        weight_init = jnp.eye(C)
 
         # weight matrix, householder product
         kernel = householder_transform(weight_init, self.weight)
@@ -44,7 +45,7 @@ class Conv1x1HouseHolder(Bijector):
         outputs = convolutions_1x1(x=inputs, kernel=kernel)
 
         # initialize logabsdet with batch dimension
-        log_abs_det = np.zeros_like(inputs)
+        log_abs_det = jnp.zeros_like(inputs)
 
         return outputs, log_abs_det
 
@@ -62,13 +63,13 @@ class Conv1x1HouseHolder(Bijector):
             the log absolute determinant of size (n_samples,)
         """
         *_, C = inputs.shape
-        weight_init = np.eye(C)
+        weight_init = jnp.eye(C)
         kernel = householder_inverse_transform(weight_init, self.weight)
 
         outputs = convolutions_1x1(x=inputs, kernel=kernel)
 
         # initialize logabsdet with batch dimension
-        log_abs_det = np.zeros_like(inputs)
+        log_abs_det = jnp.zeros_like(inputs)
 
         return outputs, log_abs_det
 
@@ -88,7 +89,7 @@ def InitConv1x1Householder(n_reflections: int):
 
     """
 
-    def init_func(rng: PRNGKey, shape: Tuple, **kwargs) -> Conv1x1HouseHolder:
+    def init_func(rng: PRNGKey, shape: Tuple, **kwargs) -> Conv1x1Householder:
 
         # extract shape
         *_, C = shape
@@ -97,7 +98,7 @@ def InitConv1x1Householder(n_reflections: int):
         V = jax.nn.initializers.orthogonal()(key=rng, shape=(n_reflections, C))
 
         # create bijector
-        return Conv1x1HouseHolder(weight=V)
+        return Conv1x1Householder(weight=V)
 
     return init_func
 
@@ -165,7 +166,7 @@ def convolutions_1x1(x: Array, kernel: Array) -> Array:
 #             the log absolute determinant of size (n_samples,)
 #         """
 #         *_, C = inputs.shape
-#         weight_init = np.eye(C)
+#         weight_init = jnp.eye(C)
 
 #         # weight matrix, householder product
 #         kernel = householder_transform(weight_init, self.weight)
@@ -174,7 +175,7 @@ def convolutions_1x1(x: Array, kernel: Array) -> Array:
 #         outputs = convolutions_1x1(x=inputs, kernel=kernel)
 
 #         # initialize logabsdet with batch dimension
-#         log_abs_det = np.zeros_like(inputs)
+#         log_abs_det = jnp.zeros_like(inputs)
 
 #         return outputs, log_abs_det
 
@@ -192,13 +193,13 @@ def convolutions_1x1(x: Array, kernel: Array) -> Array:
 #             the log absolute determinant of size (n_samples,)
 #         """
 #         *_, C = inputs.shape
-#         weight_init = np.eye(C)
+#         weight_init = jnp.eye(C)
 #         kernel = householder_inverse_transform(weight_init, self.weight)
 
 #         outputs = convolutions_1x1(x=inputs, kernel=kernel)
 
 #         # initialize logabsdet with batch dimension
-#         log_abs_det = np.zeros_like(inputs)
+#         log_abs_det = jnp.zeros_like(inputs)
 
 #         return outputs, log_abs_det
 
@@ -249,9 +250,9 @@ def convolutions_1x1(x: Array, kernel: Array) -> Array:
 #             outputs = convolutions_1x1(x=inputs, kernel=params.weight)
 
 #             # calculate log determinant jacobian
-#             log_abs_det = np.ones(n_samples)
+#             log_abs_det = jnp.ones(n_samples)
 #             log_abs_det = (
-#                 log_abs_det * height * width * np.linalg.slogdet(params.weight)[1]
+#                 log_abs_det * height * width * jnp.linalg.slogdet(params.weight)[1]
 #             )
 
 #             return outputs, log_abs_det
@@ -276,9 +277,9 @@ def convolutions_1x1(x: Array, kernel: Array) -> Array:
 #             outputs = convolutions_1x1(x=inputs, kernel=params.weight.T)
 
 #             # calculate log determinant jacobian
-#             log_abs_det = np.ones(n_samples)
+#             log_abs_det = jnp.ones(n_samples)
 #             log_abs_det = (
-#                 log_abs_det * height * width * np.linalg.slogdet(params.weight)[1]
+#                 log_abs_det * height * width * jnp.linalg.slogdet(params.weight)[1]
 #             )
 
 #             return outputs, log_abs_det

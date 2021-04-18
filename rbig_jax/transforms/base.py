@@ -5,7 +5,7 @@ import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
 from jax.random import PRNGKey
-from objax.module import Module
+from distrax._src.utils.math import sum_last
 
 
 @dataclass
@@ -49,23 +49,61 @@ class Bijector:
 
 
 @dataclass
+class InverseBijector:
+    bijector: dataclass
+
+    def forward(self, x: Array) -> Array:
+        """Computes y = f(x)."""
+        y, _ = self.bijector.inverse_and_log_det(x)
+        return y
+
+    def inverse(self, y: Array) -> Array:
+        """Computes x = f^{-1}(y)."""
+        x, _ = self.bijector.forward_and_log_det(y)
+        return x
+
+    def forward_log_det_jacobian(self, x: Array) -> Array:
+        """Computes log|det J(f)(x)|."""
+        _, logdet = self.bijector.inverse_and_log_det(x)
+        return logdet
+
+    def inverse_log_det_jacobian(self, y: Array) -> Array:
+        """Computes log|det J(f^{-1})(y)|."""
+        _, logdet = self.bijector.forward_and_log_det(y)
+        return logdet
+
+    def forward_and_log_det(self, x: Array) -> Tuple[Array, Array]:
+        """Computes y = f(x) and log|det J(f)(x)|."""
+        outputs, logdet = self.bijector.inverse_and_log_det(x)
+        return outputs, logdet
+
+    def inverse_and_log_det(self, y: Array) -> Tuple[Array, Array]:
+        """Computes x = f^{-1}(y) and log|det J(f^{-1})(y)|."""
+        outputs, logdet = self.bijector.forward_and_log_det(y)
+        return outputs, logdet
+
+
+@dataclass
 class BijectorChain(Bijector):
     bijectors: Iterable[Bijector]
 
     def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
         outputs = inputs
-        total_logabsdet = jnp.zeros_like(outputs)
+        total_logabsdet = jnp.zeros((outputs.shape[0],))
+        total_logabsdet = jnp.expand_dims(total_logabsdet, axis=1)
         for ibijector in self.bijectors:
             outputs, logabsdet = ibijector.forward_and_log_det(outputs)
-            total_logabsdet += logabsdet
+            total_logabsdet += sum_last(logabsdet, ndims=logabsdet.ndim)
         return outputs, total_logabsdet
 
     def inverse_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
         outputs = inputs
-        total_logabsdet = jnp.zeros_like(outputs)
+        total_logabsdet = jnp.zeros((outputs.shape[0],))
+        total_logabsdet = jnp.expand_dims(total_logabsdet, axis=1)
         for ibijector in reversed(self.bijectors):
             outputs, logabsdet = ibijector.inverse_and_log_det(outputs)
-            total_logabsdet += logabsdet
+            # print(logabsdet.shape)
+            total_logabsdet += sum_last(logabsdet, ndims=logabsdet.ndim)
         return outputs, total_logabsdet
 
     def forward(self, inputs: Array) -> Array:

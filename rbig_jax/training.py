@@ -25,13 +25,11 @@ def init_log_prob(base_dist: DistributionLike) -> Callable:
         latent_prob = base_dist.log_prob(outputs)
 
         # log probability
-        log_prob = latent_prob.sum(axis=1) + log_det.sum(axis=1)
+        log_prob = latent_prob.sum(axis=1) + log_det
 
         return log_prob
 
     return log_prob
-
-
 
 
 def init_train_op(
@@ -61,8 +59,6 @@ def init_train_op(
     if jitted:
         train_op = jax.jit(train_op)
     return train_op, (opt_init, opt_state, get_params)
-
-
 
 
 def train_model(
