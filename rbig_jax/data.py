@@ -1,8 +1,45 @@
 from typing import Tuple
 
-import jax.numpy as np
-import numpy as onp
+import jax.numpy as jnp
+import numpy as np
 from chex import Array
+from torch.utils.data import Dataset, DataLoader
+
+# import torch.multiprocessing as multiprocessing
+
+# multiprocessing.set_start_method("spawn")
+# class DensityDataset:
+#     def __init__(self, data, dtype=jnp.float32):
+#         self.data = data
+#         self.dtype = dtype
+
+#     def __len__(self):
+#         return len(self.data)
+
+#     def __getitem__(self, idx: int) -> Array:
+#         data = self.data[idx]
+#         return jnp.array(data, dtype=self.dtype)
+
+
+class DensityDataset(Dataset):
+    def __init__(self, data):
+        self.data = data
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx: int) -> Array:
+        data = self.data[idx]
+        return data
+
+
+def collate_fn(batch):
+    if isinstance(batch[0], jnp.ndarray):
+        return jnp.stack(batch)
+    elif isinstance(batch[0], (tuple, list)):
+        return type(batch[0])(collate_fn(samples) for samples in zip(*batch))
+    else:
+        return jnp.asarray(batch)
 
 
 def get_data(
@@ -10,35 +47,35 @@ def get_data(
     input_noise: float = 0.15,
     output_noise: float = 0.15,
     N_test: int = 400,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    onp.random.seed(0)
-    X = np.linspace(-1, 1, N)
-    Y = X + 0.2 * np.power(X, 3.0) + 0.5 * np.power(0.5 + X, 2.0) * np.sin(4.0 * X)
-    Y += output_noise * onp.random.randn(N)
-    Y -= np.mean(Y)
-    Y /= np.std(Y)
+) -> Tuple[np.ndarray, jnp.ndarray, jnp.ndarray]:
+    np.random.seed(0)
+    X = jnp.linspace(-1, 1, N)
+    Y = X + 0.2 * jnp.power(X, 3.0) + 0.5 * jnp.power(0.5 + X, 2.0) * jnp.sin(4.0 * X)
+    Y += output_noise * np.random.randn(N)
+    Y -= jnp.mean(Y)
+    Y /= jnp.std(Y)
 
-    X += input_noise * onp.random.randn(N)
+    X += input_noise * np.random.randn(N)
 
     assert X.shape == (N,)
     assert Y.shape == (N,)
 
-    X_test = np.linspace(-1.2, 1.2, N_test)
+    X_test = jnp.linspace(-1.2, 1.2, N_test)
 
     return X[:, None], Y[:, None], X_test[:, None]
 
 
 def get_classic(n_samples=10_000, seed=123):
-    rng = onp.random.RandomState(seed=seed)
-    x = onp.abs(2 * rng.randn(1, n_samples))
-    y = onp.sin(x) + 0.25 * rng.randn(1, n_samples)
-    return onp.vstack((x, y)).T
+    rng = np.random.RandomState(seed=seed)
+    x = np.abs(2 * rng.randn(1, n_samples))
+    y = np.sin(x) + 0.25 * rng.randn(1, n_samples)
+    return np.vstack((x, y)).T
 
 
 def generate_2d_grid(data: Array, n_grid: int = 1_000, buffer: float = 0.01) -> Array:
 
-    xline = np.linspace(data[:, 0].min() - buffer, data[:, 0].max() + buffer, n_grid)
-    yline = np.linspace(data[:, 1].min() - buffer, data[:, 1].max() + buffer, n_grid)
-    xgrid, ygrid = np.meshgrid(xline, yline)
-    xyinput = np.concatenate([xgrid.reshape(-1, 1), ygrid.reshape(-1, 1)], axis=1)
+    xline = jnp.linspace(data[:, 0].min() - buffer, data[:, 0].max() + buffer, n_grid)
+    yline = jnp.linspace(data[:, 1].min() - buffer, data[:, 1].max() + buffer, n_grid)
+    xgrid, ygrid = jnp.meshgrid(xline, yline)
+    xyinput = jnp.concatenate([xgrid.reshape(-1, 1), ygrid.reshape(-1, 1)], axis=1)
     return xyinput

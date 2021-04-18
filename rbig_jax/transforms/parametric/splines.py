@@ -2,6 +2,7 @@
 https://github.com/jfcrenshaw/pzflow/blob/main/pzflow/bijectors/neural_splines.py
 """
 
+from rbig_jax.transforms.base import Bijector
 from typing import Tuple, Callable
 from jax.random import PRNGKey
 import jax.random as jr
@@ -9,19 +10,31 @@ import jax.numpy as jnp
 from jax.nn import softmax, softplus
 from chex import dataclass, Array
 from distrax._src.bijectors.rational_quadratic_spline import (
-    RationalQuadraticSpline,
+    RationalQuadraticSpline as distrax_rqs,
     _rational_quadratic_spline_fwd,
     _rational_quadratic_spline_inv,
-    _normalize_bin_sizes,
-    _normalize_knot_slopes,
 )
 
 
 @dataclass
-class RQSplineParams:
+class RationalQuadraticSpline(Bijector):
     x_pos: Array
     y_pos: Array
     knot_slopes: Array
+
+    def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+        fn = jnp.vectorize(
+            _rational_quadratic_spline_fwd, signature="(),(n),(n),(n)->(),()"
+        )
+        outputs, log_det = fn(inputs, self.x_pos, self.y_pos, self.knot_slopes)
+        return outputs, log_det
+
+    def inverse_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+        fn = jnp.vectorize(
+            _rational_quadratic_spline_inv, signature="(),(n),(n),(n)->(),()"
+        )
+        outputs, log_det = fn(inputs, self.x_pos, self.y_pos, self.knot_slopes)
+        return outputs, log_det
 
 
 def PiecewiseRationalQuadraticCDF(
@@ -46,11 +59,9 @@ def PiecewiseRationalQuadraticCDF(
             f"Minimum knot slope must be positive; " f"Got {min_knot_slope}"
         )
 
-    def init_func(
-        rng: PRNGKey, n_features: int, **kwargs
-    ) -> Tuple[RQSplineParams, Callable, Callable]:
+    def init_func(rng: PRNGKey, n_features: int, **kwargs) -> Bijector:
 
-        init_params = init_spline_params(
+        return init_spline_params(
             n_bins=n_bins,
             rng=rng,
             n_features=n_features,
@@ -60,30 +71,6 @@ def PiecewiseRationalQuadraticCDF(
             range_max=range_max,
             boundary_slopes=boundary_slopes,
         )
-
-        def forward_func(
-            params: RQSplineParams, inputs: Array, **kwargs
-        ) -> Tuple[Array, Array]:
-            fn = jnp.vectorize(
-                _rational_quadratic_spline_fwd, signature="(),(n),(n),(n)->(),()"
-            )
-            outputs, log_det = fn(
-                inputs, params.x_pos, params.y_pos, params.knot_slopes
-            )
-            return outputs, log_det
-
-        def inverse_func(
-            params: RQSplineParams, inputs: Array, **kwargs
-        ) -> Tuple[Array, Array]:
-            fn = jnp.vectorize(
-                _rational_quadratic_spline_inv, signature="(),(n),(n),(n)->(),()"
-            )
-            outputs, log_det = fn(
-                inputs, params.x_pos, params.y_pos, params.knot_slopes
-            )
-            return outputs, log_det
-
-        return init_params, forward_func, inverse_func
 
     return init_func
 
@@ -132,7 +119,7 @@ def init_spline_params(
         [unnormalized_widths, unnormalized_heights, unnormalized_derivatives], axis=-1
     )
 
-    clf = RationalQuadraticSpline(
+    clf = distrax_rqs(
         params,
         range_min=range_min,
         range_max=range_max,
@@ -140,41 +127,8 @@ def init_spline_params(
         min_bin_size=min_bin_size,
         min_knot_slope=min_knot_slope,
     )
-
-    # # Normalize bin sizes and compute bin positions on the x and y axis.
-    # range_size = range_max - range_min
-    # bin_widths = _normalize_bin_sizes(unnormalized_widths, range_size, min_bin_size)
-    # bin_heights = _normalize_bin_sizes(unnormalized_heights, range_size, min_bin_size)
-    # x_pos = range_min + jnp.cumsum(bin_widths[..., :-1], axis=-1)
-    # y_pos = range_min + jnp.cumsum(bin_heights[..., :-1], axis=-1)
-    # pad_shape = n_features + (1,)
-    # pad_below = jnp.full(pad_shape, range_min, dtype=dtype)
-    # pad_above = jnp.full(pad_shape, range_max, dtype=dtype)
-    # x_pos = jnp.concatenate([pad_below, x_pos, pad_above], axis=-1)
-    # y_pos = jnp.concatenate([pad_below, y_pos, pad_above], axis=-1)
-    # # Normalize knot slopes and enforce requested boundary conditions.
-    # knot_slopes = _normalize_knot_slopes(unnormalized_derivatives, min_knot_slope)
-    # if boundary_slopes == "unconstrained":
-    #     pass
-    # elif boundary_slopes == "lower_identity":
-    #     ones = jnp.ones(pad_shape, dtype)
-    #     knot_slopes = jnp.concatenate([ones, knot_slopes[..., 1:]], axis=-1)
-    # elif boundary_slopes == "upper_identity":
-    #     ones = jnp.ones(pad_shape, dtype)
-    #     knot_slopes = jnp.concatenate([knot_slopes[..., :-1], ones], axis=-1)
-    # elif boundary_slopes == "identity":
-    #     ones = jnp.ones(pad_shape, dtype)
-    #     knot_slopes = jnp.concatenate([ones, knot_slopes[..., 1:-1], ones], axis=-1)
-    # elif boundary_slopes == "circular":
-    #     knot_slopes = jnp.concatenate(
-    #         [knot_slopes[..., :-1], knot_slopes[..., :1]], axis=-1
-    #     )
-    # else:
-    #     raise ValueError(
-    #         f"Unknown option for boundary slopes:" f" `{boundary_slopes}`."
-    #     )
-
-    init_params = RQSplineParams(
+    init_rqs_bijector = RationalQuadraticSpline(
         x_pos=clf.x_pos, y_pos=clf.y_pos, knot_slopes=clf.knot_slopes
     )
-    return init_params
+    return init_rqs_bijector
+
