@@ -72,8 +72,16 @@ def PiecewiseRationalQuadraticCDF(
             )
             return outputs, log_det
 
-        def inverse_func():
-            return None
+        def inverse_func(
+            params: RQSplineParams, inputs: Array, **kwargs
+        ) -> Tuple[Array, Array]:
+            fn = jnp.vectorize(
+                _rational_quadratic_spline_inv, signature="(),(n),(n),(n)->(),()"
+            )
+            outputs, log_det = fn(
+                inputs, params.x_pos, params.y_pos, params.knot_slopes
+            )
+            return outputs, log_det
 
         return init_params, forward_func, inverse_func
 
