@@ -2,12 +2,13 @@ from typing import Callable, Optional, Tuple
 
 import jax.numpy as np
 from chex import Array, dataclass
-from distrax._src.bijectors.sigmoid import (_more_stable_sigmoid,
-                                            _more_stable_softplus)
+from distrax._src.bijectors.sigmoid import _more_stable_sigmoid, _more_stable_softplus
 from jax.nn import sigmoid, softplus
 from jax.random import PRNGKey
 
 from rbig_jax.transforms.base import Bijector
+from distrax._src.bijectors.sigmoid import Sigmoid
+from distrax._src.bijectors.inverse import Inverse
 
 EPS = 1e-5
 TEMPERATURE = 1.0
@@ -46,6 +47,16 @@ class Logit(Bijector):
 def InitLogit(eps: float = 1e-5, temperature: float = 1.0):
     def init_func(rng: PRNGKey, n_features: int, **kwargs):
 
-        return Logit()
+        return Inverse(Sigmoid())
+
+    return init_func
+
+
+def InitLogitTransform():
+    def init_func(X: Array, rng: PRNGKey, n_features: int, **kwargs):
+        bijector = Inverse(Sigmoid())
+
+        outputs = bijector.forward(X)
+        return outputs, bijector
 
     return init_func

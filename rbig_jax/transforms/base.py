@@ -89,21 +89,21 @@ class BijectorChain(Bijector):
 
     def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
         outputs = inputs
-        total_logabsdet = jnp.zeros((outputs.shape[0],))
-        total_logabsdet = jnp.expand_dims(total_logabsdet, axis=1)
+        total_logabsdet = jnp.zeros_like(outputs)
+        # total_logabsdet = jnp.zeros((outputs.shape[0],))
+        # total_logabsdet = jnp.expand_dims(total_logabsdet, axis=1)
         for ibijector in self.bijectors:
             outputs, logabsdet = ibijector.forward_and_log_det(outputs)
-            total_logabsdet += sum_last(logabsdet, ndims=logabsdet.ndim)
+            total_logabsdet += logabsdet  # sum_last(logabsdet, ndims=logabsdet.ndim)
         return outputs, total_logabsdet
 
     def inverse_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
         outputs = inputs
-        total_logabsdet = jnp.zeros((outputs.shape[0],))
-        total_logabsdet = jnp.expand_dims(total_logabsdet, axis=1)
+        total_logabsdet = jnp.zeros_like(outputs)
+        # total_logabsdet = jnp.expand_dims(total_logabsdet, axis=1)
         for ibijector in reversed(self.bijectors):
             outputs, logabsdet = ibijector.inverse_and_log_det(outputs)
-            # print(logabsdet.shape)
-            total_logabsdet += sum_last(logabsdet, ndims=logabsdet.ndim)
+            total_logabsdet += logabsdet  # sum_last(logabsdet, ndims=logabsdet.ndim)
         return outputs, total_logabsdet
 
     def forward(self, inputs: Array) -> Array:

@@ -8,6 +8,7 @@ import tqdm
 from chex import dataclass
 from distrax._src.distributions import distribution as dist_base
 from jax import scipy as jscipy
+from distrax._src.utils.math import sum_last
 
 DistributionLike = dist_base.DistributionLike
 
@@ -18,15 +19,18 @@ def init_log_prob(base_dist: DistributionLike) -> Callable:
         # forward transformation
         outputs, log_det = bijector.forward_and_log_det(inputs)
 
-        # # gradient transformation
-        # log_det = grad_f(params, inputs)
-
         # probability in the latent space
         latent_prob = base_dist.log_prob(outputs)
 
         # log probability
-        log_prob = latent_prob.sum(axis=1) + log_det
+        log_prob = sum_last(latent_prob, ndims=latent_prob.ndim - 1) + sum_last(
+            log_det, ndims=log_det.ndim - 1
+        )
 
+        # # log probability
+        # log_prob = sum_last(latent_prob, ndims=latent_prob.ndim) + sum_last(
+        #     log_det, ndims=latent_prob.ndim
+        # )
         return log_prob
 
     return log_prob
