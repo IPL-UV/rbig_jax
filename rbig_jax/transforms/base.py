@@ -1,11 +1,12 @@
 import abc
-from typing import Callable, Iterable, List, Sequence, Tuple
+from typing import Callable, Iterable, List, Sequence, Tuple, NamedTuple
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
 from jax.random import PRNGKey
 from distrax._src.utils.math import sum_last
+from distrax._src.bijectors.bijector import Bijector as FixedBijector
 
 
 @dataclass
@@ -13,6 +14,24 @@ class TransformInfo:
     name: str
     input_shape: Tuple
     output_shape: Tuple
+
+
+class InitFunctions(NamedTuple):
+    init_params: Callable
+    init_bijector: Callable
+    init_transform: Callable
+
+
+class InitFunctionsPlus(NamedTuple):
+    init_params: Callable
+    init_bijector: Callable
+    init_transform: Callable
+    init_layer: Callable
+
+
+@dataclass(frozen=True)
+class HyperParams:
+    params: dataclass
 
 
 @dataclass

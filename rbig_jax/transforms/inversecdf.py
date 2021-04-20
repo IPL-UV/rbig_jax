@@ -5,6 +5,7 @@ import jax.numpy as jnp
 from chex import Array, dataclass
 from jax.random import PRNGKey
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
+from rbig_jax.transforms.base import InitFunctionsPlus
 
 
 class InverseGaussCDF(distaxBijector):
@@ -20,7 +21,9 @@ class InverseGaussCDF(distaxBijector):
         outputs = jax.scipy.stats.norm.ppf(inputs)
 
         # gradient transformation
-        logabsdet = -jax.scipy.stats.norm.logpdf(outputs)
+        # print(outputs.min(), outputs.max())
+        # logabsdet = -jax.scipy.stats.norm.logpdf(outputs)
+        logabsdet = -_stable_log_pdf(outputs)
 
         return outputs, logabsdet
 
@@ -34,14 +37,48 @@ class InverseGaussCDF(distaxBijector):
         return outputs, logabsdet
 
 
-def InitInverseGaussCDFTransform(eps: float = 1e-5):
-    def init_func(X: Array, rng: PRNGKey, n_features: int, **kwargs):
-        bijector = InverseGaussCDF(eps=eps)
+import math
 
-        outputs = bijector.forward(X)
+_half_log2pi = 0.5 * math.log(2 * math.pi)
+# _half_log2pi = jnp.log(jnp.sqrt(2 * jnp.pi))
+
+
+def _stable_log_pdf(inputs):
+
+    log_unnormalized = -0.5 * jnp.square(inputs)
+
+    log_normalization = _half_log2pi
+    return log_unnormalized - log_normalization
+
+
+def InitInverseGaussCDFTransform(eps: float = 1e-5):
+
+    # initialize bijector
+    bijector = InverseGaussCDF(eps=eps)
+
+    def init_layer(rng: PRNGKey, n_features: int, **kwargs):
+
+        return bijector
+
+    def init_params(inputs):
+        outputs = bijector.forward(inputs)
+        return outputs, ()
+
+    def init_transform(inputs):
+
+        outputs = bijector.forward(inputs)
+        return outputs
+
+    def init_bijector(inputs):
+        outputs = bijector.forward(inputs)
         return outputs, bijector
 
-    return init_func
+    return InitFunctionsPlus(
+        init_params=init_params,
+        init_bijector=init_bijector,
+        init_transform=init_transform,
+        init_layer=init_layer,
+    )
 
 
 # def InverseGaussCDF(eps: float = 1e-5) -> Callable:

@@ -1,5 +1,7 @@
 from functools import partial
-from typing import Union
+from rbig_jax.transforms.base import InitFunctions
+from rbig_jax.transforms.marginal import MarginalUniformizeTransform
+from typing import Union, NamedTuple, Tuple
 
 import jax
 import jax.numpy as np
@@ -8,57 +10,74 @@ from chex import Array, dataclass
 from rbig_jax.utils import get_domain_extension
 
 
-@dataclass
-class UniKDEParams:
+class UniKDEParams(NamedTuple):
     support: Array
     quantiles: Array
     support_pdf: Array
     empirical_pdf: Array
 
 
-def InitKDEUniformize(
-    n_samples: int,
+def InitUniKDETransform(
+    shape: Tuple,
     support_extension: Union[int, float] = 10,
     precision: int = 1_000,
     bw: float = 0.1,
+    jitted: bool = False,
 ):
 
-    # TODO a kde bin init function
-    # bw = scotts_method(n_samples, 1) * 0.5
+    n_samples, n_features = shape
 
-    def init_fun(inputs):
+    bw = estimate_bw(n_samples=n_samples, n_features=n_features, method=bw)
 
-        outputs, params = get_kde_params(
-            X=inputs,
-            support_extension=support_extension,
-            precision=precision,
-            bw=bw,
-            return_params=True,
-        )
+    f = jax.partial(
+        init_kde_params,
+        support_extension=support_extension,
+        precision=precision,
+        bw=bw,
+        return_params=True,
+    )
 
+    f_slim = jax.partial(
+        init_kde_params,
+        support_extension=support_extension,
+        precision=precision,
+        bw=bw,
+        return_params=False,
+    )
+    if jitted:
+        f = jax.jit(f)
+        f_slim = jax.jit(f_slim)
+
+    def init_params(inputs):
+
+        outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
         return outputs, params
 
-    def forward_transform(params, inputs):
+    def init_transform(inputs):
 
-        return kde_forward_transform(params, inputs)
+        outputs = jax.vmap(f_slim, out_axes=1, in_axes=(1,))(inputs)
+        return outputs
 
-    def gradient_transform(params, inputs):
+    def init_bijector(inputs):
+        outputs, params = init_params(inputs)
+        # print(params)
+        # initialize parameters
+        bijector = MarginalUniformizeTransform(
+            support=params.support,
+            quantiles=params.quantiles,
+            support_pdf=params.support_pdf,
+            empirical_pdf=params.empirical_pdf,
+        )
+        return outputs, bijector
 
-        outputs = kde_forward_transform(params, inputs)
-
-        absdet = kde_gradient_transform(params, inputs)
-
-        logabsdet = np.log(absdet)
-
-        return outputs, logabsdet
-
-    def inverse_transform(params, inputs):
-        return kde_inverse_transform(params, inputs)
-
-    return init_fun, forward_transform, gradient_transform, inverse_transform
+    return InitFunctions(
+        init_params=init_params,
+        init_bijector=init_bijector,
+        init_transform=init_transform,
+    )
 
 
-def get_kde_params(
+def init_kde_params(
     X: np.ndarray,
     bw: int = 0.1,
     support_extension: Union[int, float] = 10,
@@ -172,6 +191,17 @@ def broadcast_kde_cdf(x_evals, samples, factor):
     return jax.scipy.special.ndtr(
         (x_evals[:, np.newaxis] - samples[np.newaxis, :]) / factor
     ).mean(axis=1)
+
+
+def estimate_bw(n_samples, n_features, method="scott"):
+    if isinstance(method, float) or isinstance(method, Array):
+        return method
+    elif method == "scott":
+        return scotts_method(n_samples, n_features)
+    elif method == "silverman":
+        return silvermans_method(n_samples, n_features)
+    else:
+        raise ValueError(f"Unrecognized bw estimation method: {method}")
 
 
 def scotts_method(n, d=1):

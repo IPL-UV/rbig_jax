@@ -6,7 +6,7 @@ from distrax._src.bijectors.sigmoid import _more_stable_sigmoid, _more_stable_so
 from jax.nn import sigmoid, softplus
 from jax.random import PRNGKey
 
-from rbig_jax.transforms.base import Bijector
+from rbig_jax.transforms.base import Bijector, InitFunctionsPlus
 from distrax._src.bijectors.sigmoid import Sigmoid
 from distrax._src.bijectors.inverse import Inverse
 
@@ -44,19 +44,61 @@ class Logit(Bijector):
         return outputs, logabsdet
 
 
-def InitLogit(eps: float = 1e-5, temperature: float = 1.0):
-    def init_func(rng: PRNGKey, n_features: int, **kwargs):
+def InitSigmoidTransform():
 
-        return Inverse(Sigmoid())
+    # initialize bijector
+    bijector = Sigmoid()
 
-    return init_func
+    def init_layer(rng: PRNGKey, n_features: int, **kwargs):
+
+        return bijector
+
+    def init_params(inputs):
+        outputs = bijector.forward(inputs)
+        return outputs, ()
+
+    def init_transform(inputs):
+
+        outputs = bijector.forward(inputs)
+        return outputs
+
+    def init_bijector(inputs):
+        outputs = bijector.forward(inputs)
+        return outputs, bijector
+
+    return InitFunctionsPlus(
+        init_params=init_params,
+        init_bijector=init_bijector,
+        init_transform=init_transform,
+        init_layer=init_layer,
+    )
 
 
 def InitLogitTransform():
-    def init_func(X: Array, rng: PRNGKey, n_features: int, **kwargs):
-        bijector = Inverse(Sigmoid())
 
-        outputs = bijector.forward(X)
+    # initialize bijector
+    bijector = Inverse(Sigmoid())
+
+    def init_layer(rng: PRNGKey, n_features: int, **kwargs):
+
+        return bijector
+
+    def init_params(inputs):
+        outputs = bijector.forward(inputs)
+        return outputs, ()
+
+    def init_transform(inputs):
+
+        outputs = bijector.forward(inputs)
+        return outputs
+
+    def init_bijector(inputs):
+        outputs = bijector.forward(inputs)
         return outputs, bijector
 
-    return init_func
+    return InitFunctionsPlus(
+        init_params=init_params,
+        init_bijector=init_bijector,
+        init_transform=init_transform,
+        init_layer=init_layer,
+    )
