@@ -128,6 +128,8 @@ def init_hist_params(
     # get number of samples
     n_samples = jnp.shape(X)[0]
 
+    # nbins_ = nbins(X)
+
     # get histogram counts and bin edges
     counts, bin_edges = jnp.histogram(X, bins=nbins)
 
@@ -250,3 +252,63 @@ def hist_gradient_transform(params: UniHistParams, X: Array) -> Array:
         The transformed univariate parameters
     """
     return jnp.interp(X, params.support_pdf, params.empirical_pdf)
+
+
+def init_bin_estimator(method="sturges"):
+    if method == "sqrt":
+        return hist_bin_sqrt
+    elif method == "scott":
+        raise NotImplementedError(f"Error with data dependent method")
+
+    # return hist_bin_scott
+    elif method == "sturges":
+        return hist_bin_sturges
+    elif method == "rice":
+        return hist_bin_rice
+    elif method == "fd":
+        raise NotImplementedError(f"Error with data dependent method")
+        # return hist_bin_fd
+    elif method == "auto":
+        raise NotImplementedError(f"Error with data dependent method")
+        # return hist_bin_auto
+    else:
+        raise ValueError(f"Unrecognized bin estimation method: {method}")
+
+
+def _ptp(x):
+    return jnp.ptp(x).astype(jnp.uint32)
+
+
+import math
+
+
+def hist_bin_sqrt(x):
+    return math.ceil(math.sqrt(x.size))
+
+
+def hist_bin_scott(x):
+    return (24.0 * math.pi ** 0.5 / x.size) ** (1.0 / 3.0) * jnp.std(x)
+
+
+def hist_bin_sturges(x):
+    # return _ptp(x) / (jnp.log2(x.size) + 1.0)
+    return math.ceil(math.log2(x.size) + 1.0)
+
+
+def hist_bin_rice(x):
+    # return _ptp(x) / (2.0 * x.size ** (1.0 / 3))
+    return math.ceil(2.0 * x.size ** (1.0 / 3))
+
+
+def hist_bin_fd(x):
+    iqr = jnp.subtract(*jnp.percentile(x, [75, 25]))
+    return 2.0 * iqr * x.size ** (-1.0 / 3.0)
+
+
+def hist_bin_auto(x):
+    fd_bw = hist_bin_fd(x)
+    sturges_bw = hist_bin_sturges(x)
+    min_bin = jnp.minimum(fd_bw, sturges_bw)
+    # if fd 0, use sturges
+    return jnp.where(min_bin > 0, min_bin, sturges_bw)
+

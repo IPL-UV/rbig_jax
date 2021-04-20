@@ -51,26 +51,31 @@ def _stable_log_pdf(inputs):
     return log_unnormalized - log_normalization
 
 
-def InitInverseGaussCDFTransform(eps: float = 1e-5):
+def InitInverseGaussCDFTransform(eps: float = 1e-5, jitted=False):
 
     # initialize bijector
     bijector = InverseGaussCDF(eps=eps)
+
+    if jitted:
+        f = jax.jit(bijector.forward)
+    else:
+        f = bijector.forward
 
     def init_layer(rng: PRNGKey, n_features: int, **kwargs):
 
         return bijector
 
     def init_params(inputs):
-        outputs = bijector.forward(inputs)
+        outputs = f(inputs)
         return outputs, ()
 
     def init_transform(inputs):
 
-        outputs = bijector.forward(inputs)
+        outputs = f(inputs)
         return outputs
 
     def init_bijector(inputs):
-        outputs = bijector.forward(inputs)
+        outputs = f(inputs)
         return outputs, bijector
 
     return InitFunctionsPlus(

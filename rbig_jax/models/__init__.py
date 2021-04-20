@@ -1,3 +1,3 @@
-from rbig_jax.models.itergauss import RBIG, IterativeGaussianization
+from rbig_jax.models.gaussflow import GaussianizationFlow
 
-__all__ = ["IterativeGaussianization", "RBIG"]
+__all__ = ["GaussianizationFlow"]
