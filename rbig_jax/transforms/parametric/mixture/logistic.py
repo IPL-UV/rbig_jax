@@ -29,7 +29,7 @@ class MixtureLogisticCDF(Bijector):
         )
 
         # log abs det, all zeros
-        logabsdet = mixture_logistic_log_pdf_vectorized(
+        logabsdet = mixture_logistic_log_pdf(
             inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
         )
 

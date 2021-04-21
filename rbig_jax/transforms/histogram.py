@@ -74,6 +74,10 @@ def InitUniHistTransform(
         )
         return outputs, bijector
 
+    def init_layer(rng, shape, inputs=None):
+
+        return None
+
     return InitFunctions(
         init_params=init_params,
         init_bijector=init_bijector,

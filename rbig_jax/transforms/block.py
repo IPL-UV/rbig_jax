@@ -1,9 +1,8 @@
 from typing import Callable, Optional, Tuple, List
-
-import jax.numpy as np
 import jax.numpy as jnp
 from chex import Array, dataclass
 from rbig_jax.transforms.histogram import InitUniHistTransform
+from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDFTransform
 from rbig_jax.transforms.rotation import InitPCARotation
 
@@ -69,30 +68,45 @@ class RBIGBlockParams:
 
 
 def init_default_rbig_block(
-    n_samples: int,
+    shape: Tuple,
+    method: str = "histogram",
     support_extension: int = 10,
     alpha: float = 1e-5,
     precision: int = 100,
     nbins: Optional[int] = None,
+    bw: str = "scott",
     jitted: bool = True,
     eps: float = 1e-5,
 ) -> RBIGBlock:
 
-    # init histogram transformation
-    if nbins is None:
-        nbins = int(jnp.sqrt(n_samples))
+    n_samples = shape[0]
 
-    init_hist_f = InitUniHistTransform(
-        n_samples=n_samples,
-        nbins=nbins,
-        support_extension=support_extension,
-        precision=precision,
-        alpha=alpha,
-        jitted=jitted,
-    )
+    # init histogram transformation
+    if method == "histogram":
+        if nbins is None:
+            nbins = int(jnp.sqrt(n_samples))
+
+        init_hist_f = InitUniHistTransform(
+            n_samples=n_samples,
+            nbins=nbins,
+            support_extension=support_extension,
+            precision=precision,
+            alpha=alpha,
+            jitted=jitted,
+        )
+    elif method == "kde":
+        init_hist_f = InitUniKDETransform(
+            shape=shape,
+            support_extension=support_extension,
+            precision=precision,
+            bw=bw,
+            jitted=jitted,
+        )
+    else:
+        raise ValueError(f"Unrecognzed Method : {method}")
 
     # init Inverse Gaussian CDF transform
-    init_icdf_f = InitInverseGaussCDFTransform(eps=eps)
+    init_icdf_f = InitInverseGaussCDFTransform(eps=eps, jitted=jitted)
 
     # init PCA transformation
     init_pca_f = InitPCARotation(jitted=jitted)

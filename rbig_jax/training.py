@@ -101,3 +101,4 @@ def train_model(
 
     final_params = get_params(opt_state)
     return final_params, losses
+

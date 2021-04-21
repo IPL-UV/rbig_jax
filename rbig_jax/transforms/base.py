@@ -103,7 +103,7 @@ class InverseBijector:
 
 
 @dataclass
-class BijectorChain(Bijector):
+class BijectorChain:
     bijectors: Iterable[Bijector]
 
     def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:

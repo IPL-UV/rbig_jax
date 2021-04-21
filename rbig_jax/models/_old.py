@@ -19,7 +19,6 @@
 #     ilayer: int
 #     info_loss: Array
 
-
 # class IterativeGaussianization:
 #     def __init__(
 #         self,
@@ -174,46 +173,6 @@
 #     def entropy(self, X: np.ndarray, base: int = 2) -> np.ndarray:
 #         raise NotImplementedError
 #         # return self.uni_ent_est(X).sum() * np.log(base) - self.total_correlation(base)
-
-
-# class RBIG(IterativeGaussianization):
-#     def __init__(
-#         self,
-#         n_samples: int,
-#         n_features: int,
-#         support_extension: int = 10,
-#         zero_tolerance: int = 30,
-#         precision: int = 100,
-#         alpha: int = 1e-5,
-#         nbins: Optional[int] = None,
-#         p: int = 0.25,
-#         max_layers: int = 1_000,
-#         eps: float = 1e-5,
-#     ):
-#         if nbins is None:
-#             nbins = int(np.sqrt(n_samples))
-
-#         # initialize histogram transformation
-#         uni_uniformize = InitUniHistUniformize(
-#             n_samples=n_samples,
-#             nbins=nbins,
-#             support_extension=support_extension,
-#             precision=precision,
-#             alpha=alpha,
-#         )
-#         # initialize rotation transformation
-#         rot_transform = InitPCARotation()
-
-#         super().__init__(
-#             uni_uniformize=uni_uniformize,
-#             rot_transform=rot_transform,
-#             p=p,
-#             n_samples=n_samples,
-#             n_features=n_features,
-#             max_layers=max_layers,
-#             zero_tolerance=zero_tolerance,
-#             eps=eps,
-#         )
 
 
 # def get_default_mg(n_samples: int, return_params: bool = True):

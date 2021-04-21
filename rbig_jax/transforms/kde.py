@@ -59,7 +59,9 @@ def InitUniKDETransform(
         return outputs
 
     def init_bijector(inputs):
-        outputs, params = init_params(inputs)
+        outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(
+            inputs
+        )  # init_params(inputs)
         # print(params)
         # initialize parameters
         bijector = MarginalUniformizeTransform(

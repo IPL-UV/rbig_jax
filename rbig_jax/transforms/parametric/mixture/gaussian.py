@@ -1,9 +1,10 @@
+from rbig_jax.transforms.parametric.mixture.init import init_mixture_weights
 from typing import Callable, Tuple
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
-from jax.nn import log_softmax
+from jax.nn import log_softmax, softplus
 from jax.random import PRNGKey
 from jax.scipy.special import logsumexp
 
@@ -21,12 +22,12 @@ class MixtureGaussianCDF(Bijector):
 
         # forward transformation with batch dimension
         outputs = mixture_gaussian_cdf_vectorized(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         # log abs det, all zeros
         logabsdet = mixture_gaussian_log_pdf_vectorized(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         return outputs, logabsdet  # .sum(axis=1)
@@ -35,17 +36,19 @@ class MixtureGaussianCDF(Bijector):
 
         # transformation
         outputs = mixture_gaussian_invcdf_vectorized(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
         # log abs det, all zeros
         logabsdet = mixture_gaussian_log_pdf_vectorized(
-            outputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            outputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         return outputs, logabsdet  # .sum(axis=1)
 
 
-def InitMixtureGaussianCDF(n_components: int) -> Callable:
+def InitMixtureGaussianCDF(
+    n_components: int, init_method: str = "standard"
+) -> Callable:
     """Performs the householder transformation.
 
     This is a useful method to parameterize an orthogonal matrix.
@@ -60,10 +63,13 @@ def InitMixtureGaussianCDF(n_components: int) -> Callable:
 
     def init_func(rng: PRNGKey, n_features: int, **kwargs) -> MixtureGaussianCDF:
 
-        # initialize mixture
-        means = jax.random.normal(key=rng, shape=(n_features, n_components))
-        log_scales = jnp.zeros((n_features, n_components))
-        prior_logits = jnp.zeros((n_features, n_components))
+        prior_logits, means, log_scales = init_mixture_weights(
+            rng=rng,
+            n_features=n_features,
+            n_components=n_components,
+            method=init_method,
+            X=kwargs.get("X", None),
+        )
 
         return MixtureGaussianCDF(
             means=means, log_scales=log_scales, prior_logits=prior_logits
@@ -91,7 +97,8 @@ def mixture_gaussian_cdf(
     # n_features, n_components = prior_logits
     #
     # x_r = jnp.tile(x, (n_features, n_components))
-    x_r = x.reshape(-1, 1)
+    # x_r = x.reshape(-1, 1)
+    x_r = jnp.expand_dims(x, axis=-1)
     # normalize logit weights to 1
     prior_logits = jax.nn.log_softmax(prior_logits)
 
@@ -99,7 +106,7 @@ def mixture_gaussian_cdf(
     log_cdfs = prior_logits + jax.scipy.stats.norm.logcdf(x_r, means, scales)
 
     # normalize distribution
-    log_cdf = jax.scipy.special.logsumexp(log_cdfs, axis=1)
+    log_cdf = logsumexp(log_cdfs, axis=-1)
 
     return jnp.exp(log_cdf)
 
@@ -161,15 +168,16 @@ def mixture_gaussian_log_pdf(
     # n_components = prior_logits.shape[1]
     #
     # x_r = jnp.tile(x, (n_components))
-    x_r = x.reshape(-1, 1)
+    # x_r = x.reshape(-1, 1)
+    x_r = jnp.expand_dims(x, axis=-1)
     # normalize logit weights to 1, (D,K)->(D,K)
-    prior_logits = log_softmax(prior_logits, axis=1)
+    prior_logits = log_softmax(prior_logits, axis=-1)
 
     # calculate the log pdf, (D,K)->(D,K)
     log_pdfs = prior_logits + jax.scipy.stats.norm.logpdf(x_r, means, scales)
 
     # normalize distribution for components, (D,K)->(D,)
-    log_pdf = logsumexp(log_pdfs, axis=1)
+    log_pdf = logsumexp(log_pdfs, axis=-1)
 
     return log_pdf
 

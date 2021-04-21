@@ -1,4 +1,5 @@
 import collections
+from rbig_jax.transforms.rotation import compute_projection
 from typing import Callable, Tuple
 
 import jax
@@ -35,7 +36,7 @@ class HouseHolder(Bijector):
         return outputs, logabsdet
 
 
-def InitHouseHolder(n_reflections: int) -> Callable:
+def InitHouseHolder(n_reflections: int, method: str = "random") -> Callable:
     """Performs the householder transformation.
 
     This is a useful method to parameterize an orthogonal matrix.
@@ -50,14 +51,35 @@ def InitHouseHolder(n_reflections: int) -> Callable:
 
     def init_func(rng: PRNGKey, n_features: int, **kwargs) -> HouseHolder:
 
-        # initialize the householder rotation matrix
-        V = jax.nn.initializers.orthogonal()(key=rng, shape=(n_reflections, n_features))
-
+        # # initialize the householder rotation matrix
+        # V = jax.nn.initializers.orthogonal()(key=rng, shape=(n_reflections, n_features))
+        V = init_householder_weights(
+            rng,
+            n_features=n_features,
+            n_reflections=n_reflections,
+            method=method,
+            X=kwargs.get("X", None),
+        )
         init_params = HouseHolder(V=V)
 
         return init_params
 
     return init_func
+
+
+def init_householder_weights(
+    rng, n_reflections, n_features, method: str = "random", X=None
+):
+    if method == "random":
+        # initialize mixture
+        V = jax.nn.initializers.orthogonal()(key=rng, shape=(n_reflections, n_features))
+
+    elif method == "pca":
+
+        V = compute_projection(X)
+    else:
+        raise ValueError(f"Unrecognized init method: {method}")
+    return V
 
 
 def householder_product(inputs: Array, q_vector: Array) -> Array:

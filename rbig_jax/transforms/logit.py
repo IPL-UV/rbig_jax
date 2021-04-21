@@ -1,5 +1,6 @@
 from typing import Callable, Optional, Tuple
 
+import jax
 import jax.numpy as np
 from chex import Array, dataclass
 from distrax._src.bijectors.sigmoid import _more_stable_sigmoid, _more_stable_softplus
@@ -44,26 +45,31 @@ class Logit(Bijector):
         return outputs, logabsdet
 
 
-def InitSigmoidTransform():
+def InitSigmoidTransform(jitted: bool = False):
 
     # initialize bijector
     bijector = Sigmoid()
+
+    if jitted:
+        f = jax.jit(bijector.forward)
+    else:
+        f = bijector.forward
 
     def init_layer(rng: PRNGKey, n_features: int, **kwargs):
 
         return bijector
 
     def init_params(inputs):
-        outputs = bijector.forward(inputs)
+        outputs = f(inputs)
         return outputs, ()
 
     def init_transform(inputs):
 
-        outputs = bijector.forward(inputs)
+        outputs = f(inputs)
         return outputs
 
     def init_bijector(inputs):
-        outputs = bijector.forward(inputs)
+        outputs = f(inputs)
         return outputs, bijector
 
     return InitFunctionsPlus(
@@ -74,26 +80,31 @@ def InitSigmoidTransform():
     )
 
 
-def InitLogitTransform():
+def InitLogitTransform(jitted: bool = False):
 
     # initialize bijector
     bijector = Inverse(Sigmoid())
+
+    if jitted:
+        f = jax.jit(bijector.forward)
+    else:
+        f = bijector.forward
 
     def init_layer(rng: PRNGKey, n_features: int, **kwargs):
 
         return bijector
 
     def init_params(inputs):
-        outputs = bijector.forward(inputs)
+        outputs = f(inputs)
         return outputs, ()
 
     def init_transform(inputs):
 
-        outputs = bijector.forward(inputs)
+        outputs = f(inputs)
         return outputs
 
     def init_bijector(inputs):
-        outputs = bijector.forward(inputs)
+        outputs = f(inputs)
         return outputs, bijector
 
     return InitFunctionsPlus(
