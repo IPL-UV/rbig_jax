@@ -3,7 +3,7 @@ import jax.numpy as jnp
 from chex import Array, dataclass
 from rbig_jax.transforms.histogram import InitUniHistTransform
 from rbig_jax.transforms.kde import InitUniKDETransform
-from rbig_jax.transforms.inversecdf import InitInverseGaussCDFTransform
+from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
 from rbig_jax.transforms.rotation import InitPCARotation
 
 # from rbig_jax.transforms.histogram import InitUniHistUniformize
@@ -27,7 +27,7 @@ class RBIGBlock:
         for ibijector in self.init_functions:
 
             # transform and params
-            outputs, iparams = ibijector.init_bijector(outputs)
+            outputs, iparams = ibijector.bijector_and_transform(outputs)
 
             # accumulate params
             params.append(iparams)
@@ -54,7 +54,7 @@ class RBIGBlock:
     def forward(self, inputs: Array) -> Tuple[Array, Array]:
         outputs = inputs
         for ibijector in self.init_functions:
-            outputs = ibijector.init_transform(outputs)
+            outputs = ibijector.transform(outputs)
         return outputs
 
 
@@ -106,7 +106,7 @@ def init_default_rbig_block(
         raise ValueError(f"Unrecognzed Method : {method}")
 
     # init Inverse Gaussian CDF transform
-    init_icdf_f = InitInverseGaussCDFTransform(eps=eps, jitted=jitted)
+    init_icdf_f = InitInverseGaussCDF(eps=eps, jitted=jitted)
 
     # init PCA transformation
     init_pca_f = InitPCARotation(jitted=jitted)

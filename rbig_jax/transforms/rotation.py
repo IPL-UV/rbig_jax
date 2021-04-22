@@ -5,7 +5,7 @@ import jax.numpy as jnp
 import jax
 from chex import Array, dataclass
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
-from rbig_jax.transforms.base import InitFunctions
+from rbig_jax.transforms.base import InitFunctions, InitLayersFunctions
 
 RotParams = collections.namedtuple("Params", ["rotation"])
 
@@ -77,23 +77,36 @@ def InitPCARotation(jitted=False):
         f = jax.jit(f)
         f_slim = jax.jit(f_slim)
 
-    def init_params(inputs):
+    def init_params(inputs, **kwargs):
+        _, params = f(inputs)
+        return params
+
+    def params_and_transform(inputs, **kwargs):
+
         outputs, params = f(inputs)
         return outputs, params
 
-    def init_transform(inputs):
+    def transform(inputs, **kwargs):
+
         outputs = f_slim(inputs)
         return outputs
 
-    def init_bijector(inputs):
-        outputs, params = init_params(inputs)
+    def bijector(inputs, **kwargs):
+        params = init_params(inputs, **kwargs)
+        bijector = Rotation(rotation=params.rotation,)
+        return bijector
+
+    def bijector_and_transform(inputs, **kwargs):
+        outputs, params = params_and_transform(inputs, **kwargs)
         bijector = Rotation(rotation=params.rotation,)
         return outputs, bijector
 
-    return InitFunctions(
-        init_params=init_params,
-        init_bijector=init_bijector,
-        init_transform=init_transform,
+    return InitLayersFunctions(
+        bijector=bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=init_params,
+        params_and_transform=params_and_transform,
     )
 
 
@@ -112,25 +125,39 @@ def InitRandomRotation(rng: PRNGKey, jitted=False):
 
         key_, rng = kwargs.get("rng", jax.random.split(key, 2))
 
+        _, params = f(rng, inputs)
+        return params
+
+    def params_and_transform(inputs, **kwargs):
+
+        key_, rng = kwargs.get("rng", jax.random.split(key, 2))
+
         outputs, params = f(rng, inputs)
         return outputs, params
 
-    def init_transform(inputs, **kwargs):
+    def transform(inputs, **kwargs):
 
         key_, rng = kwargs.get("rng", jax.random.split(key, 2))
 
         outputs = f_slim(inputs)
         return outputs
 
-    def init_bijector(inputs, **kwargs):
-        outputs, params = init_params(inputs, **kwargs)
+    def bijector(inputs, **kwargs):
+        params = init_params(inputs, **kwargs)
+        bijector = Rotation(rotation=params.rotation,)
+        return bijector
+
+    def bijector_and_transform(inputs, **kwargs):
+        outputs, params = params_and_transform(inputs, **kwargs)
         bijector = Rotation(rotation=params.rotation,)
         return outputs, bijector
 
-    return InitFunctions(
-        init_params=init_params,
-        init_bijector=init_bijector,
-        init_transform=init_transform,
+    return InitLayersFunctions(
+        bijector=bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=init_params,
+        params_and_transform=params_and_transform,
     )
 
 

@@ -8,7 +8,7 @@ from jax.nn import log_softmax, softplus
 from jax.random import PRNGKey
 from jax.scipy.special import logsumexp
 
-from rbig_jax.transforms.base import Bijector
+from rbig_jax.transforms.base import Bijector, InitLayersFunctions
 from rbig_jax.utils import bisection_search
 
 
@@ -47,7 +47,7 @@ class MixtureGaussianCDF(Bijector):
 
 
 def InitMixtureGaussianCDF(
-    n_components: int, init_method: str = "standard"
+    n_components: int, init_method: str = "standard",
 ) -> Callable:
     """Performs the householder transformation.
 
@@ -61,21 +61,54 @@ def InitMixtureGaussianCDF(
         the number of householder reflections
     """
 
-    def init_func(rng: PRNGKey, n_features: int, **kwargs) -> MixtureGaussianCDF:
-
+    def init_bijector(
+        rng: PRNGKey, n_features: int, inputs=None, **kwargs
+    ) -> MixtureGaussianCDF:
         prior_logits, means, log_scales = init_mixture_weights(
             rng=rng,
             n_features=n_features,
             n_components=n_components,
             method=init_method,
-            X=kwargs.get("X", None),
+            X=inputs,
         )
 
-        return MixtureGaussianCDF(
+        bijector = MixtureGaussianCDF(
             means=means, log_scales=log_scales, prior_logits=prior_logits
         )
 
-    return init_func
+        return bijector
+
+    def bijector_and_transform(
+        rng: PRNGKey, n_features: int, inputs: Array, **kwargs
+    ) -> MixtureGaussianCDF:
+
+        # init bijector
+        bijector = init_bijector(
+            rng=rng, n_features=n_features, inputs=inputs, **kwargs
+        )
+
+        # forward transform
+        outputs = bijector.forward(inputs=inputs)
+        return outputs, bijector
+
+    def transform(
+        rng: PRNGKey, n_features: int, inputs: Array, **kwargs
+    ) -> MixtureGaussianCDF:
+
+        # init bijector
+        outputs = init_bijector(
+            rng=rng, n_features=n_features, inputs=inputs, **kwargs
+        ).forward(inputs=inputs)
+
+        return outputs
+
+    return InitLayersFunctions(
+        bijector=init_bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=None,
+        params_and_transform=None,
+    )
 
 
 def mixture_gaussian_cdf(
@@ -100,11 +133,11 @@ def mixture_gaussian_cdf(
     # x_r = x.reshape(-1, 1)
     x_r = jnp.expand_dims(x, axis=-1)
     # normalize logit weights to 1
-    prior_logits = jax.nn.log_softmax(prior_logits)
+    prior_logits = jax.nn.log_softmax(prior_logits, axis=1)
+    x_r = (x_r - means) / scales
 
     # calculate the log cdf
     log_cdfs = prior_logits + jax.scipy.stats.norm.logcdf(x_r, means, scales)
-
     # normalize distribution
     log_cdf = logsumexp(log_cdfs, axis=-1)
 

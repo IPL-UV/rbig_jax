@@ -8,14 +8,17 @@ from typing import Callable, Tuple
 import jax.numpy as jnp
 import jax.random as jr
 from chex import Array, dataclass
-from distrax._src.bijectors.rational_quadratic_spline import \
-    RationalQuadraticSpline as distrax_rqs
 from distrax._src.bijectors.rational_quadratic_spline import (
-    _rational_quadratic_spline_fwd, _rational_quadratic_spline_inv)
+    RationalQuadraticSpline as distrax_rqs,
+)
+from distrax._src.bijectors.rational_quadratic_spline import (
+    _rational_quadratic_spline_fwd,
+    _rational_quadratic_spline_inv,
+)
 from jax.nn import softmax, softplus
 from jax.random import PRNGKey
 
-from rbig_jax.transforms.base import Bijector
+from rbig_jax.transforms.base import Bijector, InitLayersFunctions
 
 
 @dataclass
@@ -61,9 +64,11 @@ def InitPiecewiseRationalQuadraticCDF(
             f"Minimum knot slope must be positive; " f"Got {min_knot_slope}"
         )
 
-    def init_func(rng: PRNGKey, shape: int, **kwargs) -> Bijector:
+    def init_bijector(
+        inputs: Array = None, rng: PRNGKey = None, shape: int = None, **kwargs
+    ) -> Bijector:
 
-        return init_spline_params(
+        bijector = init_spline_params(
             n_bins=n_bins,
             rng=rng,
             shape=shape,
@@ -74,7 +79,40 @@ def InitPiecewiseRationalQuadraticCDF(
             boundary_slopes=boundary_slopes,
         )
 
-    return init_func
+        return bijector
+
+    def bijector_and_transform(
+        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+    ) -> Tuple[Array, Bijector]:
+
+        # init bijector
+        bijector = init_bijector(
+            rng=rng, n_features=n_features, inputs=inputs, **kwargs,
+        )
+
+        # forward transform
+        outputs = bijector.forward(inputs=inputs)
+
+        return outputs, bijector
+
+    def transform(
+        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+    ) -> Array:
+
+        # init bijector
+        outputs = init_bijector(
+            rng=rng, n_features=n_features, inputs=inputs, **kwargs,
+        ).forward(inputs=inputs)
+
+        return outputs
+
+    return InitLayersFunctions(
+        bijector=init_bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=None,
+        params_and_transform=None,
+    )
 
 
 def init_spline_params(

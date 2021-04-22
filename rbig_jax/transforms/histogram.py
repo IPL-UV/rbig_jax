@@ -1,12 +1,13 @@
 import collections
 from typing import NamedTuple, Optional, Union, Tuple, Callable
+from chex._src.pytypes import PRNGKey
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
 from rbig_jax.utils import get_domain_extension, marginal_transform
-from rbig_jax.transforms.base import HyperParams, InitFunctions
+from rbig_jax.transforms.base import InitLayersFunctions
 from rbig_jax.transforms.marginal import MarginalUniformizeTransform
 
 
@@ -52,20 +53,24 @@ def InitUniHistTransform(
         f = jax.jit(f)
         f_slim = jax.jit(f_slim)
 
-    def init_params(inputs):
+    def params_and_transform(inputs, **kwargs):
 
         outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
         return outputs, params
 
-    def init_transform(inputs):
+    def init_params(inputs, **kwargs):
+
+        _, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
+        return params
+
+    def transform(inputs, **kwargs):
 
         outputs = jax.vmap(f_slim, out_axes=1, in_axes=(1,))(inputs)
         return outputs
 
-    def init_bijector(inputs):
-        outputs, params = init_params(inputs)
-        # print(params)
-        # initialize parameters
+    def bijector_and_transform(inputs, **kwargs):
+        outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
+
         bijector = MarginalUniformizeTransform(
             support=params.support,
             quantiles=params.quantiles,
@@ -74,14 +79,23 @@ def InitUniHistTransform(
         )
         return outputs, bijector
 
-    def init_layer(rng, shape, inputs=None):
+    def bijector(X, **kwargs):
+        _, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(X)
 
-        return None
+        bijector = MarginalUniformizeTransform(
+            support=params.support,
+            quantiles=params.quantiles,
+            support_pdf=params.support_pdf,
+            empirical_pdf=params.empirical_pdf,
+        )
+        return bijector
 
-    return InitFunctions(
-        init_params=init_params,
-        init_bijector=init_bijector,
-        init_transform=init_transform,
+    return InitLayersFunctions(
+        bijector=bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=init_params,
+        params_and_transform=params_and_transform,
     )
 
 

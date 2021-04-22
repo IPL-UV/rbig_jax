@@ -13,12 +13,12 @@ from rbig_jax.training.iterative import train_info_loss_model
 from rbig_jax.losses import init_info_loss
 
 
-@dataclass
-class IterativeGaussianization(GaussianizationFlow):
-    bijectors: Iterable[Bijector]
-    base_dist: Distribution
-    info_loss: Array
-    pass
+# @dataclass
+# class IterativeGaussianization(GaussianizationFlow):
+#     bijectors: Iterable[Bijector]
+#     base_dist: Distribution
+#     info_loss: Array
+#     pass
 
 
 def RBIG(
@@ -64,7 +64,7 @@ def RBIG(
     )
 
     # run iterative training
-    X_g, rbig_model, final_loss = train_info_loss_model(
+    X_g, rbig_model = train_info_loss_model(
         X=X,
         rbig_block=rbig_block,
         loss=loss,
@@ -72,5 +72,5 @@ def RBIG(
         interval=interval,
         n_layers_remove=n_layers_remove,
     )
-    return None
+    return X_g, rbig_model
 

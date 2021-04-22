@@ -5,7 +5,7 @@ import jax.numpy as jnp
 from chex import Array, dataclass
 from jax.random import PRNGKey
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
-from rbig_jax.transforms.base import InitFunctionsPlus
+from rbig_jax.transforms.base import InitFunctionsPlus, InitLayersFunctions
 
 
 class InverseGaussCDF(distaxBijector):
@@ -51,7 +51,7 @@ def _stable_log_pdf(inputs):
     return log_unnormalized - log_normalization
 
 
-def InitInverseGaussCDFTransform(eps: float = 1e-5, jitted=False):
+def InitInverseGaussCDF(eps: float = 1e-5, jitted=False):
 
     # initialize bijector
     bijector = InverseGaussCDF(eps=eps)
@@ -61,28 +61,31 @@ def InitInverseGaussCDFTransform(eps: float = 1e-5, jitted=False):
     else:
         f = bijector.forward
 
-    def init_layer(rng: PRNGKey, n_features: int, **kwargs):
+    def init_bijector(inputs, **kwargs):
 
-        return bijector
+        return InverseGaussCDF(eps=eps)
 
-    def init_params(inputs):
+    def bijector_and_transform(inputs, **kwargs):
+        outputs = f(inputs)
+        return outputs, InverseGaussCDF(eps=eps)
+
+    def transform(inputs, **kwargs):
         outputs = f(inputs)
         return outputs, ()
 
-    def init_transform(inputs):
+    def params(inputs, **kwargs):
+        return ()
 
+    def params_and_transform(inputs, **kwargs):
         outputs = f(inputs)
-        return outputs
+        return outputs, ()
 
-    def init_bijector(inputs):
-        outputs = f(inputs)
-        return outputs, bijector
-
-    return InitFunctionsPlus(
-        init_params=init_params,
-        init_bijector=init_bijector,
-        init_transform=init_transform,
-        init_layer=init_layer,
+    return InitLayersFunctions(
+        bijector=init_bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=params,
+        params_and_transform=params_and_transform,
     )
 
 
@@ -114,41 +117,41 @@ def InitInverseGaussCDFTransform(eps: float = 1e-5, jitted=False):
 #     return init_func
 
 
-def InitInverseGaussCDF(eps: float = 1e-5,) -> Tuple:
+# def InitInverseGaussCDF(eps: float = 1e-5,) -> Tuple:
 
-    # TODO a bin initialization function
+#     # TODO a bin initialization function
 
-    def init_fun(inputs):
+#     def init_fun(inputs):
 
-        # clip inputs within boundary
-        inputs = jnp.clip(inputs, eps, 1 - eps)
+#         # clip inputs within boundary
+#         inputs = jnp.clip(inputs, eps, 1 - eps)
 
-        # forward transformation
-        outputs = invgausscdf_forward_transform(inputs)
+#         # forward transformation
+#         outputs = invgausscdf_forward_transform(inputs)
 
-        return outputs, ()
+#         return outputs, ()
 
-    def forward_transform(params, inputs):
+#     def forward_transform(params, inputs):
 
-        # clip inputs within [0,1] boundary
-        inputs = jnp.clip(inputs, eps, 1 - eps)
+#         # clip inputs within [0,1] boundary
+#         inputs = jnp.clip(inputs, eps, 1 - eps)
 
-        return invgausscdf_forward_transform(inputs)
+#         return invgausscdf_forward_transform(inputs)
 
-    def gradient_transform(params, inputs):
+#     def gradient_transform(params, inputs):
 
-        # forward transformation
-        outputs = forward_transform(params, inputs)
+#         # forward transformation
+#         outputs = forward_transform(params, inputs)
 
-        # calculate gradient
-        logabsdet = -jax.scipy.stats.norm.logpdf(outputs)
+#         # calculate gradient
+#         logabsdet = -jax.scipy.stats.norm.logpdf(outputs)
 
-        return outputs, logabsdet
+#         return outputs, logabsdet
 
-    def inverse_transform(params, inputs):
-        return invgausscdf_inverse_transform(inputs)
+#     def inverse_transform(params, inputs):
+#         return invgausscdf_inverse_transform(inputs)
 
-    return init_fun, forward_transform, gradient_transform, inverse_transform
+#     return init_fun, forward_transform, gradient_transform, inverse_transform
 
 
 def invgausscdf_forward_transform(X):

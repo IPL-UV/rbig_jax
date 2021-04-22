@@ -1,3 +1,4 @@
+from rbig_jax.transforms.parametric.mixture.init import init_mixture_weights
 from typing import Callable, Tuple
 
 import jax
@@ -9,6 +10,7 @@ from jax.scipy.special import logsumexp
 
 from rbig_jax.transforms.base import Bijector
 from rbig_jax.utils import bisection_search
+from rbig_jax.transforms.base import InitLayersFunctions
 
 
 @dataclass
@@ -35,21 +37,49 @@ class MixtureLogisticCDF(Bijector):
 
         return outputs, logabsdet  # .sum(axis=1)
 
-    def inverse_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
+    def forward(self, inputs: Array, **kwargs) -> Array:
+        # log abs det, all zeros
+        outputs = mixture_logistic_cdf(
+            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+        )
 
+        return outputs  # .sum(axis=1)
+
+    def inverse(self, inputs: Array, **kwargs) -> Array:
         # transformation
         outputs = mixture_logistic_invcdf_vectorized(
             inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
         )
+
+        return outputs  # .sum(axis=1)
+
+    def forward_log_det_jacobian(self, inputs: Array, **kwargs) -> Array:
         # log abs det, all zeros
-        logabsdet = mixture_logistic_log_pdf_vectorized(
-            outputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+        logabsdet = mixture_logistic_log_pdf(
+            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
         )
 
-        return outputs, logabsdet  # .sum(axis=1)
+        return logabsdet  # .sum(axis=1)
+
+    def inverse_log_det_jacobian(self, inputs: Array, **kwargs) -> Array:
+        # transformation
+        logabsdet = mixture_logistic_log_pdf_vectorized(
+            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+        )
+
+        return logabsdet  # .sum(axis=1)
+
+    def inverse_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
+
+        # log abs det, all zeros
+        logabsdet = mixture_logistic_log_pdf_vectorized(
+            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+        )
+
+        return logabsdet  # .sum(axis=1)
 
 
-def InitMixtureLogisticCDF(n_components: int) -> Callable:
+def InitMixtureLogisticCDF(n_components: int, init_method: str = "gmm") -> Callable:
     """Performs the householder transformation.
 
     This is a useful method to parameterize an orthogonal matrix.
@@ -62,20 +92,55 @@ def InitMixtureLogisticCDF(n_components: int) -> Callable:
         the number of householder reflections
     """
 
-    def init_func(rng: PRNGKey, n_features: int, **kwargs) -> MixtureLogisticCDF:
+    def init_bijector(
+        rng: PRNGKey, n_features: int, inputs=None, **kwargs
+    ) -> MixtureLogisticCDF:
 
-        # initialize mixture
-        means = jax.random.normal(key=rng, shape=(n_features, n_components))
-        log_scales = jnp.zeros((n_features, n_components))
-        prior_logits = jnp.zeros((n_features, n_components))
+        prior_logits, means, log_scales = init_mixture_weights(
+            rng=rng,
+            n_features=n_features,
+            n_components=n_components,
+            method=init_method,
+            X=inputs,
+        )
 
-        init_params = MixtureLogisticCDF(
+        bijector = MixtureLogisticCDF(
             means=means, log_scales=log_scales, prior_logits=prior_logits
         )
 
-        return init_params
+        return bijector
 
-    return init_func
+    def bijector_and_transform(
+        rng: PRNGKey, n_features: int, inputs: Array, **kwargs
+    ) -> MixtureLogisticCDF:
+
+        # init bijector
+        bijector = init_bijector(
+            rng=rng, n_features=n_features, inputs=inputs, **kwargs
+        )
+
+        # forward transform
+        outputs = bijector.forward(inputs=inputs)
+        return outputs, bijector
+
+    def transform(
+        rng: PRNGKey, n_features: int, inputs: Array, **kwargs
+    ) -> MixtureLogisticCDF:
+
+        # init bijector
+        outputs = init_bijector(
+            rng=rng, n_features=n_features, inputs=inputs, **kwargs
+        ).forward(inputs=inputs)
+
+        return outputs
+
+    return InitLayersFunctions(
+        bijector=init_bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=None,
+        params_and_transform=None,
+    )
 
 
 def mixture_logistic_cdf(

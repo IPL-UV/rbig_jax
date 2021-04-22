@@ -1,8 +1,9 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 import jax.numpy as jnp
 import numpy as np
 from chex import Array
+from sklearn import datasets
 from torch.utils.data import DataLoader, Dataset
 
 # import torch.multiprocessing as multiprocessing
@@ -22,8 +23,11 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class DensityDataset(Dataset):
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, n_samples: int = 10_000, noise: float = 0.1, seed: int = 123):
+        self.n_samples = n_samples
+        self.seed = seed
+        self.noise = noise
+        self.reset()
 
     def __len__(self):
         return len(self.data)
@@ -31,6 +35,17 @@ class DensityDataset(Dataset):
     def __getitem__(self, idx: int) -> Array:
         data = self.data[idx]
         return data
+
+    def reset(self):
+        self._create_data()
+
+    def _create_data(self):
+        raise NotImplementedError
+
+
+class GenericDataset(DensityDataset):
+    def __init__(self, data):
+        self.data = data
 
 
 def collate_fn(batch):
@@ -63,6 +78,47 @@ def get_data(
     X_test = jnp.linspace(-1.2, 1.2, N_test)
 
     return X[:, None], Y[:, None], X_test[:, None]
+
+
+class SCurveDataset(DensityDataset):
+    def _create_data(self):
+        data, _ = datasets.make_s_curve(
+            n_samples=self.n_samples, noise=self.noise, random_state=self.seed
+        )
+        data = data[:, [0, 2]]
+        self.data = data
+
+
+class BlobsDataset(DensityDataset):
+    def _create_data(self):
+        data, _ = datasets.make_blobs(n_samples=self.n_samples, random_state=self.seed)
+        self.data = data
+
+
+class MoonsDataset(DensityDataset):
+    def _create_data(self):
+        data, _ = datasets.make_moons(
+            n_samples=self.n_samples, noise=self.noise, random_state=self.seed
+        )
+        self.data = data
+
+
+class SwissRollDataset(DensityDataset):
+    def _create_data(self):
+        data, _ = datasets.make_swiss_roll(
+            n_samples=self.n_samples, noise=self.noise, random_state=self.seed
+        )
+        data = data[:, [0, 2]]
+        self.data = data
+
+
+class NoisySineDataset(DensityDataset):
+    def _create_data(self):
+
+        rng = np.random.RandomState(seed=seed)
+        x = np.abs(2 * rng.randn(1, self.n_samples))
+        y = np.sin(x) + 0.25 * rng.randn(1, self.n_samples)
+        self.data = np.vstack((x, y)).T
 
 
 def get_classic(n_samples=10_000, seed=123):

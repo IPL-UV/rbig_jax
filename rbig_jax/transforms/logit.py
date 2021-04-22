@@ -7,7 +7,7 @@ from distrax._src.bijectors.sigmoid import _more_stable_sigmoid, _more_stable_so
 from jax.nn import sigmoid, softplus
 from jax.random import PRNGKey
 
-from rbig_jax.transforms.base import Bijector, InitFunctionsPlus
+from rbig_jax.transforms.base import Bijector, InitFunctionsPlus, InitLayersFunctions
 from distrax._src.bijectors.sigmoid import Sigmoid
 from distrax._src.bijectors.inverse import Inverse
 
@@ -47,69 +47,69 @@ class Logit(Bijector):
 
 def InitSigmoidTransform(jitted: bool = False):
 
-    # initialize bijector
-    bijector = Sigmoid()
-
     if jitted:
-        f = jax.jit(bijector.forward)
+        f = jax.jit(Sigmoid().forward)
     else:
-        f = bijector.forward
+        f = Sigmoid().forward
 
-    def init_layer(rng: PRNGKey, n_features: int, **kwargs):
+    def init_bijector(inputs, **kwargs):
 
-        return bijector
+        return Sigmoid()
 
-    def init_params(inputs):
+    def bijector_and_transform(inputs, **kwargs):
+        outputs = f(inputs)
+        return outputs, Sigmoid()
+
+    def transform(inputs, **kwargs):
         outputs = f(inputs)
         return outputs, ()
 
-    def init_transform(inputs):
+    def params(inputs, **kwargs):
+        return ()
 
+    def params_and_transform(inputs, **kwargs):
         outputs = f(inputs)
-        return outputs
+        return outputs, ()
 
-    def init_bijector(inputs):
-        outputs = f(inputs)
-        return outputs, bijector
-
-    return InitFunctionsPlus(
-        init_params=init_params,
-        init_bijector=init_bijector,
-        init_transform=init_transform,
-        init_layer=init_layer,
+    return InitLayersFunctions(
+        bijector=init_bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=params,
+        params_and_transform=params_and_transform,
     )
 
 
 def InitLogitTransform(jitted: bool = False):
 
-    # initialize bijector
-    bijector = Inverse(Sigmoid())
-
     if jitted:
-        f = jax.jit(bijector.forward)
+        f = jax.jit(Inverse(Sigmoid()).forward)
     else:
-        f = bijector.forward
+        f = Inverse(Sigmoid()).forward
 
-    def init_layer(rng: PRNGKey, n_features: int, **kwargs):
+    def init_bijector(inputs, **kwargs):
 
-        return bijector
+        return Inverse(Sigmoid())
 
-    def init_params(inputs):
+    def bijector_and_transform(inputs, **kwargs):
+        outputs = f(inputs)
+        return outputs, Inverse(Sigmoid())
+
+    def transform(inputs, **kwargs):
         outputs = f(inputs)
         return outputs, ()
 
-    def init_transform(inputs):
+    def params(inputs, **kwargs):
+        return ()
 
+    def params_and_transform(inputs, **kwargs):
         outputs = f(inputs)
-        return outputs
+        return outputs, ()
 
-    def init_bijector(inputs):
-        outputs = f(inputs)
-        return outputs, bijector
-
-    return InitFunctionsPlus(
-        init_params=init_params,
-        init_bijector=init_bijector,
-        init_transform=init_transform,
-        init_layer=init_layer,
+    return InitLayersFunctions(
+        bijector=init_bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=params,
+        params_and_transform=params_and_transform,
     )

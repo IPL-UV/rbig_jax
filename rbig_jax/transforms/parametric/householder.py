@@ -1,13 +1,13 @@
 import collections
 from rbig_jax.transforms.rotation import compute_projection
-from typing import Callable, Tuple
+from typing import Callable, Optional, Tuple
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
 from jax.random import PRNGKey
 
-from rbig_jax.transforms.base import Bijector
+from rbig_jax.transforms.base import Bijector, InitLayersFunctions
 
 # RotParams = collections.namedtuple("Params", ["projection"])
 
@@ -49,22 +49,53 @@ def InitHouseHolder(n_reflections: int, method: str = "random") -> Callable:
         the number of householder reflections
     """
 
-    def init_func(rng: PRNGKey, n_features: int, **kwargs) -> HouseHolder:
+    def init_bijector(
+        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+    ) -> HouseHolder:
 
-        # # initialize the householder rotation matrix
-        # V = jax.nn.initializers.orthogonal()(key=rng, shape=(n_reflections, n_features))
         V = init_householder_weights(
-            rng,
+            rng=rng,
             n_features=n_features,
             n_reflections=n_reflections,
             method=method,
-            X=kwargs.get("X", None),
+            X=inputs,
         )
-        init_params = HouseHolder(V=V)
+        bijector = HouseHolder(V=V)
 
-        return init_params
+        return bijector
 
-    return init_func
+    def bijector_and_transform(
+        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+    ) -> Tuple[Array, HouseHolder]:
+
+        # init bijector
+        bijector = init_bijector(
+            rng=rng, n_features=n_features, inputs=inputs, **kwargs,
+        )
+
+        # forward transform
+        outputs = bijector.forward(inputs=inputs)
+
+        return outputs, bijector
+
+    def transform(
+        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+    ) -> Array:
+
+        # init bijector
+        outputs = init_bijector(
+            rng=rng, n_features=n_features, inputs=inputs, **kwargs,
+        ).forward(inputs=inputs)
+
+        return outputs
+
+    return InitLayersFunctions(
+        bijector=init_bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=None,
+        params_and_transform=None,
+    )
 
 
 def init_householder_weights(

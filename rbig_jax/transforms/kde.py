@@ -1,10 +1,10 @@
 from functools import partial
-from rbig_jax.transforms.base import InitFunctions
+from rbig_jax.transforms.base import InitFunctions, InitLayersFunctions
 from rbig_jax.transforms.marginal import MarginalUniformizeTransform
-from typing import Union, NamedTuple, Tuple
+from typing import Callable, Union, NamedTuple, Tuple
 
 import jax
-import jax.numpy as np
+import jax.numpy as jnp
 from chex import Array, dataclass
 
 from rbig_jax.utils import get_domain_extension
@@ -27,7 +27,7 @@ def InitUniKDETransform(
 
     n_samples, n_features = shape
 
-    bw = estimate_bw(n_samples=n_samples, n_features=n_features, method=bw)
+    bw = estimate_bw(n_samples, n_features, method=bw)
 
     f = jax.partial(
         init_kde_params,
@@ -48,22 +48,24 @@ def InitUniKDETransform(
         f = jax.jit(f)
         f_slim = jax.jit(f_slim)
 
-    def init_params(inputs):
+    def params_and_transform(inputs, **kwargs):
 
         outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
         return outputs, params
 
-    def init_transform(inputs):
+    def init_params(inputs, **kwargs):
+
+        _, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
+        return params
+
+    def transform(inputs, **kwargs):
 
         outputs = jax.vmap(f_slim, out_axes=1, in_axes=(1,))(inputs)
         return outputs
 
-    def init_bijector(inputs):
-        outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(
-            inputs
-        )  # init_params(inputs)
-        # print(params)
-        # initialize parameters
+    def bijector_and_transform(inputs, **kwargs):
+        outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
+
         bijector = MarginalUniformizeTransform(
             support=params.support,
             quantiles=params.quantiles,
@@ -72,23 +74,36 @@ def InitUniKDETransform(
         )
         return outputs, bijector
 
-    return InitFunctions(
-        init_params=init_params,
-        init_bijector=init_bijector,
-        init_transform=init_transform,
+    def bijector(X, **kwargs):
+        _, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(X)
+
+        bijector = MarginalUniformizeTransform(
+            support=params.support,
+            quantiles=params.quantiles,
+            support_pdf=params.support_pdf,
+            empirical_pdf=params.empirical_pdf,
+        )
+        return bijector
+
+    return InitLayersFunctions(
+        bijector=bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=init_params,
+        params_and_transform=params_and_transform,
     )
 
 
 def init_kde_params(
-    X: np.ndarray,
-    bw: int = 0.1,
+    X: jnp.ndarray,
+    bw: float = 0.1,
     support_extension: Union[int, float] = 10,
     precision: int = 1_000,
     return_params: bool = True,
 ):
     # generate support points
     lb, ub = get_domain_extension(X, support_extension)
-    support = np.linspace(lb, ub, precision)
+    support = jnp.linspace(lb, ub, precision)
 
     # calculate the pdf for gaussian pdf
     pdf_support = broadcast_kde_pdf(support, X, bw)
@@ -99,7 +114,7 @@ def init_kde_params(
     quantiles = broadcast_kde_cdf(support, X, factor)
 
     # forward transformation
-    outputs = np.interp(X, support, quantiles)
+    outputs = jnp.interp(X, support, quantiles)
 
     if return_params is True:
 
@@ -117,11 +132,11 @@ def init_kde_params(
 
 
 def kde_transform(
-    X: np.ndarray, support_extension: Union[int, float] = 10, precision: int = 1_000,
+    X: jnp.ndarray, support_extension: Union[int, float] = 10, precision: int = 1_000,
 ):
     # generate support points
     lb, ub = get_domain_extension(X, support_extension)
-    grid = np.linspace(lb, ub, precision)
+    grid = jnp.linspace(lb, ub, precision)
 
     bw = scotts_method(X.shape[0], 1) * 0.5
 
@@ -130,7 +145,7 @@ def kde_transform(
 
     x_cdf = broadcast_kde_cdf(grid, X, factor)
 
-    X_transform = np.interp(X, grid, x_cdf)
+    X_transform = jnp.interp(X, grid, x_cdf)
 
     return X_transform
 
@@ -142,17 +157,17 @@ def broadcast_kde_pdf(eval_points, samples, bandwidth):
 
     # distances (use broadcasting)
     rescaled_x = (
-        eval_points[:, np.newaxis] - samples[np.newaxis, :]
+        eval_points[:, jnp.newaxis] - samples[jnp.newaxis, :]
     ) / bandwidth  # (2 * bandwidth ** 2)
     # print(rescaled_x.shape)
     # compute the gaussian kernel
-    gaussian_kernel = 1 / np.sqrt(2 * np.pi) * np.exp(-0.5 * rescaled_x ** 2)
+    gaussian_kernel = 1 / jnp.sqrt(2 * jnp.pi) * jnp.exp(-0.5 * rescaled_x ** 2)
     # print(gaussian_kernel.shape)
     # rescale
     # print("H!!!!")
     # print(gaussian_kernel)
     # print(n_samples, bandwidth)
-    K = np.sum(gaussian_kernel, axis=1) / n_samples / bandwidth
+    K = jnp.sum(gaussian_kernel, axis=1) / n_samples / bandwidth
     # print(K.shape)
     # print("Byeeee")
     return K
@@ -164,34 +179,34 @@ def gaussian_kde_pdf(eval_points, samples, bandwidth):
     rescaled_x = (eval_points - samples) / bandwidth
 
     # compute the gaussian kernel
-    gaussian_kernel = np.exp(-0.5 * rescaled_x ** 2) / np.sqrt(2 * np.pi)
+    gaussian_kernel = jnp.exp(-0.5 * rescaled_x ** 2) / jnp.sqrt(2 * jnp.pi)
 
     # rescale
-    return np.sum(gaussian_kernel, axis=0) / samples.shape[0] / bandwidth
+    return jnp.sum(gaussian_kernel, axis=0) / samples.shape[0] / bandwidth
 
 
 def normalization_factor(data, bw):
 
-    data_covariance = np.cov(data[:, np.newaxis], rowvar=0, bias=False)
+    data_covariance = jnp.cov(data[:, jnp.newaxis], rowvar=0, bias=False)
 
     covariance = data_covariance * bw ** 2
 
-    stdev = np.sqrt(covariance)
+    stdev = jnp.sqrt(covariance)
 
     return stdev
 
 
 def gaussian_kde_cdf(x_eval, samples, factor):
 
-    low = np.ravel((-np.inf - samples) / factor)
-    hi = np.ravel((x_eval - samples) / factor)
+    low = jnp.ravel((-jnp.inf - samples) / factor)
+    hi = jnp.ravel((x_eval - samples) / factor)
 
     return jax.scipy.special.ndtr(hi - low).mean(axis=0)
 
 
 def broadcast_kde_cdf(x_evals, samples, factor):
     return jax.scipy.special.ndtr(
-        (x_evals[:, np.newaxis] - samples[np.newaxis, :]) / factor
+        (x_evals[:, jnp.newaxis] - samples[jnp.newaxis, :]) / factor
     ).mean(axis=1)
 
 
@@ -199,19 +214,23 @@ def estimate_bw(n_samples, n_features, method="scott"):
     if isinstance(method, float) or isinstance(method, Array):
         return method
     elif method == "scott":
-        return scotts_method(n_samples, n_features)
+        return scotts_method(n_samples, n_features,)
     elif method == "silverman":
-        return silvermans_method(n_samples, n_features)
+        return silvermans_method(n_samples, n_features,)
     else:
         raise ValueError(f"Unrecognized bw estimation method: {method}")
 
 
-def scotts_method(n, d=1):
-    return np.power(n, -1.0 / (d + 4))
+def scotts_method(
+    n_samples: int, n_features: int,
+):
+    return jnp.power(n_samples, -1.0 / (n_features + 4))
 
 
-def silvermans_method(n, d=1):
-    return np.power(n * (d + 2.0) / 4.0, -1.0 / (d + 4))
+def silvermans_method(
+    n_samples: int, n_features: int,
+):
+    return jnp.power(n_samples * (n_features + 2.0) / 4.0, -1.0 / (n_features + 4))
 
 
 def kde_forward_transform(params: UniKDEParams, X: Array) -> Array:
@@ -219,7 +238,7 @@ def kde_forward_transform(params: UniKDEParams, X: Array) -> Array:
     
     Parameters
     ----------
-    X : np.ndarray
+    X : jnp.ndarray
         The univariate data to be transformed.
     
     params: UniParams
@@ -228,10 +247,10 @@ def kde_forward_transform(params: UniKDEParams, X: Array) -> Array:
     
     Returns
     -------
-    X_trans : np.ndarray
+    X_trans : jnp.ndarray
         The transformed univariate parameters
     """
-    return np.interp(X, params.support, params.quantiles)
+    return jnp.interp(X, params.support, params.quantiles)
 
 
 def kde_inverse_transform(params: UniKDEParams, X: Array) -> Array:
@@ -239,7 +258,7 @@ def kde_inverse_transform(params: UniKDEParams, X: Array) -> Array:
     
     Parameters
     ----------
-    X : np.ndarray
+    X : jnp.ndarray
         The uniform univariate data to be transformed.
     
     params: UniParams
@@ -248,10 +267,10 @@ def kde_inverse_transform(params: UniKDEParams, X: Array) -> Array:
     
     Returns
     -------
-    X_trans : np.ndarray
+    X_trans : jnp.ndarray
         The transformed univariate parameters
     """
-    return np.interp(X, params.quantiles, params.support)
+    return jnp.interp(X, params.quantiles, params.support)
 
 
 def kde_gradient_transform(params: UniKDEParams, X: Array) -> Array:
@@ -259,7 +278,7 @@ def kde_gradient_transform(params: UniKDEParams, X: Array) -> Array:
     
     Parameters
     ----------
-    X : np.ndarray
+    X : jnp.ndarray
         The univariate data to be transformed.
     
     params: UniParams
@@ -268,7 +287,7 @@ def kde_gradient_transform(params: UniKDEParams, X: Array) -> Array:
     
     Returns
     -------
-    X_trans : np.ndarray
+    X_trans : jnp.ndarray
         The transformed univariate parameters
     """
-    return np.interp(X, params.support_pdf, params.empirical_pdf)
+    return jnp.interp(X, params.support_pdf, params.empirical_pdf)

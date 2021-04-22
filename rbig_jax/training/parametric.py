@@ -108,7 +108,8 @@ def init_gf_train_op(
 
 def train_model(
     gf_model: dataclass,
-    dataloader,
+    train_dl,
+    valid_dl=None,
     epochs: int = 100,
     optimizer: Optional[JAXOptimizer] = None,
     lr: float = 0.01,
@@ -151,8 +152,11 @@ def train_model(
     # ================================
     # TRAINING
     # ================================
-    losses = list()
+    train_losses = list()
+    valid_losses = list()
     itercount = itertools.count()
+    train_batch_loss = 0.0
+    valid_batch_loss = 0.0
 
     pbar = tqdm.trange(epochs)
 
@@ -162,7 +166,7 @@ def train_model(
             # Train
             avg_loss = []
 
-            for ix in dataloader:
+            for ix in train_dl:
 
                 # cast to jax array
                 ix = jnp.array(ix, dtype=jnp.float32)
@@ -174,12 +178,56 @@ def train_model(
                 avg_loss.append(float(loss))
 
             # average loss
-            batch_loss = jnp.mean(jnp.stack(avg_loss))
+            train_batch_loss = jnp.mean(jnp.stack(avg_loss))
 
             # Log losses
-            losses.append(np.array(batch_loss))
-            pbar.set_postfix({"loss": f"{batch_loss:.4f}"})
+            train_losses.append(np.array(train_batch_loss))
+            pbar.set_postfix(
+                {
+                    "Train Loss": f"{train_batch_loss:.4f}",
+                    "Valid Loss": f"{valid_batch_loss:.4f}",
+                }
+            )
 
-    final_model = get_params(opt_state)
+            if valid_dl is not None:
 
-    return final_model, np.stack(losses)
+                final_params = get_params(opt_state)
+
+                # Train
+                avg_loss = []
+
+                for ix in valid_dl:
+
+                    # cast to jax array
+                    ix = jnp.array(ix, dtype=jnp.float32)
+
+                    # compute loss
+                    loss = final_params.score(ix)
+
+                    # append batch
+                    avg_loss.append(float(loss))
+
+                # average loss
+                valid_batch_loss = jnp.mean(jnp.stack(avg_loss))
+
+                valid_losses.append(np.array(valid_batch_loss))
+
+                pbar.set_postfix(
+                    {
+                        "Train Loss": f"{train_batch_loss:.4f}",
+                        "Valid Loss": f"{valid_batch_loss:.4f}",
+                    }
+                )
+
+            else:
+                continue
+
+    final_params = get_params(opt_state)
+
+    train_losses = jnp.stack(train_losses)
+    if valid_dl is not None:
+        valid_losses = jnp.stack(valid_losses)
+    else:
+        valid_losses = None
+    losses = {"train": train_losses, "valid": valid_losses}
+    return final_params, losses
