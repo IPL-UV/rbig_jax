@@ -27,7 +27,7 @@ class InfoLossState:
     def update_state(self, info_loss: Array):
 
         # update info loss
-        info_loss = jax.ops.index_update(self.info_loss, self.ilayer, info_loss)
+        info_loss = jax.ops.index_update(self.info_loss, self.ilayer - 1, info_loss)
 
         # create new state
         return InfoLossState(
@@ -37,14 +37,18 @@ class InfoLossState:
 
 def init_info_loss(
     max_layers: int = 50,
-    zero_tolerance: int = 5,
+    zero_tolerance: int = 60,
+    n_layers_remove: int = 50,
     n_samples: int = 1_000,
     jitted: bool = True,
     info_loss_f: Optional[Callable] = None,
+    dtype=jnp.int64,
     **kwargs,
 ):
 
     window = jnp.ones(zero_tolerance) / zero_tolerance
+
+    dtype = jnp.int64 if window.dtype is jnp.float64 else jnp.int32
 
     # intialize condition
     def info_loss_condition(state):
@@ -55,7 +59,10 @@ def init_info_loss(
         # count number of zeros in moving window
         n_zeros = jnp.sum(jnp.where(x_cumsum_window > 0.0, 0, 1)).astype(jnp.int32)
 
-        return jnp.logical_and(jax.lax.ne(n_zeros, 1), state.ilayer < state.max_layers)
+        return jnp.logical_and(
+            jax.lax.ne(n_zeros, jnp.array([1.0], dtype=jnp.int32)),
+            state.ilayer < state.max_layers,
+        )
 
     # intialize loss function
     if info_loss_f is None:

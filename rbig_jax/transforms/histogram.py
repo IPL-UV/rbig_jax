@@ -7,7 +7,7 @@ import jax.numpy as jnp
 from chex import Array, dataclass
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
 from rbig_jax.utils import get_domain_extension, marginal_transform
-from rbig_jax.transforms.base import InitLayersFunctions
+from rbig_jax.transforms.base import InitLayersFunctions, NonTrainableBijector
 from rbig_jax.transforms.marginal import MarginalUniformizeTransform
 
 
@@ -17,6 +17,223 @@ class UniHistParams(NamedTuple):
     quantiles: Array
     support_pdf: Array
     empirical_pdf: Array
+
+
+# class InitUniHistTransform(NonTrainableBijector):
+#     def __init__(
+#         self,
+#         shape: int,
+#         nbins: Optional[int] = 10,
+#         support_extension: Union[int, float] = 10,
+#         precision: int = 1_000,
+#         alpha: float = 1e-5,
+#         jitted: bool = True,
+#     ):
+#         self.shape = shape
+#         self.support_extension = support_extension
+#         self.precision = precision
+#         self.alpha = alpha
+#         self.nbins = nbins
+
+#         f_params = jax.partial(
+#             init_hist_params,
+#             nbins=nbins,
+#             support_extension=support_extension,
+#             precision=precision,
+#             alpha=alpha,
+#             return_params=True,
+#         )
+#         f = jax.partial(
+#             init_hist_params,
+#             nbins=nbins,
+#             support_extension=support_extension,
+#             precision=precision,
+#             alpha=alpha,
+#             return_params=False,
+#         )
+#         if jitted:
+#             f = jax.jit(f)
+#             f_params = jax.jit(f_params)
+
+#         self._f = f
+#         self._f_params = f_params
+
+#     def forward(self, inputs):
+
+#         outputs = jax.vmap(self._f, out_axes=1, in_axes=(1,))(inputs)
+
+#         return outputs
+
+#     def forward_and_log_det(self, inputs):
+#         outputs, params = jax.vmap(self._f_params, out_axes=(1, 0), in_axes=(1,))(
+#             inputs
+#         )
+
+#         # transformation
+#         log_abs_det = jax.vmap(jnp.interp, in_axes=(1, 0, 0), out_axes=1)(
+#             inputs, params.support_pdf, params.empirical_pdf
+#         )
+
+#         log_abs_det = jnp.log(log_abs_det)
+
+#         return outputs, log_abs_det
+
+#     def forward_and_params(self, inputs):
+
+#         # get parameters
+#         outputs, params = jax.vmap(self._f_params, out_axes=(1, 0), in_axes=(1,))(
+#             inputs
+#         )
+
+#         return outputs, params
+
+#     def forward_and_bijector(self, inputs):
+
+#         # get parameters
+#         outputs, params = jax.vmap(self._f_params, out_axes=(1, 0), in_axes=(1,))(
+#             inputs
+#         )
+
+#         # initialize bijector
+#         bijector = MarginalUniformizeTransform(
+#             support=params.support,
+#             quantiles=params.quantiles,
+#             support_pdf=params.support_pdf,
+#             empirical_pdf=params.empirical_pdf,
+#         )
+#         return outputs, bijector
+
+#     def forward_log_det_bijector(self, inputs):
+
+#         # get parameters
+#         outputs, params = jax.vmap(self._f_params, out_axes=(1, 0), in_axes=(1,))(
+#             inputs
+#         )
+
+#         # transformation
+#         log_abs_det = jax.vmap(jnp.interp, in_axes=(1, 0, 0), out_axes=1)(
+#             inputs, params.support_pdf, params.empirical_pdf
+#         )
+
+#         log_abs_det = jnp.log(log_abs_det)
+
+#         # initialize bijector
+#         bijector = MarginalUniformizeTransform(
+#             support=params.support,
+#             quantiles=params.quantiles,
+#             support_pdf=params.support_pdf,
+#             empirical_pdf=params.empirical_pdf,
+#         )
+#         return outputs, log_abs_det, bijector
+
+#     def bijector(self, inputs):
+#         # get parameters
+#         _, params = jax.vmap(self._f_params, out_axes=(1, 0), in_axes=(1,))(inputs)
+
+#         # initialize bijector
+#         bijector = MarginalUniformizeTransform(
+#             support=params.support,
+#             quantiles=params.quantiles,
+#             support_pdf=params.support_pdf,
+#             empirical_pdf=params.empirical_pdf,
+#         )
+#         return bijector
+
+#     # @jax.jit(static_argnums=(0,))
+#     def _transform_and_params(self, inputs):
+#         outputs, params = init_hist_params(
+#             X=inputs,
+#             nbins=self.nbins,
+#             support_extension=self.support_extension,
+#             precision=self.precision,
+#             alpha=self.alpha,
+#             return_params=True,
+#         )
+
+#         return outputs, params
+
+#     # @jax.jit(static_argnums=(0,))
+#     def _transform(self, inputs):
+#         outputs = init_hist_params(
+#             X=inputs,
+#             nbins=self.nbins,
+#             support_extension=self.support_extension,
+#             precision=self.precision,
+#             alpha=self.alpha,
+#             return_params=False,
+#         )
+
+#         return outputs
+
+# # TODO a bin initialization function
+# if nbins is None:
+#     nbins = int(jnp.sqrt(n_samples))
+
+# f = jax.partial(
+#     init_hist_params,
+#     nbins=nbins,
+#     support_extension=support_extension,
+#     precision=precision,
+#     alpha=alpha,
+#     return_params=True,
+# )
+
+# f_slim = jax.partial(
+#     init_hist_params,
+#     nbins=nbins,
+#     support_extension=support_extension,
+#     precision=precision,
+#     alpha=alpha,
+#     return_params=False,
+# )
+# if jitted:
+#     f = jax.jit(f)
+#     f_slim = jax.jit(f_slim)
+
+# def params_and_transform(inputs, **kwargs):
+
+#     outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
+#     return outputs, params
+
+# def init_params(inputs, **kwargs):
+
+#     _, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
+#     return params
+
+# def transform(inputs, **kwargs):
+
+#     outputs = jax.vmap(f_slim, out_axes=1, in_axes=(1,))(inputs)
+#     return outputs
+
+# def bijector_and_transform(inputs, **kwargs):
+#     outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
+
+#     bijector = MarginalUniformizeTransform(
+#         support=params.support,
+#         quantiles=params.quantiles,
+#         support_pdf=params.support_pdf,
+#         empirical_pdf=params.empirical_pdf,
+#     )
+#     return outputs, bijector
+
+# def bijector(X, **kwargs):
+#     _, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(X)
+
+#     bijector = MarginalUniformizeTransform(
+#         support=params.support,
+#         quantiles=params.quantiles,
+#         support_pdf=params.support_pdf,
+#         empirical_pdf=params.empirical_pdf,
+#     )
+#     return bijector
+
+# return InitLayersFunctions(
+#     bijector=bijector,
+#     bijector_and_transform=bijector_and_transform,
+#     transform=transform,
+#     params=init_params,
+#     params_and_transform=params_and_transform,
+# )
 
 
 def InitUniHistTransform(

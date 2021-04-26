@@ -148,6 +148,7 @@ def InitRandomRotation(rng: PRNGKey, jitted=False):
         return bijector
 
     def bijector_and_transform(inputs, **kwargs):
+        print(inputs.shape)
         outputs, params = params_and_transform(inputs, **kwargs)
         bijector = Rotation(rotation=params.rotation,)
         return outputs, bijector
@@ -161,10 +162,12 @@ def InitRandomRotation(rng: PRNGKey, jitted=False):
     )
 
 
-def get_pca_params(inputs: Array, return_params: bool = True) -> Array:
+def get_pca_params(
+    inputs: Array, full_matrices: bool = False, return_params: bool = True
+) -> Array:
 
     # rotation
-    rotation = compute_projection(inputs)
+    rotation = compute_projection(inputs, full_matrices=full_matrices)
     outputs = jnp.dot(inputs, rotation)
 
     if return_params:
@@ -190,7 +193,7 @@ def get_random_rotation(
         return outputs
 
 
-def compute_projection(X: jnp.ndarray) -> jnp.ndarray:
+def compute_projection(X: jnp.ndarray, full_matrices: bool = False) -> jnp.ndarray:
     """Compute PCA projection matrix
     Using SVD, this computes the PCA components for
     a dataset X and computes the projection matrix
@@ -216,7 +219,7 @@ def compute_projection(X: jnp.ndarray) -> jnp.ndarray:
     X = X - jnp.mean(X, axis=0)
 
     # Compute SVD
-    _, _, VT = jnp.linalg.svd(X, full_matrices=False, compute_uv=True)
+    _, _, VT = jnp.linalg.svd(X, full_matrices=full_matrices, compute_uv=True)
 
     return VT.T
 

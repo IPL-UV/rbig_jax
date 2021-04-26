@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, NamedTuple
 
 import jax.numpy as jnp
 import tensor_annotations.jax as tjax
@@ -20,60 +20,133 @@ MLOutputs = tjax.Array2[Batch, Features]
 Outputs = Union[ImageOutput, MLOutputs]
 
 
-# @dataclass(mappable_dataclass=False,)
-class SqueezeLayer(distaxBijector):
-    def __init__(self, H: int, W: int, C: int, Wn: int, Hn: int, fh: int, fw: int):
-        self.H = H
-        self.W = W
-        self.C = C
+from typing import Callable
 
-        self.Hn = Hn
-        self.Wn = Wn
-        self.fh = fh
-        self.fw = fw
 
-    def forward_and_log_det(self, inputs: ImageInputs, **kwargs,) -> ImageOutput:
+class RescaleParams(NamedTuple):
+    fh: int
+    fw: int
+    Hn: int
+    Wn: int
+    W: int
+    H: int
+    C: int
 
-        # batch size is independent
 
-        B, *_ = inputs.shape
+class RescaleFunctions(NamedTuple):
+    forward: Callable
+    inverse: Callable
+    params: RescaleParams
 
-        # forward rearrange
-        outputs = rearrange(
+
+def init_scale_function(filter, image_shape):
+
+    # create filter params
+    fh, fw = filter
+    H = image_shape.H
+    W = image_shape.W
+    C = image_shape.C
+    #     # do some checks!
+    #     assert H / fh !% 0
+    #     assert W / fw !% 0
+
+    Hn = H // fh
+    Wn = W // fw
+
+    rescale_params = RescaleParams(fh=fh, fw=fw, H=H, W=W, C=C, Hn=Hn, Wn=Wn)
+
+    def forward(inputs):
+
+        return rearrange(
             inputs,
-            "B (Hn fh) (Wn fw) C -> B fh fw (C Hn Wn)",
-            B=B,
-            C=self.C,
-            Hn=self.Hn,
-            Wn=self.Wn,
-            fh=self.fh,
-            fw=self.fw,
+            "B (Hn fh Wn fw C) -> (B Hn Wn) (fh fw C)",
+            fh=fh,
+            fw=fw,
+            C=C,
+            Wn=Wn,
+            Hn=Hn,
         )
 
-        # logdet empty
-        log_det = jnp.zeros((B,))
-        log_det = jnp.expand_dims(log_det, axis=1)
-        return outputs, log_det
+    def inverse(inputs):
 
-    def inverse_and_log_det(self, inputs: ImageInputs, **kwargs,) -> ImageInputs:
-
-        B, *_ = inputs.shape
-
-        # undo squeeze
-        outputs = rearrange(
+        temp = rearrange(
             inputs,
-            "B fh fw (C Hn Wn) -> B (Hn fh) (Wn fw) C",
-            C=self.C,
-            Hn=self.Hn,
-            Wn=self.Wn,
-            fh=self.fh,
-            fw=self.fw,
+            "(B Hn Wn) (fh fw C) -> B Hn Wn fh fw C",
+            #             B=inputs.shape[0],
+            C=C,
+            Hn=Hn,
+            Wn=Wn,
+            fh=fh,
+            fw=fw,
+        )
+        return rearrange(
+            temp,
+            "B Hn Wn fh fw C -> B (Hn fh Wn fw C)",
+            #             B=inputs.shape[0],
+            C=C,
+            Hn=Hn,
+            Wn=Wn,
+            fh=fh,
+            fw=fw,
         )
 
-        # logdet empty
-        log_det = jnp.zeros((outputs.shape[0],))
-        log_det = jnp.expand_dims(log_det, axis=1)
-        return outputs, log_det
+    return RescaleFunctions(forward=forward, inverse=inverse, params=rescale_params)
+
+
+# # @dataclass(mappable_dataclass=False,)
+# class SqueezeLayer(distaxBijector):
+#     def __init__(self, H: int, W: int, C: int, Wn: int, Hn: int, fh: int, fw: int):
+#         self.H = H
+#         self.W = W
+#         self.C = C
+
+#         self.Hn = Hn
+#         self.Wn = Wn
+#         self.fh = fh
+#         self.fw = fw
+
+#     def forward_and_log_det(self, inputs: ImageInputs, **kwargs,) -> ImageOutput:
+
+#         # batch size is independent
+
+#         B, *_ = inputs.shape
+
+#         # forward rearrange
+#         outputs = rearrange(
+#             inputs,
+#             "B (Hn fh) (Wn fw) C -> B fh fw (C Hn Wn)",
+#             B=B,
+#             C=self.C,
+#             Hn=self.Hn,
+#             Wn=self.Wn,
+#             fh=self.fh,
+#             fw=self.fw,
+#         )
+
+#         # logdet empty
+#         log_det = jnp.zeros((B,))
+#         log_det = jnp.expand_dims(log_det, axis=1)
+#         return outputs, log_det
+
+#     def inverse_and_log_det(self, inputs: ImageInputs, **kwargs,) -> ImageInputs:
+
+#         B, *_ = inputs.shape
+
+#         # undo squeeze
+#         outputs = rearrange(
+#             inputs,
+#             "B fh fw (C Hn Wn) -> B (Hn fh) (Wn fw) C",
+#             C=self.C,
+#             Hn=self.Hn,
+#             Wn=self.Wn,
+#             fh=self.fh,
+#             fw=self.fw,
+#         )
+
+#         # logdet empty
+#         log_det = jnp.zeros((outputs.shape[0],))
+#         log_det = jnp.expand_dims(log_det, axis=1)
+#         return outputs, log_det
 
 
 # # @dataclass(mappable_dataclass=False,)
@@ -130,67 +203,67 @@ class SqueezeLayer(distaxBijector):
 #         return outputs, log_det
 
 
-def InitSqueezeLayer(filter_shape: Tuple[int, int],):
-    def init_func(rng: PRNGKey, shape: Tuple, **kwargs):
-        H, W, C = shape
+# def InitSqueezeLayer(filter_shape: Tuple[int, int],):
+#     def init_func(rng: PRNGKey, shape: Tuple, **kwargs):
+#         H, W, C = shape
 
-        # extract coordinates
-        fh, fw = filter_shape
+#         # extract coordinates
+#         fh, fw = filter_shape
 
-        # # check for no remainders
-        # assert H % fh == 0
-        # assert W % fw == 0
+#         # # check for no remainders
+#         # assert H % fh == 0
+#         # assert W % fw == 0
 
-        # new shapes
-        Hn = H // fh
-        Wn = W // fw
+#         # new shapes
+#         Hn = H // fh
+#         Wn = W // fw
 
-        return SqueezeLayer(H=H, W=W, C=C, fh=fh, fw=fw, Hn=Hn, Wn=Wn)
+#         return SqueezeLayer(H=H, W=W, C=C, fh=fh, fw=fw, Hn=Hn, Wn=Wn)
 
-    return init_func
+#     return init_func
 
 
-class CollapseLayer(distaxBijector):
-    def __init__(self, collapse_shape: str, H: int, W: int, C: int):
-        self.collapse_shape = collapse_shape
-        self.H = H
-        self.W = W
-        self.C = C
+# class CollapseLayer(distaxBijector):
+#     def __init__(self, collapse_shape: str, H: int, W: int, C: int):
+#         self.collapse_shape = collapse_shape
+#         self.H = H
+#         self.W = W
+#         self.C = C
 
-    def forward_and_log_det(self, inputs: ImageInputs, **kwargs,) -> MLOutputs:
+#     def forward_and_log_det(self, inputs: ImageInputs, **kwargs,) -> MLOutputs:
 
-        # batch size is independent
+#         # batch size is independent
 
-        B, *_ = inputs.shape
+#         B, *_ = inputs.shape
 
-        # collapse dimensions
-        outputs = rearrange(
-            inputs,
-            "B H W C ->" + self.collapse_shape,
-            B=B,
-            C=self.C,
-            H=self.H,
-            W=self.W,
-        )
+#         # collapse dimensions
+#         outputs = rearrange(
+#             inputs,
+#             "B H W C ->" + self.collapse_shape,
+#             B=B,
+#             C=self.C,
+#             H=self.H,
+#             W=self.W,
+#         )
 
-        # logdet empty
-        log_det = jnp.zeros((B,))
-        log_det = jnp.expand_dims(log_det, axis=1)
-        return outputs, log_det
+#         # logdet empty
+#         log_det = jnp.zeros((B,))
+#         log_det = jnp.expand_dims(log_det, axis=1)
+#         return outputs, log_det
 
-    def inverse_and_log_det(self, inputs: ImageInputs, **kwargs,) -> ImageOutput:
+#     def inverse_and_log_det(self, inputs: ImageInputs, **kwargs,) -> ImageOutput:
 
-        B, *_ = inputs.shape
+#         B, *_ = inputs.shape
 
-        # un-collapse dimensions
-        outputs = rearrange(
-            inputs, self.collapse_shape + "-> B H W C", C=self.C, H=self.H, W=self.W,
-        )
+#         # un-collapse dimensions
+#         outputs = rearrange(
+#             inputs, self.collapse_shape + "-> B H W C", C=self.C, H=self.H, W=self.W,
+#         )
 
-        # logdet empty
-        log_det = jnp.zeros((outputs.shape[0],))
-        log_det = jnp.expand_dims(log_det, axis=1)
-        return outputs, log_det
+#         # logdet empty
+#         log_det = jnp.zeros((outputs.shape[0],))
+#         log_det = jnp.expand_dims(log_det, axis=1)
+#         return outputs, log_det
 
 
 # @dataclass(mappable_dataclass=False)
@@ -382,3 +455,34 @@ def _get_new_shapes(
     channels *= height_n * width_n
 
     return height, width, channels
+
+
+from einops import rearrange
+from typing import NamedTuple
+
+
+class ImageShape(NamedTuple):
+    H: int
+    W: int
+    C: int
+
+
+def flatten_image(img, shape: ImageShape, scaler=None, batch: bool = False) -> Array:
+
+    # flatten image
+    if batch:
+        img = rearrange(img, "B H W C -> B (H W C)", C=shape.C, H=shape.H, W=shape.W)
+    else:
+        img = rearrange(img, "H W C -> (H W C)", C=shape.C, H=shape.H, W=shape.W)
+
+    return img
+
+
+def unflatten_image(img, shape: ImageShape, scaler=None, batch: bool = False) -> Array:
+    # flatten image
+    if batch:
+        img = rearrange(img, "B (H W C) -> B H W C", C=shape.C, H=shape.H, W=shape.W)
+    else:
+        img = rearrange(img, "(H W C) -> H W C", C=shape.C, H=shape.H, W=shape.W)
+
+    return img

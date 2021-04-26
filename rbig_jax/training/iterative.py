@@ -1,8 +1,9 @@
 from typing import List, Tuple, Optional
-from rbig_jax.losses import IterativeInfoLoss
+from rbig_jax.losses import IterativeInfoLoss, init_info_loss
 import jax
 import jax.numpy as jnp
-from rbig_jax.transforms.block import RBIGBlock
+
+from rbig_jax.transforms.block import RBIGBlockInit
 from chex import Array, dataclass
 from rbig_jax.models import GaussianizationFlow
 from distrax._src.distributions.normal import Normal
@@ -11,7 +12,7 @@ import time
 
 def train_max_layers_model(
     X: Array,
-    rbig_block: RBIGBlock,
+    rbig_block: RBIGBlockInit,
     max_layers: int = 50,
     verbose: bool = False,
     interval: int = 10,
@@ -83,11 +84,16 @@ def train_max_layers_model(
 
 def train_info_loss_model(
     X: Array,
-    rbig_block: RBIGBlock,
+    rbig_block_init: dataclass,
+    max_layers: int = 1_000,
+    zero_tolerance: int = 60,
     loss: Optional[IterativeInfoLoss] = None,
     verbose: bool = True,
     interval: int = 5,
+    base: int = 2,
+    p: float = 0.25,
     n_layers_remove: Optional[int] = 10,
+    jitted: bool = True,
 ) -> Tuple[List[dataclass], Array]:
     """Simple training procedure using the iterative scheme
     
@@ -95,7 +101,7 @@ def train_info_loss_model(
     ----------
     X : Array
         the input data to be trained
-    rbig_block : RBIGBlock
+    rbig_block_init : RBIGBlockInit
         a dataclass to be used
     loss : IterativeLoss
         a namedtuple with all of the components for the loss
@@ -119,13 +125,23 @@ def train_info_loss_model(
     n_features = X.shape[1]
 
     # extract the components
+    if loss is None:
+        # initialize info loss function
+        loss = init_info_loss(
+            n_samples=X.shape[0],
+            max_layers=max_layers,
+            zero_tolerance=zero_tolerance,
+            p=p,
+            base=base,
+            jitted=jitted,
+        )
     loss_f, condition, state, name = loss
 
     assert name == "info"
     # assert state.zero_tolerance > remove_layers
 
     # initialize list of bijectors
-    n_bijectors = len(rbig_block.init_functions)
+    n_bijectors = len(rbig_block_init.init_functions)
     bijectors = list()
     t0 = time.time()
     while condition(state):
@@ -134,7 +150,7 @@ def train_info_loss_model(
         layer_loss = jax.partial(loss_f, X_before=X_g)
 
         # fit RBIG block
-        X_g, ibijector = rbig_block.forward_and_params(X_g)
+        X_g, ibijector = rbig_block_init.forward_and_params(X_g)
 
         # get information reduction
         layer_loss = layer_loss(X_after=X_g)
@@ -148,7 +164,7 @@ def train_info_loss_model(
         if verbose:
             if state.ilayer % interval == 0:
                 print(
-                    f"Layer {state.ilayer} - Cum. Info Reduction: {state.info_loss[:state.ilayer].sum():.3f} - Elapsed Time: {time.time()-t0:.4f}"
+                    f"Layer {state.ilayer} - Cum. Info Reduction: {state.info_loss[:state.ilayer].sum():.3f} - Elapsed Time: {time.time()-t0:.4f} secs"
                 )
 
     if verbose:
@@ -166,11 +182,9 @@ def train_info_loss_model(
             n_bijectors=n_bijectors,
             n_layers_remove=n_layers_remove,
         )
-    if verbose:
-        print(
-            f"Final Number of layers: {final_loss.shape[0]} (Blocks: {final_loss.shape[0]//n_bijectors})"
-        )
-        print(f"Total Time: {time.time()-t0:.4f}")
+
+    t1 = time.time()
+
     # ================================
     # Create Gaussianization model
     # ================================
@@ -182,6 +196,12 @@ def train_info_loss_model(
     rbig_model = GaussianizationFlow(base_dist=base_dist, bijectors=bijectors)
 
     rbig_model.info_loss = final_loss
+
+    if verbose:
+        print(
+            f"Final Number of layers: {final_loss.shape[0]} (Blocks: {final_loss.shape[0]//n_bijectors})"
+        )
+        print(f"Total Time: {t1-t0:.4f} secs")
 
     # return relevant stuff
     return X_g, rbig_model

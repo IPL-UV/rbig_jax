@@ -62,7 +62,7 @@ def InitSigmoidTransform(jitted: bool = False):
 
     def transform(inputs, **kwargs):
         outputs = f(inputs)
-        return outputs, ()
+        return outputs
 
     def params(inputs, **kwargs):
         return ()
@@ -97,7 +97,7 @@ def InitLogitTransform(jitted: bool = False):
 
     def transform(inputs, **kwargs):
         outputs = f(inputs)
-        return outputs, ()
+        return outputs
 
     def params(inputs, **kwargs):
         return ()

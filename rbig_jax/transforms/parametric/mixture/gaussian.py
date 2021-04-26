@@ -127,21 +127,21 @@ def mixture_gaussian_cdf(
     Returns:
         x_cdf (Array) : CDF for the mixture distribution
     """
-    # n_features, n_components = prior_logits
-    #
-    # x_r = jnp.tile(x, (n_features, n_components))
-    # x_r = x.reshape(-1, 1)
-    x_r = jnp.expand_dims(x, axis=-1)
-    # normalize logit weights to 1
-    prior_logits = jax.nn.log_softmax(prior_logits, axis=1)
-    x_r = (x_r - means) / scales
 
-    # calculate the log cdf
-    log_cdfs = prior_logits + jax.scipy.stats.norm.logcdf(x_r, means, scales)
-    # normalize distribution
-    log_cdf = logsumexp(log_cdfs, axis=-1)
+    x = jnp.expand_dims(x, axis=-1)
 
-    return jnp.exp(log_cdf)
+    # normalize
+    x = (x - means) / scales
+
+    # normalize prior logits
+    weights = jax.nn.log_softmax(prior_logits, axis=1)
+
+    log_cdfs = weights + jax.scipy.special.log_ndtr(x)
+
+    # calculate log cdf
+    log_cdfs = jax.nn.logsumexp(log_cdfs, axis=-1)
+
+    return jnp.exp(log_cdfs)
 
 
 mixture_gaussian_cdf_vectorized = jax.vmap(
@@ -202,12 +202,14 @@ def mixture_gaussian_log_pdf(
     #
     # x_r = jnp.tile(x, (n_components))
     # x_r = x.reshape(-1, 1)
-    x_r = jnp.expand_dims(x, axis=-1)
+    x = jnp.expand_dims(x, axis=-1)
+
+    x = (x - means) / scales
     # normalize logit weights to 1, (D,K)->(D,K)
     prior_logits = log_softmax(prior_logits, axis=-1)
 
     # calculate the log pdf, (D,K)->(D,K)
-    log_pdfs = prior_logits + jax.scipy.stats.norm.logpdf(x_r, means, scales)
+    log_pdfs = prior_logits + jax.scipy.stats.norm.logpdf(x)
 
     # normalize distribution for components, (D,K)->(D,)
     log_pdf = logsumexp(log_pdfs, axis=-1)

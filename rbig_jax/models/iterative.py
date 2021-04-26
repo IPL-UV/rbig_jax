@@ -1,24 +1,63 @@
 from chex import Array, dataclass
 from rbig_jax.models.gaussflow import GaussianizationFlow
 
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Tuple
 
 from rbig_jax.transforms.base import Bijector
-
+import jax.numpy as jnp
 from distrax._src.distributions.distribution import Distribution
+from rbig_jax.transforms.histogram import InitUniHistTransform
+from rbig_jax.transforms.kde import InitUniKDETransform
+from rbig_jax.transforms.rotation import InitPCARotation
+from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
+from rbig_jax.transforms.block import RBIGBlockInit
 
-from rbig_jax.transforms.block import init_default_rbig_block
 
-from rbig_jax.training.iterative import train_info_loss_model
-from rbig_jax.losses import init_info_loss
+def init_default_rbig_block(
+    shape: Tuple,
+    method: str = "histogram",
+    support_extension: int = 10,
+    alpha: float = 1e-5,
+    precision: int = 100,
+    nbins: Optional[int] = None,
+    bw: str = "scott",
+    jitted: bool = True,
+    eps: float = 1e-5,
+) -> RBIGBlockInit:
 
+    n_samples = shape[0]
 
-# @dataclass
-# class IterativeGaussianization(GaussianizationFlow):
-#     bijectors: Iterable[Bijector]
-#     base_dist: Distribution
-#     info_loss: Array
-#     pass
+    # init histogram transformation
+    if method == "histogram":
+        if nbins is None:
+            nbins = int(jnp.sqrt(n_samples))
+
+        init_hist_f = InitUniHistTransform(
+            n_samples=n_samples,
+            nbins=nbins,
+            support_extension=support_extension,
+            precision=precision,
+            alpha=alpha,
+            jitted=jitted,
+        )
+    elif method == "kde":
+        init_hist_f = InitUniKDETransform(
+            shape=shape,
+            support_extension=support_extension,
+            precision=precision,
+            bw=bw,
+            jitted=jitted,
+        )
+    else:
+        raise ValueError(f"Unrecognzed Method : {method}")
+
+    # init Inverse Gaussian CDF transform
+    init_icdf_f = InitInverseGaussCDF(eps=eps, jitted=jitted)
+
+    # init PCA transformation
+    init_pca_f = InitPCARotation(jitted=jitted)
+
+    return [init_hist_f, init_icdf_f, init_pca_f]
 
 
 def RBIG(
@@ -41,7 +80,7 @@ def RBIG(
 ):
 
     # init rbig_block
-    rbig_block = init_default_rbig_block(
+    rbig_block_init = init_default_rbig_block(
         shape=X.shape,
         support_extension=support_extension,
         alpha=alpha,
@@ -53,6 +92,8 @@ def RBIG(
         method=method,
     )
 
+    from rbig_jax.losses import init_info_loss
+
     # initialize info loss function
     loss = init_info_loss(
         n_samples=X.shape[0],
@@ -63,10 +104,12 @@ def RBIG(
         jitted=jitted,
     )
 
+    from rbig_jax.training.iterative import train_info_loss_model
+
     # run iterative training
     X_g, rbig_model = train_info_loss_model(
         X=X,
-        rbig_block=rbig_block,
+        rbig_block_init=rbig_block_init,
         loss=loss,
         verbose=verbose,
         interval=interval,

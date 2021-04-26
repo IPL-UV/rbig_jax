@@ -27,12 +27,12 @@ class MixtureLogisticCDF(Bijector):
         # )
 
         outputs = mixture_logistic_cdf(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         # log abs det, all zeros
         logabsdet = mixture_logistic_log_pdf(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         return outputs, logabsdet  # .sum(axis=1)
@@ -40,7 +40,7 @@ class MixtureLogisticCDF(Bijector):
     def forward(self, inputs: Array, **kwargs) -> Array:
         # log abs det, all zeros
         outputs = mixture_logistic_cdf(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         return outputs  # .sum(axis=1)
@@ -48,7 +48,7 @@ class MixtureLogisticCDF(Bijector):
     def inverse(self, inputs: Array, **kwargs) -> Array:
         # transformation
         outputs = mixture_logistic_invcdf_vectorized(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         return outputs  # .sum(axis=1)
@@ -56,7 +56,7 @@ class MixtureLogisticCDF(Bijector):
     def forward_log_det_jacobian(self, inputs: Array, **kwargs) -> Array:
         # log abs det, all zeros
         logabsdet = mixture_logistic_log_pdf(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         return logabsdet  # .sum(axis=1)
@@ -64,7 +64,7 @@ class MixtureLogisticCDF(Bijector):
     def inverse_log_det_jacobian(self, inputs: Array, **kwargs) -> Array:
         # transformation
         logabsdet = mixture_logistic_log_pdf_vectorized(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         return logabsdet  # .sum(axis=1)
@@ -73,7 +73,7 @@ class MixtureLogisticCDF(Bijector):
 
         # log abs det, all zeros
         logabsdet = mixture_logistic_log_pdf_vectorized(
-            inputs, self.prior_logits, self.means, jnp.exp(self.log_scales),
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         return logabsdet  # .sum(axis=1)
@@ -203,7 +203,8 @@ def logistic_log_cdf(x: Array, mean: Array, scale: Array) -> Array:
     z = (x - mean) / scale
 
     # log cdf
-    log_cdf = log_sigmoid(z)
+    # log_cdf = log_sigmoid(z)
+    log_cdf = -softplus(-z)
 
     return log_cdf
 
@@ -301,6 +302,7 @@ def logistic_log_pdf(x: Array, mean: Array, scale: Array) -> Array:
     # log probability
     # log_prob = z -jnp.log(scale) - 2 * jax.nn.softplus(z)
     # log_prob = jax.scipy.stats.logistic.logpdf(z)
-    log_prob = z - jnp.log(scale) - 2 * softplus(z)
+    # log_prob = z - jnp.log(scale) - 2 * softplus(z)
+    log_prob = -z - 2.0 * softplus(-z) - jnp.log(scale)
 
     return log_prob

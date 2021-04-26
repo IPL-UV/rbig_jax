@@ -35,6 +35,30 @@ class HouseHolder(Bijector):
 
         return outputs, logabsdet
 
+    def forward(self, inputs: Array) -> Tuple[Array, Array]:
+        # forward transformation with batch dimension
+        outputs = jax.vmap(householder_transform, in_axes=(0, None))(inputs, self.V)
+        return outputs
+
+    def inverse(self, inputs: Array) -> Tuple[Array, Array]:
+        outputs = jax.vmap(householder_inverse_transform, in_axes=(0, None))(
+            inputs, self.V
+        )
+        return outputs
+
+    def forward_log_det_jacobian(self, inputs: Array) -> Tuple[Array, Array]:
+        # log abs det, all zeros
+        logabsdet = jnp.zeros_like(inputs)
+
+        return logabsdet
+
+    def inverse_log_det_jacobian(self, inputs: Array) -> Tuple[Array, Array]:
+
+        # log abs det, all zeros
+        logabsdet = jnp.zeros_like(inputs)
+
+        return logabsdet
+
 
 def InitHouseHolder(n_reflections: int, method: str = "random") -> Callable:
     """Performs the householder transformation.
@@ -50,9 +74,10 @@ def InitHouseHolder(n_reflections: int, method: str = "random") -> Callable:
     """
 
     def init_bijector(
-        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+        inputs: Array = None, rng: PRNGKey = None, n_features: int = None, **kwargs
     ) -> HouseHolder:
 
+        # initialize weight matrix
         V = init_householder_weights(
             rng=rng,
             n_features=n_features,
@@ -60,6 +85,8 @@ def InitHouseHolder(n_reflections: int, method: str = "random") -> Callable:
             method=method,
             X=inputs,
         )
+
+        # initialize bijector
         bijector = HouseHolder(V=V)
 
         return bijector
@@ -107,7 +134,11 @@ def init_householder_weights(
 
     elif method == "pca":
 
-        V = compute_projection(X)
+        raise NotImplementedError(f"The pca init method hasn't been implemented yet.")
+
+    elif method == "ica":
+
+        raise NotImplementedError(f"The ica init method hasn't been implemented yet.")
     else:
         raise ValueError(f"Unrecognized init method: {method}")
     return V

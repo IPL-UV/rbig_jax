@@ -4,7 +4,7 @@ import jax.numpy as jnp
 import jax
 
 
-def init_mixture_weights(rng, n_features, n_components, method, X=None):
+def init_mixture_weights(rng, n_features, n_components, method, X=None, **kwargs):
 
     if method == "random":
         # initialize mixture
@@ -14,7 +14,11 @@ def init_mixture_weights(rng, n_features, n_components, method, X=None):
 
     elif method == "gmm":
         prior_logits, means, covariances = init_means_GMM_marginal(
-            X, n_components=n_components, random_state=rng[0]
+            X,
+            n_components=n_components,
+            random_state=int(rng[0]),
+            covariance_type="diag",
+            **kwargs,
         )
 
         log_scales = jnp.array(covariances)
@@ -24,7 +28,11 @@ def init_mixture_weights(rng, n_features, n_components, method, X=None):
     elif method == "kmeans":
 
         clusters = init_means_kmeans_marginal(
-            X=X, n_components=n_components, random_state=rng[0]
+            X=X,
+            n_components=n_components,
+            random_state=int(rng[0]),
+            covariance_type="diag",
+            **kwargs,
         )
         means = jnp.array(clusters)
 
@@ -90,9 +98,7 @@ def init_means_GMM_marginal(X: np.ndarray, n_components: int, **kwargs):
     weights, means, covariances = [], [], []
 
     for iX in X.T:
-        clf = GaussianMixture(
-            n_components=n_components, covariance_type="diag", **kwargs
-        ).fit(iX[:, None])
+        clf = GaussianMixture(n_components=n_components, **kwargs).fit(iX[:, None])
         weights.append(clf.weights_)
         means.append(clf.means_.T)
         covariances.append(clf.covariances_.T)

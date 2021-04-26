@@ -7,6 +7,8 @@ from chex import Array, dataclass
 from jax.random import PRNGKey
 from distrax._src.utils.math import sum_last
 from distrax._src.bijectors.bijector import Bijector as FixedBijector
+from distrax._src.utils import jittable
+import abc
 
 
 @dataclass
@@ -20,26 +22,6 @@ class InitFunctions(NamedTuple):
     init_params: Callable
     init_bijector: Callable
     init_transform: Callable
-
-
-class InitLayersFunctions(NamedTuple):
-    bijector: Optional[Callable]
-    bijector_and_transform: Optional[Callable]
-    transform: Optional[Callable]
-    params: Optional[Callable]
-    params_and_transform: Optional[Callable]
-
-
-class InitFunctionsPlus(NamedTuple):
-    init_params: Callable
-    init_bijector: Callable
-    init_transform: Callable
-    init_layer: Callable
-
-
-@dataclass(frozen=True)
-class HyperParams:
-    params: dataclass
 
 
 @dataclass
@@ -73,6 +55,48 @@ class Bijector:
         raise NotImplementedError(
             f"Bijector {self.name} does not implement `inverse_and_log_det`."
         )
+
+
+class NonTrainableBijector(jittable.Jittable, metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def forward(self, inputs: Array) -> Array:
+        return NotImplementedError()
+
+    @abc.abstractmethod
+    def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+        return NotImplementedError()
+
+    @abc.abstractmethod
+    def forward_and_bijector(self, inputs: Array) -> Tuple[Array, Bijector]:
+        return NotImplementedError()
+
+    @abc.abstractmethod
+    def forward_log_det_bijector(self, inputs: Array) -> Tuple[Array, Array, Bijector]:
+        return NotImplementedError()
+
+    @abc.abstractmethod
+    def bijector(self, inputs: Array) -> Bijector:
+        return NotImplementedError()
+
+
+class InitLayersFunctions(NamedTuple):
+    bijector: Optional[Callable]
+    bijector_and_transform: Optional[Callable]
+    transform: Optional[Callable]
+    params: Optional[Callable]
+    params_and_transform: Optional[Callable]
+
+
+class InitFunctionsPlus(NamedTuple):
+    init_params: Callable
+    init_bijector: Callable
+    init_transform: Callable
+    init_layer: Callable
+
+
+@dataclass(frozen=True)
+class HyperParams:
+    params: dataclass
 
 
 @dataclass
@@ -115,6 +139,7 @@ class BijectorChain:
     bijectors: Iterable[Bijector]
 
     def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+
         outputs = inputs
         total_logabsdet = jnp.zeros_like(outputs)
         # total_logabsdet = jnp.zeros((outputs.shape[0],))
@@ -122,28 +147,56 @@ class BijectorChain:
         for ibijector in self.bijectors:
             outputs, logabsdet = ibijector.forward_and_log_det(outputs)
             total_logabsdet += logabsdet  # sum_last(logabsdet, ndims=logabsdet.ndim)
+
         return outputs, total_logabsdet
 
     def inverse_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+
         outputs = inputs
         total_logabsdet = jnp.zeros_like(outputs)
         # total_logabsdet = jnp.expand_dims(total_logabsdet, axis=1)
         for ibijector in reversed(self.bijectors):
             outputs, logabsdet = ibijector.inverse_and_log_det(outputs)
             total_logabsdet += logabsdet  # sum_last(logabsdet, ndims=logabsdet.ndim)
+
         return outputs, total_logabsdet
 
     def forward(self, inputs: Array) -> Array:
+
         outputs = inputs
         for ibijector in self.bijectors:
             outputs = ibijector.forward(outputs)
+
         return outputs
 
     def inverse(self, inputs: Array) -> Array:
+
         outputs = inputs
         for ibijector in reversed(self.bijectors):
             outputs = ibijector.inverse(outputs)
+
         return outputs
+
+    def forward_log_det_jacobian(self, inputs: Array) -> Array:
+
+        outputs = inputs
+        total_logabsdet = jnp.zeros_like(outputs)
+        for ibijector in self.bijectors:
+            outputs, logabsdet = ibijector.forward_and_log_det(outputs)
+            total_logabsdet += logabsdet
+
+        return total_logabsdet
+
+    def inverse_log_det_jacobian(self, inputs: Array) -> Tuple[Array, Array]:
+
+        outputs = inputs
+        total_logabsdet = jnp.zeros_like(outputs)
+        # total_logabsdet = jnp.expand_dims(total_logabsdet, axis=1)
+        for ibijector in reversed(self.bijectors):
+            outputs, logabsdet = ibijector.inverse_and_log_det(outputs)
+            total_logabsdet += logabsdet  # sum_last(logabsdet, ndims=logabsdet.ndim)
+
+        return total_logabsdet
 
 
 def CompositeTransform(bijectors: Sequence[Callable]):

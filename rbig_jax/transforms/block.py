@@ -16,7 +16,7 @@ from rbig_jax.transforms.rotation import InitPCARotation
 
 
 @dataclass
-class RBIGBlock:
+class RBIGBlockInit:
     init_functions: List[dataclass]
 
     def forward_and_params(self, inputs: Array) -> Tuple[Array, Array]:
@@ -34,24 +34,7 @@ class RBIGBlock:
 
         return outputs, params
 
-    # def forward_and_params_and_gradient(self, inputs: Array) -> Tuple[Array, Array]:
-    #     outputs = inputs
-    #     params = []
-
-    #     # loop through bijectors
-    #     for ibijector in self.init_functions:
-
-    #         # transform and params
-    #         outputs, iparams = ibijector.init_bijector(outputs)
-
-    #         # outputs
-
-    #         # accumulate params
-    #         params.append(iparams)
-
-    #     return outputs, params
-
-    def forward(self, inputs: Array) -> Tuple[Array, Array]:
+    def forward(self, inputs: Array) -> Array:
         outputs = inputs
         for ibijector in self.init_functions:
             outputs = ibijector.transform(outputs)
@@ -77,7 +60,7 @@ def init_default_rbig_block(
     bw: str = "scott",
     jitted: bool = True,
     eps: float = 1e-5,
-) -> RBIGBlock:
+) -> RBIGBlockInit:
 
     n_samples = shape[0]
 
@@ -111,4 +94,4 @@ def init_default_rbig_block(
     # init PCA transformation
     init_pca_f = InitPCARotation(jitted=jitted)
 
-    return RBIGBlock(init_functions=[init_hist_f, init_icdf_f, init_pca_f])
+    return RBIGBlockInit(init_functions=[init_hist_f, init_icdf_f, init_pca_f])

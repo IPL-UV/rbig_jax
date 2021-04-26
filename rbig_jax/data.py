@@ -115,7 +115,7 @@ class SwissRollDataset(DensityDataset):
 class NoisySineDataset(DensityDataset):
     def _create_data(self):
 
-        rng = np.random.RandomState(seed=seed)
+        rng = np.random.RandomState(seed=self.seed)
         x = np.abs(2 * rng.randn(1, self.n_samples))
         y = np.sin(x) + 0.25 * rng.randn(1, self.n_samples)
         self.data = np.vstack((x, y)).T
