@@ -1,12 +1,13 @@
 from collections import namedtuple
-from rbig_jax.transforms.rotation import InitPCARotation
-from rbig_jax.transforms.histogram import InitUniHistUniformize
-from rbig_jax.information.total_corr import rbig_total_correlation
-from rbig_jax.information.entropy import rbig_multivariate_entropy
 from typing import Callable, Optional
 
 import jax
 import jax.numpy as np
+
+from rbig_jax.information.entropy import rbig_multivariate_entropy
+from rbig_jax.information.total_corr import rbig_total_correlation
+from rbig_jax.transforms.histogram import InitUniHistUniformize
+from rbig_jax.transforms.rotation import InitPCARotation
 
 RBIGMutualInfo = namedtuple("RBIGMutualInfo", ["mi_X", "mi_Y", "mi_XY"])
 

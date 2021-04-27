@@ -1,14 +1,44 @@
-from rbig_jax.transforms.histogram import InitUniHistUniformize
-from rbig_jax.transforms.rotation import InitPCARotation
-import jax.numpy as np
-from typing import Callable, Optional, Tuple
-from chex import dataclass, Array
+from typing import Callable, Optional, Tuple, List
+import jax.numpy as jnp
+from chex import Array, dataclass
+from rbig_jax.transforms.histogram import InitUniHistTransform
+from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
-from rbig_jax.transforms.marginal import (
-    marginal_fit_transform,
-    marginal_gradient_transform,
-    marginal_transform,
-)
+from rbig_jax.transforms.rotation import InitPCARotation
+
+# from rbig_jax.transforms.histogram import InitUniHistUniformize
+# from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
+# from rbig_jax.transforms.marginal import (
+#     marginal_fit_transform,
+#     marginal_gradient_transform,
+#     marginal_transform,
+# )
+
+
+@dataclass
+class RBIGBlockInit:
+    init_functions: List[dataclass]
+
+    def forward_and_params(self, inputs: Array) -> Tuple[Array, Array]:
+        outputs = inputs
+        params = []
+
+        # loop through bijectors
+        for ibijector in self.init_functions:
+
+            # transform and params
+            outputs, iparams = ibijector.bijector_and_transform(outputs)
+
+            # accumulate params
+            params.append(iparams)
+
+        return outputs, params
+
+    def forward(self, inputs: Array) -> Array:
+        outputs = inputs
+        for ibijector in self.init_functions:
+            outputs = ibijector.transform(outputs)
+        return outputs
 
 
 @dataclass
@@ -20,123 +50,48 @@ class RBIGBlockParams:
     rotation: Array
 
 
-def InitRBIGBlock(uni_uniformize: Callable, rot_transform: Callable, eps: float = 1e-5):
-
-    # unpack functions
-    uni_init_f, uni_forward_f, uni_grad_f, uni_inverse_f = uni_uniformize
-    icdf_init_f, icdf_forward_f, icdf_grad_f, icdf_inverse_f = InitInverseGaussCDF(
-        eps=eps
-    )
-    rot_init_f, rot_forward_f, _, rot_inverse_f = rot_transform
-
-    # TODO a bin initialization function
-    def init_func(inputs):
-
-        # marginal uniformization
-        inputs, uni_params = marginal_fit_transform(inputs, uni_init_f)
-
-        # inverse CDF Transformation
-        inputs, _ = icdf_init_f(inputs)
-
-        # rotation
-        outputs, rot_params = rot_init_f(inputs)
-
-        # initialize new RBiG params
-        params = RBIGBlockParams(
-            support=uni_params.support,
-            quantiles=uni_params.quantiles,
-            empirical_pdf=uni_params.empirical_pdf,
-            support_pdf=uni_params.support_pdf,
-            rotation=rot_params.rotation,
-        )
-
-        return outputs, params
-
-    def transform(params, inputs):
-
-        # marginal uniformization
-        inputs = marginal_transform(inputs, params, uni_forward_f)
-
-        # inverse CDF transformation
-        inputs = icdf_forward_f(params, inputs)
-
-        # rotation
-        outputs = rot_forward_f(params, inputs)
-
-        return outputs
-
-    def gradient_transform(params, inputs):
-
-        # marginal uniformization
-        inputs, Xu_ldj = marginal_gradient_transform(inputs, params, uni_grad_f)
-
-        # inverse CDF transformation
-        inputs, Xg_ldj = icdf_grad_f(params, inputs)
-
-        # rotation is zero...
-        outputs = rot_forward_f(params, inputs)
-
-        # sum the log det jacobians
-        logabsdet = Xu_ldj + Xg_ldj
-
-        return outputs, logabsdet
-
-    def inverse_transform(params, inputs):
-
-        # rotation
-        inputs = rot_inverse_f(params, inputs)
-
-        # inverse gaussian cdf
-        inputs = icdf_inverse_f(params, inputs)
-
-        # marginal uniformization
-        outputs = marginal_transform(inputs, params, uni_inverse_f)
-
-        return outputs
-
-    return init_func, transform, gradient_transform, inverse_transform
-
-
-def get_default_rbig_block_params(
-    n_samples: int,
-    nbins: Optional[int] = None,
-    precision: int = 1_000,
+def init_default_rbig_block(
+    shape: Tuple,
+    method: str = "histogram",
     support_extension: int = 10,
     alpha: float = 1e-5,
-) -> Tuple[Callable, Callable]:
-    # initialize histogram parameters
-    if nbins is None:
-        nbins = int(np.sqrt(n_samples))
-
-    # initialize histogram function
-    uni_uniformize = InitUniHistUniformize(
-        n_samples=n_samples,
-        nbins=nbins,
-        support_extension=support_extension,
-        precision=precision,
-        alpha=alpha,
-    )
-    # initialize rotation transformation
-    rot_transform = InitPCARotation()
-
-    return uni_uniformize, rot_transform
-
-
-def get_default_rbig_block(
-    n_samples: int,
+    precision: int = 100,
     nbins: Optional[int] = None,
-    precision: int = 1_000,
-    support_extension: int = 10,
-    alpha: float = 1e-5,
+    bw: str = "scott",
+    jitted: bool = True,
     eps: float = 1e-5,
-) -> Tuple[Callable, Callable]:
-    uni_uniformize, rot_transform = get_default_rbig_block_params(
-        n_samples=n_samples,
-        nbins=nbins,
-        support_extension=support_extension,
-        precision=precision,
-        alpha=alpha,
-    )
+) -> RBIGBlockInit:
 
-    return InitRBIGBlock(uni_uniformize, rot_transform, eps=eps)
+    n_samples = shape[0]
 
+    # init histogram transformation
+    if method == "histogram":
+        if nbins is None:
+            nbins = int(jnp.sqrt(n_samples))
+
+        init_hist_f = InitUniHistTransform(
+            n_samples=n_samples,
+            nbins=nbins,
+            support_extension=support_extension,
+            precision=precision,
+            alpha=alpha,
+            jitted=jitted,
+        )
+    elif method == "kde":
+        init_hist_f = InitUniKDETransform(
+            shape=shape,
+            support_extension=support_extension,
+            precision=precision,
+            bw=bw,
+            jitted=jitted,
+        )
+    else:
+        raise ValueError(f"Unrecognzed Method : {method}")
+
+    # init Inverse Gaussian CDF transform
+    init_icdf_f = InitInverseGaussCDF(eps=eps, jitted=jitted)
+
+    # init PCA transformation
+    init_pca_f = InitPCARotation(jitted=jitted)
+
+    return RBIGBlockInit(init_functions=[init_hist_f, init_icdf_f, init_pca_f])

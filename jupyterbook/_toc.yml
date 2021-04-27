@@ -1,0 +1,20 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+- file: intro
+
+
+- part: Iterative Gaussianization
+  chapters: 
+  - file: content/iterative/demos/rbig_demo_plane.md
+  - file: content/iterative/demos/rbig_building_blocks.md
+  - file: content/iterative/demos/rbig_building_blocks_better_sampling.md
+
+- part: Parametric Gaussianization
+  chapters: 
+  - file: content/parametric/demos/gf_demo_plane.md
+
+- part: Exploration
+  chapters: 
+  - file: content/experimental/overview.md
+    sections:
+    - file: literature

@@ -77,3 +77,30 @@ def plot_info_loss(
         plt.savefig(save_name)
     else:
         plt.show()
+
+
+from mpl_toolkits.axes_grid1 import ImageGrid
+from rbig_jax.transforms.reshape import unflatten_image
+from typing import Optional
+
+
+def plot_image_grid(image, image_shape: Optional = None):
+
+    fig = plt.figure(figsize=(10.0, 10.0))
+    grid = ImageGrid(
+        fig,
+        111,  # similar to subplot(111)
+        nrows_ncols=(5, 5),  # creates 2x2 grid of axes
+        axes_pad=0.1,  # pad between axes in inch.
+    )
+
+    for i, ax in enumerate(grid):
+        img = image[i]
+
+        if image_shape is not None:
+            img = unflatten_image(img, image_shape, batch=False)
+
+        ax.imshow(img, cmap="gray")
+
+    plt.show
+    return fig, grid

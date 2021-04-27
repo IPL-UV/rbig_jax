@@ -5,11 +5,9 @@ import numpy as onp
 import objax
 import pytest
 from jax import random
-from rbig_jax.transforms.kde import (
-    broadcast_kde_pdf,
-    broadcast_kde_cdf,
-    normalization_factor,
-)
+
+from rbig_jax.transforms.kde import (broadcast_kde_cdf, broadcast_kde_pdf,
+                                     normalization_factor)
 from rbig_jax.utils import get_domain_extension
 
 seed = 123

@@ -6,9 +6,9 @@ import jax.numpy as np
 import numpy as onp
 import seaborn as sns
 import tqdm
+import wandb
 from jax.config import config
 
-import wandb
 from rbig_jax.data import get_classic
 from rbig_jax.information.reduction import information_reduction
 from rbig_jax.plots.info import plot_total_corr

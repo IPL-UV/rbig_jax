@@ -1,0 +1,28 @@
+program: scripts/plane/gf.py
+project: "gf_2d_data"
+entity: "ipl_uv"
+name : "gf_2d_all"
+description : "Finding the Best parameters for 2D dataset with GF"
+method: grid
+metric: 
+  name: nll_loss
+  goal: minimize
+parameters:
+  batch_size:
+    values: [256]
+  n_blocks:
+    values: [4, 8, 12, 16]
+  n_components:
+    values: [10, 20, 50]
+  n_reflections:
+    values: [2, 6, 10]
+  mixture:
+    values: ["gaussian"]
+  inverse_cdf:
+    values: ["gaussian"]
+  lr:
+    values: [0.01, 0.005, 0.001]
+  dataset:
+    values: ["noisysine", "moons", "checkerboard", "s_curve"]
+  epochs:
+    values: [300]

@@ -13,3 +13,12 @@ MeanFunc = jnp.float64
 
 Variance = Union[jnp.float64, jnp.ndarray]
 Lengthscales = Union[jnp.float64, jnp.ndarray]
+
+from typing import NamedTuple
+
+
+class ImageShape(NamedTuple):
+    H: int
+    W: int
+    C: int
+

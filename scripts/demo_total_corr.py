@@ -11,9 +11,9 @@ import numpy as onp
 import seaborn as sns
 # logging
 import tqdm
+import wandb
 from jax.config import config
 
-import wandb
 # library functions
 from rbig_jax.data import get_classic
 from rbig_jax.information.entropy import histogram_entropy

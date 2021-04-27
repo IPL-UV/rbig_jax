@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 import numpy as onp
 import seaborn as sns
 import tqdm
+import wandb
 from jax.config import config
 from scipy.stats import beta
 
-import wandb
 from rbig_jax.data import get_classic
 from rbig_jax.information.entropy import histogram_entropy
 from rbig_jax.information.total_corr import rbig_total_correlation
