@@ -1,0 +1,969 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Package Preamble &#8212; Gaussianization</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">Gaussianization</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../intro.html">
+   Iterative and Parametric Gaussianization with Jax
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Iterative Gaussianization
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../demos/rbig_demo_plane.html">
+   Demo - RBIG
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../demos/rbig_building_blocks.html">
+   Building Blocks 4 RBIG
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Parametric Gaussianization
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../parametric/demos/gf_demo_plane.html">
+   Demo - Gaussianization Flow
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Exploration
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../experimental/overview.html">
+   Overview
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../../_sources/content/iterative/experimental/multiscaler_rbig.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/content/iterative/experimental/multiscaler_rbig.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Package Preamble
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data">
+   Data
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reshaping">
+   Reshaping
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#forward-reshape">
+     Forward Reshape
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#inverse-reshape">
+     Inverse Reshape
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reshape-layer">
+   Reshape Layer
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#demo">
+     Demo
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#forward">
+       Forward
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#inverse">
+       Inverse
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rbig-transformation">
+   RBIG Transformation
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#transformation">
+     Transformation
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#model">
+     Model
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#another-level">
+   Another Level
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Install Packages</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">pyprojroot</span> <span class="kn">import</span> <span class="n">here</span>
+
+    <span class="c1"># spyder up to find the root</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">here</span><span class="p">(</span><span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.here&quot;</span><span class="p">,</span> <span class="s2">&quot;setup.py&quot;</span><span class="p">])</span>
+
+    <span class="c1"># append to path</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install objax chex tfds-nightly tf-nightly tensor-sensor[jax] einops&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install git+https://github.com/IPL-UV/rbig_jax.git#egg=rbig_jax&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="package-preamble">
+<h1>Package Preamble<a class="headerlink" href="#package-preamble" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># jax packages</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">import</span> <span class="nn">chex</span>
+
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># datasets</span>
+<span class="kn">import</span> <span class="nn">tensorflow_datasets</span> <span class="k">as</span> <span class="nn">tfds</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="c1"># library parameters</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">get_classic</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.plots</span> <span class="kn">import</span> <span class="n">plot_info_loss</span><span class="p">,</span> <span class="n">plot_joint</span><span class="p">,</span> <span class="n">plot_joint_prob</span>
+
+<span class="c1"># logging</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">import</span> <span class="nn">wandb</span>
+
+<span class="c1"># plot methods</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">reset_defaults</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+<span class="o">%</span><span class="k">load_ext</span> lab_black
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>INFO:tensorflow:Enabling eager execution
+INFO:tensorflow:Enabling v2 tensorshape
+INFO:tensorflow:Enabling resource variables
+INFO:tensorflow:Enabling tensor equality
+INFO:tensorflow:Enabling control flow v2
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="data">
+<h1>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h1>
+<p>We’re going to using the MNIST dataset. It’s a simple dataset with a single channel image and <code class="docutils literal notranslate"><span class="pre">28x28</span></code>. So overall it’s <code class="docutils literal notranslate"><span class="pre">60Kx28x28x1</span></code>.</p>
+<p>We’re going to use the <code class="docutils literal notranslate"><span class="pre">numpy</span></code> standard for the images.</p>
+<p><code class="docutils literal notranslate"><span class="pre">B,H,W,C</span></code></p>
+<p>where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">B</span></code> - batch size</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">H</span></code> - height</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">W</span></code> - width</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C</span></code> - channels</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;_OptionsDataset shapes: {image: (28, 28, 1), label: ()}, types: {image: tf.uint8, label: tf.int64}&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<span class="c1"># DATA, CIFAR10</span>
+<span class="n">ds</span><span class="p">,</span> <span class="n">ds_info</span> <span class="o">=</span> <span class="n">tfds</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;mnist&#39;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="n">as_supervised</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 41.6 ms, sys: 133 µs, total: 41.7 ms
+Wall time: 41.1 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">tfds</span><span class="o">.</span><span class="n">show_examples</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds_info</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/multiscaler_rbig_6_0.png" src="../../../_images/multiscaler_rbig_6_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># normalize images</span>
+<span class="k">def</span> <span class="nf">normalize_img</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Normalizes images: `uint8` -&gt; `float32`.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">,</span> <span class="n">label</span>
+
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">normalize_img</span><span class="p">,</span> <span class="n">num_parallel_calls</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">AUTOTUNE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">tfds</span><span class="o">.</span><span class="n">show_examples</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds_info</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/multiscaler_rbig_8_0.png" src="../../../_images/multiscaler_rbig_8_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># take some examples</span>
+<span class="n">B</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># take 10 samples from the dataset</span>
+<span class="n">ds_sample</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+<span class="c1"># extract all images</span>
+<span class="n">X</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tfds</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(</span><span class="n">ds_sample</span><span class="p">)]</span>
+
+<span class="c1"># stack them in a new batch axes</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="c1"># add some noise</span>
+<span class="n">X</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(10, 28, 28, 1)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="reshaping">
+<h1>Reshaping<a class="headerlink" href="#reshaping" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define filter shape</span>
+<span class="n">filter_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">fh</span><span class="p">,</span> <span class="n">fw</span> <span class="o">=</span> <span class="n">filter_shape</span>
+
+<span class="c1"># new shapes</span>
+<span class="n">Hn</span> <span class="o">=</span> <span class="n">H</span> <span class="o">//</span> <span class="n">fh</span>
+<span class="n">Wn</span> <span class="o">=</span> <span class="n">W</span> <span class="o">//</span> <span class="n">fw</span>
+
+<span class="c1"># extract shape</span>
+<span class="n">B</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># refactor in a nicer way</span>
+<span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="forward-reshape">
+<h2>Forward Reshape<a class="headerlink" href="#forward-reshape" title="Permalink to this headline">¶</a></h2>
+<ol class="simple">
+<li><p>Factor spatial dimension</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[
+\text{B} \times \text{H} \times \text{W} \times \text{C} \rightarrow
+\text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}} \times fh \times \frac{\text{W}}{\text{fw}} \times fw 
+\]</div>
+<ol class="simple">
+<li><p>Transpose</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[
+\text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}} \times fh \times \frac{\text{W}}{\text{fw}} \times fw 
+\rightarrow
+\text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}}  \times \frac{\text{W}}{\text{fw}} \times fh \times fw
+\]</div>
+<ol class="simple">
+<li><p>Aggregate Spatial Dim factors into channels</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[
+\text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}} \times fh \times \frac{\text{W}}{\text{fw}} \times fw 
+\rightarrow
+\left( \text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}}  \times \frac{\text{W}}{\text{fw}} \right) \times \left( fh \times fw \right)
+\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_ms</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">&quot;B (Hn fh) (Wn fw) C -&gt; (B C Hn Wn) (fh fw)&quot;</span><span class="p">,</span> <span class="n">fh</span><span class="o">=</span><span class="n">fh</span><span class="p">,</span> <span class="n">fw</span><span class="o">=</span><span class="n">fw</span><span class="p">)</span>
+<span class="n">X_ms</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(1960, 4)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="inverse-reshape">
+<h2>Inverse Reshape<a class="headerlink" href="#inverse-reshape" title="Permalink to this headline">¶</a></h2>
+<ol class="simple">
+<li><p>Aggregate Spatial Dim factors into channels</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[
+\left( \text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}}  \times \frac{\text{W}}{\text{fw}} \right) \times \left( \text{fh} \times \text{fw} \right)
+\rightarrow
+\text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}} \times \text{fh} \times \frac{\text{W}}{\text{fw}} \times \text{fw} 
+\]</div>
+<ol class="simple">
+<li><p>Transpose</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[
+\text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}}  \times \frac{\text{W}}{\text{fw}} \times \text{fh} \times \text{fw}
+\rightarrow
+\text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}} \times \text{fh} \times \frac{\text{W}}{\text{fw}} \times \text{fw}
+\]</div>
+<ol class="simple">
+<li><p>Factor spatial dimension</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[
+\text{B} \times \text{C} \times \frac{\text{H}}{\text{fh}} \times \text{fh} \times \frac{\text{W}}{\text{fw}} \times \text{fw} 
+\rightarrow
+\text{B} \times \text{H} \times \text{W} \times \text{C} 
+\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_approx</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span>
+    <span class="n">X_ms</span><span class="p">,</span>
+    <span class="s2">&quot;(B C Hn Wn) (fh fw) -&gt; B (Hn fh) (Wn fw) C&quot;</span><span class="p">,</span>
+    <span class="n">B</span><span class="o">=</span><span class="n">B</span><span class="p">,</span>
+    <span class="n">C</span><span class="o">=</span><span class="n">C</span><span class="p">,</span>
+    <span class="n">Hn</span><span class="o">=</span><span class="n">Hn</span><span class="p">,</span>
+    <span class="n">Wn</span><span class="o">=</span><span class="n">Wn</span><span class="p">,</span>
+    <span class="n">fh</span><span class="o">=</span><span class="n">fh</span><span class="p">,</span>
+    <span class="n">fw</span><span class="o">=</span><span class="n">fw</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># assert they&#39;re the same</span>
+<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">X_approx</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="reshape-layer">
+<h1>Reshape Layer<a class="headerlink" href="#reshape-layer" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">jax.random</span> <span class="kn">import</span> <span class="n">PRNGKey</span>
+<span class="kn">from</span> <span class="nn">chex</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">dataclass</span>
+
+
+<span class="k">def</span> <span class="nf">ReshapeMultiscale</span><span class="p">(</span><span class="n">filter_shape</span><span class="o">=</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">init_func</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">PRNGKey</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">shape</span>
+
+        <span class="c1"># extract coordinates</span>
+        <span class="n">fh</span><span class="p">,</span> <span class="n">fw</span> <span class="o">=</span> <span class="n">filter_shape</span>
+
+        <span class="c1"># check for no remainders</span>
+        <span class="k">assert</span> <span class="n">H</span> <span class="o">%</span> <span class="n">fh</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="n">W</span> <span class="o">%</span> <span class="n">fw</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="c1"># new shapes</span>
+        <span class="n">Hn</span> <span class="o">=</span> <span class="n">H</span> <span class="o">//</span> <span class="n">fh</span>
+        <span class="n">Wn</span> <span class="o">=</span> <span class="n">W</span> <span class="o">//</span> <span class="n">fw</span>
+
+        <span class="k">def</span> <span class="nf">forward_and_log_det</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+            <span class="c1"># batch size is independent</span>
+
+            <span class="n">B</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">shape</span>
+
+            <span class="c1"># forward rearrange</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span>
+                <span class="n">inputs</span><span class="p">,</span>
+                <span class="s2">&quot;B (Hn fh) (Wn fw) C -&gt; (B C Hn Wn) (fh fw)&quot;</span><span class="p">,</span>
+                <span class="n">B</span><span class="o">=</span><span class="n">B</span><span class="p">,</span>
+                <span class="n">C</span><span class="o">=</span><span class="n">C</span><span class="p">,</span>
+                <span class="n">Hn</span><span class="o">=</span><span class="n">Hn</span><span class="p">,</span>
+                <span class="n">Wn</span><span class="o">=</span><span class="n">Wn</span><span class="p">,</span>
+                <span class="n">fh</span><span class="o">=</span><span class="n">fh</span><span class="p">,</span>
+                <span class="n">fw</span><span class="o">=</span><span class="n">fw</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># logdet empty</span>
+            <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">log_det</span>
+
+        <span class="k">def</span> <span class="nf">inverse_and_log_det</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span>
+                <span class="n">inputs</span><span class="p">,</span>
+                <span class="s2">&quot;(B C Hn Wn) (fh fw) -&gt; B (Hn fh) (Wn fw) C&quot;</span><span class="p">,</span>
+                <span class="n">B</span><span class="o">=</span><span class="n">B</span><span class="p">,</span>
+                <span class="n">C</span><span class="o">=</span><span class="n">C</span><span class="p">,</span>
+                <span class="n">Hn</span><span class="o">=</span><span class="n">Hn</span><span class="p">,</span>
+                <span class="n">Wn</span><span class="o">=</span><span class="n">Wn</span><span class="p">,</span>
+                <span class="n">fh</span><span class="o">=</span><span class="n">fh</span><span class="p">,</span>
+                <span class="n">fw</span><span class="o">=</span><span class="n">fw</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># logdet empty</span>
+            <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">log_det</span>
+
+        <span class="k">return</span> <span class="p">(),</span> <span class="n">forward_and_log_det</span><span class="p">,</span> <span class="n">inverse_and_log_det</span>
+
+    <span class="k">return</span> <span class="n">init_func</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="demo">
+<h2>Demo<a class="headerlink" href="#demo" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># layer params</span>
+<span class="n">filter_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+
+<span class="c1"># initialize layer</span>
+<span class="n">reshape_layer</span> <span class="o">=</span> <span class="n">ReshapeMultiscale</span><span class="p">(</span><span class="n">filter_shape</span><span class="p">)</span>
+
+<span class="c1"># initialize params and functions</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">inv_f</span> <span class="o">=</span> <span class="n">reshape_layer</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="forward">
+<h3>Forward<a class="headerlink" href="#forward" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_ms_l1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="p">((),</span> <span class="n">X</span><span class="p">)</span>
+<span class="n">X_ms_l1</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(1960, 4)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="inverse">
+<h3>Inverse<a class="headerlink" href="#inverse" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_approx</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">inv_f</span><span class="p">((),</span> <span class="n">X_ms_l1</span><span class="p">)</span>
+<span class="n">X_approx</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(10, 28, 28, 1)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="rbig-transformation">
+<h1>RBIG Transformation<a class="headerlink" href="#rbig-transformation" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.transforms.rotation</span> <span class="kn">import</span> <span class="n">InitPCARotation</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.transforms.histogram</span> <span class="kn">import</span> <span class="n">InitUniHistUniformize</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.transforms.block</span> <span class="kn">import</span> <span class="n">InitRBIGBlock</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># take some examples</span>
+<span class="n">B</span> <span class="o">=</span> <span class="mi">1_000</span>
+
+<span class="c1"># take 10 samples from the dataset</span>
+<span class="n">ds_sample</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+<span class="c1"># extract all images</span>
+<span class="n">X</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tfds</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(</span><span class="n">ds_sample</span><span class="p">)]</span>
+
+<span class="c1"># stack them in a new batch axes</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># normalize</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">B</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># add some noise</span>
+<span class="n">X</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(1000, 28, 28, 1)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="transformation">
+<h2>Transformation<a class="headerlink" href="#transformation" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># layer params</span>
+<span class="n">filter_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+
+<span class="c1"># initialize layer</span>
+<span class="n">reshape_layer</span> <span class="o">=</span> <span class="n">ReshapeMultiscale</span><span class="p">(</span><span class="n">filter_shape</span><span class="p">)</span>
+
+<span class="c1"># initialize params and functions</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">inv_f</span> <span class="o">=</span> <span class="n">reshape_layer</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="n">X_ms_l1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="p">((),</span> <span class="n">X</span><span class="p">)</span>
+<span class="n">X_ms_l1</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(196000, 4)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="model">
+<h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">support_extension</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="n">precision</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">nbins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+
+<span class="c1"># initialize histogram transformation</span>
+<span class="n">uni_uniformize</span> <span class="o">=</span> <span class="n">InitUniHistUniformize</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="n">X_ms_l1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">nbins</span><span class="o">=</span><span class="n">nbins</span><span class="p">,</span>
+    <span class="n">support_extension</span><span class="o">=</span><span class="n">support_extension</span><span class="p">,</span>
+    <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># initialize rotation transformation</span>
+<span class="n">rot_transform</span> <span class="o">=</span> <span class="n">InitPCARotation</span><span class="p">()</span>
+
+<span class="c1"># initialize marginal gaussianization</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-5</span>
+
+<span class="n">fit_transform_func</span><span class="p">,</span> <span class="n">forward_f</span><span class="p">,</span> <span class="n">grad_f</span><span class="p">,</span> <span class="n">inverse_f</span> <span class="o">=</span> <span class="n">InitRBIGBlock</span><span class="p">(</span>
+    <span class="n">uni_uniformize</span><span class="p">,</span> <span class="n">rot_transform</span><span class="p">,</span> <span class="n">eps</span>
+<span class="p">)</span>
+
+<span class="c1"># optional, compiles the function to make it faster</span>
+<span class="n">fit_transform_func_jitted</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">fit_transform_func</span><span class="p">)</span>
+<span class="n">forward_f_jitted</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">forward_f</span><span class="p">)</span>
+<span class="n">grad_f_jitted</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">grad_f</span><span class="p">)</span>
+<span class="n">inverse_f_jitted</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">inverse_f</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="n">n_layers</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">ilayer</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">X_g</span> <span class="o">=</span> <span class="n">X_ms_l1</span>
+
+
+
+<span class="k">while</span> <span class="n">ilayer</span> <span class="o">&lt;</span> <span class="n">n_layers</span><span class="p">:</span>
+    
+    
+    <span class="c1"># compute </span>
+    <span class="n">X_g</span><span class="p">,</span> <span class="n">layer_params</span> <span class="o">=</span> <span class="n">fit_transform_func_jitted</span><span class="p">(</span><span class="n">X_g</span><span class="p">)</span>
+        
+    <span class="c1"># increment</span>
+    <span class="n">ilayer</span> <span class="o">+=</span> <span class="mi">1</span>
+    
+    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer_params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 5.71 ms, sys: 3.5 ms, total: 9.2 ms
+Wall time: 3.8 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">corner</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_g</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(196000, 4)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_g</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/multiscaler_rbig_35_0.png" src="../../../_images/multiscaler_rbig_35_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="another-level">
+<h1>Another Level<a class="headerlink" href="#another-level" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># layer params</span>
+<span class="n">filter_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+
+<span class="c1"># initialize layer</span>
+<span class="n">reshape_layer</span> <span class="o">=</span> <span class="n">ReshapeMultiscale</span><span class="p">(</span><span class="n">filter_shape</span><span class="p">)</span>
+
+<span class="c1"># initialize params and functions</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">inv_f</span> <span class="o">=</span> <span class="n">reshape_layer</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="n">X_ms_l1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">f</span><span class="p">((),</span> <span class="n">X_ms_l1</span><span class="p">)</span>
+<span class="n">X_ms_l1</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-.conda-jax_py38-py"
+        },
+        kernelOptions: {
+            kernelName: "conda-env-.conda-jax_py38-py",
+            path: "./content/iterative/experimental"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-.conda-jax_py38-py'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By IPL-UV<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

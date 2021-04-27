@@ -1,0 +1,1184 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RBIG JAX &#8212; Gaussianization</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">Gaussianization</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../intro.html">
+   Iterative and Parametric Gaussianization with Jax
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Iterative Gaussianization
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../demos/rbig_demo_plane.html">
+   Demo - RBIG
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../demos/rbig_building_blocks.html">
+   Building Blocks 4 RBIG
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Parametric Gaussianization
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../parametric/demos/gf_demo_plane.html">
+   Demo - Gaussianization Flow
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Exploration
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../experimental/overview.html">
+   Overview
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../../_sources/content/iterative/experimental/RBIG_multiscale.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/content/iterative/experimental/RBIG_multiscale.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   RBIG JAX
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#student-t">
+   Student-t
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#gauss">
+   Gauss
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plots">
+   PLOTS
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#prob-vs-mse">
+   Prob vs MSE
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#bucle">
+   BUCLE
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># DATA, CIFAR10</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.datasets</span> <span class="kn">import</span> <span class="n">mnist</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="n">x_train</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span> 
+<span class="n">x_test</span> <span class="o">=</span> <span class="n">x_test</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span> 
+                                   
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="rbig-jax">
+<h1>RBIG JAX<a class="headerlink" href="#rbig-jax" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!pip install git+https://github.com/IPL-UV/rbig_jax.git#egg=rbig_jax</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">get_classic</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.plots</span> <span class="kn">import</span> <span class="n">plot_joint</span><span class="p">,</span> <span class="n">plot_joint_prob</span><span class="p">,</span> <span class="n">plot_info_loss</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.models.itergauss</span> <span class="kn">import</span> <span class="n">IterativeGaussianization</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># jax packages</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="c1"># import chex</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+
+<span class="c1"># logging</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="c1">#import wandb</span>
+
+<span class="c1"># plot methods</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">reset_defaults</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">,:,:]</span>
+
+<span class="n">x_train</span> <span class="o">=</span> <span class="n">x_train</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="o">*</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(10, 28, 28, 1)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Multiscale Valero&#39;s way</span>
+<span class="n">A_11</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">,:]</span>
+<span class="n">A_12</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,:]</span>
+<span class="n">A_21</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[:,</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">,:]</span>
+<span class="n">A_22</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[:,</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,:]</span>
+<span class="n">x_train_Mv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">A_11</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">A_11</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">A_11</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="mi">4</span><span class="o">*</span><span class="n">A_11</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+<span class="n">x_train_Mv</span><span class="p">[:,:,:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_11</span>
+<span class="n">x_train_Mv</span><span class="p">[:,:,:,</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_12</span>
+<span class="n">x_train_Mv</span><span class="p">[:,:,:,</span><span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_21</span>
+<span class="n">x_train_Mv</span><span class="p">[:,:,:,</span><span class="mi">3</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_22</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">multiscale</span><span class="p">(</span><span class="n">x_train</span><span class="p">):</span>
+    <span class="n">x_train_M</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="c1"># x_train_M.shape</span>
+    <span class="n">x_train_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x_train_M</span><span class="p">,(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+    <span class="c1"># x_train_M.shape</span>
+    <span class="n">x_train_M</span> <span class="o">=</span> <span class="n">x_train_M</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">*</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">5</span><span class="p">]))</span>
+    <span class="c1">#x_train_M.shape</span>
+    <span class="k">return</span> <span class="n">x_train_M</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train_M</span> <span class="o">=</span> <span class="n">multiscale</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x_train_Mv</span><span class="p">,</span><span class="n">x_train_M</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">un_multiscale</span><span class="p">(</span><span class="n">x_train_M</span><span class="p">):</span>
+    <span class="n">x_train_M_aux</span> <span class="o">=</span> <span class="n">x_train_M</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">//</span><span class="mi">4</span><span class="p">))</span>
+    <span class="c1">#print(x_train_M_aux.shape)</span>
+    <span class="n">x_train_M_aux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x_train_M_aux</span><span class="p">,(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+    <span class="c1">#print(x_train_M_aux.shape)</span>
+    <span class="n">x_train_M_aux</span> <span class="o">=</span> <span class="n">x_train_M_aux</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x_train_M_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x_train_M_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x_train_M_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">x_train_M_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="n">x_train_M_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">x_train_M_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">5</span><span class="p">]))</span>
+    <span class="c1">#print(x_train_M_aux.shape)</span>
+    <span class="k">return</span> <span class="n">x_train_M_aux</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train_M_aux</span> <span class="o">=</span> <span class="n">un_multiscale</span><span class="p">(</span><span class="n">x_train_M</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x_train_M_aux</span><span class="p">,</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Collapse</span>
+<span class="k">def</span> <span class="nf">collapse</span><span class="p">(</span><span class="n">x_train_M</span><span class="p">):</span>
+    <span class="n">x_train_M_C</span> <span class="o">=</span> <span class="n">x_train_M</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">x_train_M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">x_train_M_C</span><span class="p">,</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># UnCollapse</span>
+<span class="k">def</span> <span class="nf">un_collapse</span><span class="p">(</span><span class="n">x_train_1</span><span class="p">,</span><span class="n">shape</span><span class="p">):</span>
+    <span class="n">x_train_1_UC</span> <span class="o">=</span> <span class="n">x_train_1</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">x_train_1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="p">(</span><span class="n">shape</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span><span class="n">shape</span><span class="p">,</span><span class="n">shape</span><span class="p">,</span><span class="n">x_train_1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">x_train_1_UC</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train_M_C</span><span class="p">,</span><span class="n">shape</span> <span class="o">=</span> <span class="n">collapse</span><span class="p">(</span><span class="n">x_train_M</span><span class="p">)</span>
+<span class="n">x_train_M_C_U</span> <span class="o">=</span> <span class="n">un_collapse</span><span class="p">(</span><span class="n">x_train_M_C</span><span class="p">,</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x_train_M</span><span class="p">,</span><span class="n">x_train_M_C_U</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.models</span> <span class="kn">import</span> <span class="n">RBIG</span>
+
+<span class="c1"># initialize RBIG Params</span>
+<span class="n">support_extension</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">precision</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">max_layers</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">zero_tolerance</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># initialize RBIG Model</span>
+<span class="n">rbig_model</span> <span class="o">=</span> <span class="n">RBIG</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="n">x_train_M_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+    <span class="n">n_features</span><span class="o">=</span><span class="n">x_train_M_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> 
+    <span class="n">max_layers</span><span class="o">=</span><span class="n">max_layers</span><span class="p">,</span>
+    <span class="n">zero_tolerance</span><span class="o">=</span><span class="n">zero_tolerance</span><span class="p">,</span>
+    <span class="n">precision</span><span class="o">=</span><span class="n">precision</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">aux</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_train_M_C</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 3.86 ms, sys: 0 ns, total: 3.86 ms
+Wall time: 3.48 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">x_train_1</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">aux</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 17 s, sys: 250 ms, total: 17.2 s
+Wall time: 17.5 s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_train_1</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">x_train_1</span><span class="p">[:,</span><span class="mi">3</span><span class="p">],</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fdcb30c45e0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_22_1.png" src="../../../_images/RBIG_multiscale_22_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># UnCollapse</span>
+<span class="n">x_train_1_UC</span> <span class="o">=</span> <span class="n">x_train_1</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">A_11</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">A_11</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">A_11</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="mi">4</span><span class="o">*</span><span class="n">A_11</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_train_1_UC</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(10, 14, 14, 4)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="student-t">
+<h1>Student-t<a class="headerlink" href="#student-t" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_t</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Bv</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">Xm</span> <span class="o">=</span> <span class="n">Bv</span> <span class="o">-</span> <span class="n">m</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,:]</span>
+<span class="n">cov_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xm</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Xm</span><span class="p">)</span> <span class="o">/</span> <span class="n">Xm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">mod_pdf</span> <span class="o">=</span> <span class="n">multivariate_t</span>
+<span class="n">mod_pdf</span> <span class="o">=</span> <span class="n">multivariate_t</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span><span class="n">shape</span> <span class="o">=</span> <span class="n">cov_matrix</span><span class="p">,</span><span class="n">df</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="n">probs_t</span> <span class="o">=</span> <span class="n">mod_pdf</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">Bv</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="gauss">
+<h1>Gauss<a class="headerlink" href="#gauss" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gauss</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_normal</span>
+
+<span class="n">mod_pdf</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span><span class="n">cov</span> <span class="o">=</span> <span class="n">cov_matrix</span><span class="p">)</span>
+
+<span class="n">probs_G</span> <span class="o">=</span> <span class="n">mod_pdf</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">Bv</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="plots">
+<h1>PLOTS<a class="headerlink" href="#plots" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">probs_G</span><span class="p">,</span><span class="n">prob_RBIG_JAX</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">probs_G</span><span class="p">,</span><span class="n">probs_t</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0e002a69d0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_30_1.png" src="../../../_images/RBIG_multiscale_30_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prob_RBIG_JAX</span><span class="p">,</span><span class="n">probs_t</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0e007243d0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_31_1.png" src="../../../_images/RBIG_multiscale_31_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prob_RBIG_JAX</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DeviceArray([0., 0., 0., ..., 0., 0., 0.], dtype=float32)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="prob-vs-mse">
+<h1>Prob vs MSE<a class="headerlink" href="#prob-vs-mse" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="bucle">
+<h1>BUCLE<a class="headerlink" href="#bucle" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NN</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="c1">#RUIDOS  = [1,3,5,10,15,20,25,30,40,50]</span>
+<span class="n">RUIDOS</span>  <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
+
+<span class="n">spear_NLPD_RMSE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_RMSE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">spear_NLPD_RMSE_PROBS_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_RMSE_PROBS_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_NLPD_RMSE_PROBS_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_RMSE_PROBS_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">spear_NLPD_RMSE_PROBS_RBIG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_RMSE_PROBS_RBIG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_NLPD_RMSE_PROBS_A_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_RMSE_PROBS_A_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">spear_NLPD_PROBS_A</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_PROBS_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_NLPD_PROBS_t</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_PROBS_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">spear_NLPD_PROBS_RBIG</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_PROBS_RBIG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_NLPD_PROBS_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_PROBS_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">spear_NLPD_PROBS_A_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_NLPD_PROBS_A_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_PIM_RMSE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_RMSE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">spear_PIM_RMSE_PROBS_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_RMSE_PROBS_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_PIM_RMSE_PROBS_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_RMSE_PROBS_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_PIM_RMSE_PROBS_RBIG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_RMSE_PROBS_RBIG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_PIM_RMSE_PROBS_A_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_RMSE_PROBS_A_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">spear_PIM_PROBS_A</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_PROBS_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_PIM_PROBS_t</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_PROBS_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_PIM_PROBS_RBIG</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_PROBS_RBIG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">spear_PIM_PROBS_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_PROBS_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">spear_PIM_PROBS_A_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+<span class="n">pear_PIM_PROBS_A_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">),))</span>
+
+<span class="n">x_test_aux</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">NN</span><span class="p">,:,:,:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="c1">#x_test_aux = x_test[0:NN,:,:,:].copy()</span>
+
+
+<span class="c1"># PROBS</span>
+<span class="n">Bn</span> <span class="o">=</span> <span class="n">x_test_aux</span><span class="o">/</span><span class="n">factor_reductor</span>
+<span class="n">Bv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Bn</span><span class="p">,[</span><span class="n">Bn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">Bn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">Bn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">Bn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]])</span>
+    
+<span class="n">prob_RBIG_JAX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Bv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
+
+<span class="n">cada</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">Bv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">cada</span><span class="p">):</span>
+    <span class="n">prob_RBIG_JAX</span><span class="p">[</span><span class="n">n</span><span class="p">:</span><span class="n">n</span><span class="o">+</span><span class="n">cada</span><span class="p">]</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">Bv</span><span class="p">[</span><span class="n">n</span><span class="p">:</span><span class="n">n</span><span class="o">+</span><span class="n">cada</span><span class="p">,:])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    
+<span class="n">mod_pdf</span> <span class="o">=</span> <span class="n">multivariate_t</span>
+<span class="n">mod_pdf</span> <span class="o">=</span> <span class="n">multivariate_t</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span><span class="n">shape</span> <span class="o">=</span> <span class="n">cov_matrix</span><span class="p">,</span><span class="n">df</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">probs_t</span> <span class="o">=</span> <span class="n">mod_pdf</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">Bv</span><span class="p">)</span>
+
+
+<span class="n">mod_pdf</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span><span class="n">cov</span> <span class="o">=</span> <span class="n">cov_matrix</span><span class="p">)</span>
+<span class="n">probs_G</span> <span class="o">=</span> <span class="n">mod_pdf</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">Bv</span><span class="p">)</span>
+
+
+
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">var_rudio</span> <span class="ow">in</span> <span class="n">RUIDOS</span><span class="p">:</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">var_rudio</span><span class="p">)</span>
+    <span class="n">random_image_B</span> <span class="o">=</span> <span class="n">x_test_aux</span> <span class="o">+</span> <span class="n">var_rudio</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">x_test_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x_test_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">x_test_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">x_test_aux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">zero_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">random_image_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">random_image_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">random_image_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">random_image_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="n">random_image_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">random_image_B</span><span class="p">,</span><span class="n">zero_array</span><span class="p">)</span>
+
+    <span class="n">zero_array</span> <span class="o">=</span> <span class="mi">255</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">random_image_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">random_image_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">random_image_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">random_image_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="n">random_image_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">random_image_B</span><span class="p">,</span><span class="n">zero_array</span><span class="p">)</span>
+
+    <span class="c1"># PRECEPTUAL METRICS</span>
+    <span class="n">random_image_A_tf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">x_test_aux</span><span class="p">,(</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">))</span>
+    <span class="n">random_image_B_tf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">random_image_B</span><span class="p">,(</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">))</span>
+
+    <span class="n">PIMS</span> <span class="o">=</span> <span class="n">model_pim</span><span class="p">(</span><span class="n">random_image_A_tf</span><span class="p">,</span> <span class="n">random_image_B_tf</span><span class="p">)</span>
+    
+    <span class="n">NLPDS</span> <span class="o">=</span> <span class="n">nlpd</span><span class="o">.</span><span class="n">nlpd</span><span class="p">(</span><span class="n">random_image_A_tf</span><span class="p">,</span> <span class="n">random_image_B_tf</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">NLPDS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">NLPDS</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># PROB</span>
+
+    <span class="n">Bn</span> <span class="o">=</span> <span class="n">random_image_B</span><span class="o">/</span><span class="n">factor_reductor</span>
+    <span class="n">Bv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Bn</span><span class="p">,[</span><span class="n">Bn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">Bn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">Bn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">Bn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]])</span>
+    <span class="n">PROBS_B</span> <span class="o">=</span> <span class="n">mod_pdf</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">Bv</span><span class="p">)</span>
+
+    <span class="c1"># RMSE</span>
+    <span class="n">RMSES</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">x_test_aux</span><span class="p">[:,:,:,:]</span><span class="o">-</span><span class="n">random_image_B</span><span class="p">[:,:,:,:])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span>
+
+    <span class="c1"># RESULTADOS NLPDS</span>
+
+    <span class="n">XX</span> <span class="o">=</span> <span class="n">NLPDS</span>
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span>
+
+    <span class="n">spear_NLPD_RMSE</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_RMSE</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span><span class="o">*</span><span class="n">probs_G</span>
+
+    <span class="n">spear_NLPD_RMSE_PROBS_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_RMSE_PROBS_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span><span class="o">*</span><span class="n">probs_t</span>
+
+    <span class="n">spear_NLPD_RMSE_PROBS_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_RMSE_PROBS_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span><span class="o">*</span><span class="n">prob_RBIG_JAX</span>
+
+    <span class="n">spear_NLPD_RMSE_PROBS_RBIG</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_RMSE_PROBS_RBIG</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span><span class="o">*</span><span class="p">(</span><span class="n">probs_G</span><span class="o">+</span><span class="n">PROBS_B</span><span class="p">)</span>
+
+    <span class="n">spear_NLPD_RMSE_PROBS_A_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_RMSE_PROBS_A_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">probs_G</span>
+
+    <span class="n">spear_NLPD_PROBS_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_PROBS_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">probs_t</span>
+
+    <span class="n">spear_NLPD_PROBS_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_PROBS_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">prob_RBIG_JAX</span>
+
+    <span class="n">spear_NLPD_PROBS_RBIG</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_PROBS_RBIG</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">PROBS_B</span>
+
+    <span class="n">spear_NLPD_PROBS_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_PROBS_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">probs_G</span><span class="o">+</span><span class="n">PROBS_B</span>
+
+    <span class="n">spear_NLPD_PROBS_A_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_NLPD_PROBS_A_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+     <span class="c1"># RESULTADOS PIMS</span>
+
+    <span class="n">XX</span> <span class="o">=</span> <span class="n">PIMS</span>
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span>
+
+    <span class="n">spear_PIM_RMSE</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_RMSE</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span><span class="o">*</span><span class="n">probs_G</span>
+
+    <span class="n">spear_PIM_RMSE_PROBS_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_RMSE_PROBS_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span><span class="o">*</span><span class="n">probs_t</span>
+
+    <span class="n">spear_PIM_RMSE_PROBS_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_RMSE_PROBS_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span><span class="o">*</span><span class="n">prob_RBIG_JAX</span>
+
+    <span class="n">spear_PIM_RMSE_PROBS_RBIG</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_RMSE_PROBS_RBIG</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">RMSES</span><span class="o">*</span><span class="p">(</span><span class="n">probs_G</span><span class="o">+</span><span class="n">PROBS_B</span><span class="p">)</span>
+
+    <span class="n">spear_PIM_RMSE_PROBS_A_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_RMSE_PROBS_A_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">probs_G</span>
+
+    <span class="n">spear_PIM_PROBS_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_PROBS_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">probs_t</span>
+
+    <span class="n">spear_PIM_PROBS_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_PROBS_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">prob_RBIG_JAX</span>
+
+    <span class="n">spear_PIM_PROBS_RBIG</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_PROBS_RBIG</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">PROBS_B</span>
+
+    <span class="n">spear_PIM_PROBS_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_PROBS_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">probs_G</span><span class="o">+</span><span class="n">PROBS_B</span>
+
+    <span class="n">spear_PIM_PROBS_A_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)</span>
+    <span class="n">pear_PIM_PROBS_A_B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0
+5
+10
+20
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RMSES</span><span class="p">,</span><span class="n">PIMS</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0d90157a00&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_38_1.png" src="../../../_images/RBIG_multiscale_38_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RMSES</span><span class="o">*</span><span class="n">probs_G</span><span class="p">,</span><span class="n">PIMS</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0d902b8640&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_39_1.png" src="../../../_images/RBIG_multiscale_39_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RMSES</span><span class="o">*</span><span class="n">probs_t</span><span class="p">,</span><span class="n">PIMS</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd1db5ee0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_40_1.png" src="../../../_images/RBIG_multiscale_40_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RMSES</span><span class="o">*</span><span class="n">prob_RBIG_JAX</span><span class="p">,</span><span class="n">PIMS</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd1bc63a0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_41_1.png" src="../../../_images/RBIG_multiscale_41_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Diferent options for the RMSE-based cost function</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_RMSE</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_RMSE_PROBS_A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_RMSE_PROBS_A_B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd1b15d30&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_42_1.png" src="../../../_images/RBIG_multiscale_42_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># spearman NLPD vs RMSE prob A</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_RMSE_PROBS_A</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_RMSE_PROBS_t</span><span class="p">,</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_RMSE_PROBS_RBIG</span><span class="p">,</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd1afd100&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_43_1.png" src="../../../_images/RBIG_multiscale_43_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># pearson NLPD vs RMSE prob A</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_NLPD_RMSE_PROBS_A</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_NLPD_RMSE_PROBS_t</span><span class="p">,</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_NLPD_RMSE_PROBS_RBIG</span><span class="p">,</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd1a52d60&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_44_1.png" src="../../../_images/RBIG_multiscale_44_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_PIM_RMSE_PROBS_A</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_PIM_RMSE_PROBS_t</span><span class="p">,</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_PIM_RMSE_PROBS_RBIG</span><span class="p">,</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd1a30af0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_46_1.png" src="../../../_images/RBIG_multiscale_46_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_PIM_RMSE_PROBS_A</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_PIM_RMSE_PROBS_t</span><span class="p">,</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_PIM_RMSE_PROBS_RBIG</span><span class="p">,</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd1996c40&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_47_1.png" src="../../../_images/RBIG_multiscale_47_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_PIM_RMSE</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_PIM_RMSE_PROBS_A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_PIM_RMSE_PROBS_A_B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd197e2e0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_48_1.png" src="../../../_images/RBIG_multiscale_48_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_NLPD_RMSE</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_NLPD_RMSE_PROBS_A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_NLPD_RMSE_PROBS_A_B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dda00d040&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_49_1.png" src="../../../_images/RBIG_multiscale_49_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_PIM_RMSE</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_PIM_RMSE_PROBS_A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_PIM_RMSE_PROBS_A_B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dbd500dc0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_50_1.png" src="../../../_images/RBIG_multiscale_50_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_PROBS_A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_PROBS_B</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_PROBS_A_B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd1d8f760&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_51_1.png" src="../../../_images/RBIG_multiscale_51_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_PROBS_A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_PROBS_t</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_NLPD_PROBS_RBIG</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0e3a52a8b0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_52_1.png" src="../../../_images/RBIG_multiscale_52_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_PIM_PROBS_A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_PIM_PROBS_B</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">spear_PIM_PROBS_A_B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dbd4fb760&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_53_1.png" src="../../../_images/RBIG_multiscale_53_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_NLPD_PROBS_A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_NLPD_PROBS_B</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_NLPD_PROBS_A_B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd18e6910&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_54_1.png" src="../../../_images/RBIG_multiscale_54_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_PIM_PROBS_A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_PIM_PROBS_B</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RUIDOS</span><span class="p">,</span><span class="n">pear_PIM_PROBS_A_B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0dd1851550&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/RBIG_multiscale_55_1.png" src="../../../_images/RBIG_multiscale_55_1.png" />
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./content/iterative/experimental"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By IPL-UV<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>
