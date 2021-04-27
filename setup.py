@@ -155,8 +155,8 @@ setup(
     # entry_points={
     #     'console_scripts': ['mycli=mymodule:cli'],
     # },
-    setup_requires=["setuptools-yaml"],
-    metadata_yaml="environment.yml",
+#     setup_requires=["setuptools-yaml"],
+#     metadata_yaml="environment.yml",
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
