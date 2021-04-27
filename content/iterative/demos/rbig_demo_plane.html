@@ -103,6 +103,11 @@
    Building Blocks 4 RBIG
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="rbig_building_blocks_sampling.html">
+   Better Sampling
+  </a>
+ </li>
 </ul>
 <p class="caption">
  <span class="caption-text">
@@ -115,6 +120,16 @@
    Demo - Gaussianization Flow
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../parametric/demos/gf_building_blocks.html">
+   Building Blocks for GFs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../experimental/plane/wandb_integration.html">
+   Weights and Biases Integration
+  </a>
+ </li>
 </ul>
 <p class="caption">
  <span class="caption-text">
@@ -122,17 +137,10 @@
  </span>
 </p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../experimental/overview.html">
-   Overview
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../literature.html">
+   Literature Review
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul class="simple">
-  </ul>
  </li>
 </ul>
 
@@ -388,13 +396,6 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>INFO:tensorflow:Enabling eager execution
-INFO:tensorflow:Enabling v2 tensorshape
-INFO:tensorflow:Enabling resource variables
-INFO:tensorflow:Enabling tensor equality
-INFO:tensorflow:Enabling control flow v2
-</pre></div>
-</div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING:absl:No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
 </pre></div>
 </div>
@@ -499,29 +500,34 @@ INFO:tensorflow:Enabling control flow v2
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Layer 10 - Cum. Info Reduction: 2.063 - Elapsed Time: 5.2067 secs
-Layer 20 - Cum. Info Reduction: 2.156 - Elapsed Time: 6.8024 secs
-Layer 30 - Cum. Info Reduction: 2.370 - Elapsed Time: 8.3549 secs
-Layer 40 - Cum. Info Reduction: 2.411 - Elapsed Time: 9.8340 secs
-Layer 50 - Cum. Info Reduction: 2.455 - Elapsed Time: 11.3444 secs
-Layer 60 - Cum. Info Reduction: 2.455 - Elapsed Time: 12.9009 secs
-Layer 70 - Cum. Info Reduction: 2.500 - Elapsed Time: 14.4444 secs
-Layer 80 - Cum. Info Reduction: 2.535 - Elapsed Time: 16.1020 secs
-Layer 90 - Cum. Info Reduction: 2.568 - Elapsed Time: 18.6512 secs
-Layer 100 - Cum. Info Reduction: 2.568 - Elapsed Time: 20.1270 secs
-Layer 110 - Cum. Info Reduction: 2.602 - Elapsed Time: 21.7564 secs
-Layer 120 - Cum. Info Reduction: 2.633 - Elapsed Time: 23.2975 secs
-Layer 130 - Cum. Info Reduction: 2.657 - Elapsed Time: 24.9704 secs
-Layer 140 - Cum. Info Reduction: 2.657 - Elapsed Time: 26.5537 secs
-Layer 150 - Cum. Info Reduction: 2.689 - Elapsed Time: 28.0505 secs
-Layer 160 - Cum. Info Reduction: 2.689 - Elapsed Time: 29.5700 secs
-Layer 170 - Cum. Info Reduction: 2.689 - Elapsed Time: 31.0775 secs
-Layer 180 - Cum. Info Reduction: 2.689 - Elapsed Time: 32.6327 secs
-Layer 190 - Cum. Info Reduction: 2.689 - Elapsed Time: 34.3381 secs
-Layer 200 - Cum. Info Reduction: 2.689 - Elapsed Time: 36.7981 secs
-Converged at Layer: 207
-Final Number of layers: 167 (Blocks: 55)
-Total Time: 37.9261 secs
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Layer 10 - Cum. Info Reduction: 2.063 - Elapsed Time: 3.7509 secs
+Layer 20 - Cum. Info Reduction: 2.156 - Elapsed Time: 5.0976 secs
+Layer 30 - Cum. Info Reduction: 2.370 - Elapsed Time: 6.3924 secs
+Layer 40 - Cum. Info Reduction: 2.411 - Elapsed Time: 7.7929 secs
+Layer 50 - Cum. Info Reduction: 2.440 - Elapsed Time: 9.1722 secs
+Layer 60 - Cum. Info Reduction: 2.491 - Elapsed Time: 10.6816 secs
+Layer 70 - Cum. Info Reduction: 2.539 - Elapsed Time: 11.9954 secs
+Layer 80 - Cum. Info Reduction: 2.539 - Elapsed Time: 13.3886 secs
+Layer 90 - Cum. Info Reduction: 2.584 - Elapsed Time: 14.7946 secs
+Layer 100 - Cum. Info Reduction: 2.584 - Elapsed Time: 16.1335 secs
+Layer 110 - Cum. Info Reduction: 2.584 - Elapsed Time: 17.5646 secs
+Layer 120 - Cum. Info Reduction: 2.616 - Elapsed Time: 18.8801 secs
+Layer 130 - Cum. Info Reduction: 2.648 - Elapsed Time: 20.2027 secs
+Layer 140 - Cum. Info Reduction: 2.648 - Elapsed Time: 21.5133 secs
+Layer 150 - Cum. Info Reduction: 2.648 - Elapsed Time: 22.8943 secs
+Layer 160 - Cum. Info Reduction: 2.664 - Elapsed Time: 24.1822 secs
+Layer 170 - Cum. Info Reduction: 2.688 - Elapsed Time: 25.5486 secs
+Layer 180 - Cum. Info Reduction: 2.688 - Elapsed Time: 26.8591 secs
+Layer 190 - Cum. Info Reduction: 2.688 - Elapsed Time: 28.1851 secs
+Layer 200 - Cum. Info Reduction: 2.714 - Elapsed Time: 29.5733 secs
+Layer 210 - Cum. Info Reduction: 2.714 - Elapsed Time: 30.9815 secs
+Layer 220 - Cum. Info Reduction: 2.714 - Elapsed Time: 32.4277 secs
+Layer 230 - Cum. Info Reduction: 2.714 - Elapsed Time: 34.0959 secs
+Layer 240 - Cum. Info Reduction: 2.714 - Elapsed Time: 35.4590 secs
+Layer 250 - Cum. Info Reduction: 2.714 - Elapsed Time: 36.8152 secs
+Converged at Layer: 252
+Final Number of layers: 212 (Blocks: 70)
+Total Time: 37.1271 secs
 </pre></div>
 </div>
 </div>
@@ -534,14 +540,13 @@ Total Time: 37.9261 secs
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot data</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_g</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_g</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <img alt="../../../_images/rbig_demo_plane_13_0.png" src="../../../_images/rbig_demo_plane_13_0.png" />
-<img alt="../../../_images/rbig_demo_plane_13_1.png" src="../../../_images/rbig_demo_plane_13_1.png" />
 </div>
 </div>
 </div>
@@ -553,15 +558,15 @@ Total Time: 37.9261 secs
 <span class="n">X_g_</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
 <span class="c1"># plot data</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_g_</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_g_</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <img alt="../../../_images/rbig_demo_plane_15_0.png" src="../../../_images/rbig_demo_plane_15_0.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 21 s, sys: 1.11 s, total: 22.1 s
-Wall time: 19.3 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 17.3 s, sys: 947 ms, total: 18.2 s
+Wall time: 14.5 s
 </pre></div>
 </div>
 </div>
@@ -593,7 +598,7 @@ Wall time: 19.3 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NLL Score: 1.5169
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NLL Score: 1.5106
 </pre></div>
 </div>
 </div>
@@ -687,19 +692,19 @@ Wall time: 19.3 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 35.8 s, sys: 1.72 s, total: 37.5 s
-Wall time: 13.6 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 32.5 s, sys: 773 ms, total: 33.2 s
+Wall time: 14.4 s
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original Data&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original Data&quot;</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Original Data&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="n">fig2</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_samples</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+<span class="n">fig2</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_samples</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
 <span class="n">fig2</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Generated Samples&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -779,8 +784,8 @@ Wall time: 13.6 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NLL (Original): 1.5169
-NLL (Loaded): 1.5169
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NLL (Original): 1.5106
+NLL (Loaded): 1.5106
 </pre></div>
 </div>
 </div>
@@ -798,16 +803,16 @@ NLL (Loaded): 1.5169
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "conda-env-.conda-jax_py38-py"
+            mode: "conda-env-jpy38-py"
         },
         kernelOptions: {
-            kernelName: "conda-env-.conda-jax_py38-py",
+            kernelName: "conda-env-jpy38-py",
             path: "./content/iterative/demos"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'conda-env-.conda-jax_py38-py'</script>
+    <script>kernelName = 'conda-env-jpy38-py'</script>
 
               </div>
               

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Building Blocks 4 RBIG &#8212; Gaussianization</title>
+    <title>Better Sampling &#8212; Gaussianization</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -51,6 +51,8 @@
     <script async="async" src="../../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Demo - Gaussianization Flow" href="../../parametric/demos/gf_demo_plane.html" />
+    <link rel="prev" title="Building Blocks 4 RBIG" href="rbig_building_blocks.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -90,7 +92,7 @@
   Iterative Gaussianization
  </span>
 </p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="rbig_demo_plane.html">
    Demo - RBIG
@@ -99,6 +101,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="rbig_building_blocks.html">
    Building Blocks 4 RBIG
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Better Sampling
   </a>
  </li>
 </ul>
@@ -113,6 +120,16 @@
    Demo - Gaussianization Flow
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../parametric/demos/gf_building_blocks.html">
+   Building Blocks for GFs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../experimental/plane/wandb_integration.html">
+   Weights and Biases Integration
+  </a>
+ </li>
 </ul>
 <p class="caption">
  <span class="caption-text">
@@ -120,17 +137,10 @@
  </span>
 </p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../experimental/overview.html">
-   Overview
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../literature.html">
+   Literature Review
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul class="simple">
-  </ul>
  </li>
 </ul>
 
@@ -253,7 +263,7 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#better-sampling">
+  <a class="reference internal nav-link" href="#id1">
    Better Sampling
   </a>
  </li>
@@ -290,8 +300,8 @@
         
               <div>
                 
-  <div class="section" id="building-blocks-4-rbig">
-<h1>Building Blocks 4 RBIG<a class="headerlink" href="#building-blocks-4-rbig" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="better-sampling">
+<h1>Better Sampling<a class="headerlink" href="#better-sampling" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Install Packages</span>
@@ -597,8 +607,8 @@ Wall time: 5.94 s
 </div>
 </div>
 </div>
-<div class="section" id="better-sampling">
-<h2>Better Sampling<a class="headerlink" href="#better-sampling" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h2>Better Sampling<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.models.sampling</span> <span class="kn">import</span> <span class="n">init_gf_inverse_sampler</span>
@@ -787,6 +797,8 @@ Wall time: 12.6 s
         
         <div class='prev-next-bottom'>
             
+    <a class='left-prev' id="prev-link" href="rbig_building_blocks.html" title="previous page">Building Blocks 4 RBIG</a>
+    <a class='right-next' id="next-link" href="../../parametric/demos/gf_demo_plane.html" title="next page">Demo - Gaussianization Flow</a>
 
         </div>
         

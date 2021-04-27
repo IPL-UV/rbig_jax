@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gaussianization Flows (Details) &#8212; Gaussianization</title>
+    <title>Building Blocks for GFs &#8212; Gaussianization</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -51,6 +51,8 @@
     <script async="async" src="../../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Weights and Biases Integration" href="../../experimental/plane/wandb_integration.html" />
+    <link rel="prev" title="Demo - Gaussianization Flow" href="gf_demo_plane.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -101,16 +103,31 @@
    Building Blocks 4 RBIG
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../iterative/demos/rbig_building_blocks_sampling.html">
+   Better Sampling
+  </a>
+ </li>
 </ul>
 <p class="caption">
  <span class="caption-text">
   Parametric Gaussianization
  </span>
 </p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="gf_demo_plane.html">
    Demo - Gaussianization Flow
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Building Blocks for GFs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../experimental/plane/wandb_integration.html">
+   Weights and Biases Integration
   </a>
  </li>
 </ul>
@@ -120,17 +137,10 @@
  </span>
 </p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../experimental/overview.html">
-   Overview
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../literature.html">
+   Literature Review
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul class="simple">
-  </ul>
  </li>
 </ul>
 
@@ -173,7 +183,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../../../_sources/content/parametric/demos/New_Demo_Full.ipynb"><button type="button"
+        <a class="dropdown-buttons" href="../../../_sources/content/parametric/demos/gf_building_blocks.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
@@ -198,7 +208,7 @@
         aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
     <div class="dropdown-buttons">
         
-        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/content/parametric/demos/New_Demo_Full.ipynb"><button type="button"
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/content/parametric/demos/gf_building_blocks.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
                 data-placement="left"><img class="binder-button-logo"
                     src="../../../_static/images/logo_binder.svg"
@@ -302,11 +312,6 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#original">
-     Original
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#trained-model">
      Trained Model
     </a>
@@ -341,8 +346,8 @@
         
               <div>
                 
-  <div class="section" id="gaussianization-flows-details">
-<h1>Gaussianization Flows (Details)<a class="headerlink" href="#gaussianization-flows-details" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="building-blocks-for-gfs">
+<h1>Building Blocks for GFs<a class="headerlink" href="#building-blocks-for-gfs" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#@title Install Packages</span>
@@ -466,7 +471,7 @@ INFO:tensorflow:Enabling control flow v2
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/New_Demo_Full_5_0.png" src="../../../_images/New_Demo_Full_5_0.png" />
+<img alt="../../../_images/gf_building_blocks_5_0.png" src="../../../_images/gf_building_blocks_5_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -634,13 +639,13 @@ INFO:tensorflow:Enabling control flow v2
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/New_Demo_Full_17_0.png" src="../../../_images/New_Demo_Full_17_0.png" />
-<img alt="../../../_images/New_Demo_Full_17_1.png" src="../../../_images/New_Demo_Full_17_1.png" />
-<img alt="../../../_images/New_Demo_Full_17_2.png" src="../../../_images/New_Demo_Full_17_2.png" />
-<img alt="../../../_images/New_Demo_Full_17_3.png" src="../../../_images/New_Demo_Full_17_3.png" />
-<img alt="../../../_images/New_Demo_Full_17_4.png" src="../../../_images/New_Demo_Full_17_4.png" />
-<img alt="../../../_images/New_Demo_Full_17_5.png" src="../../../_images/New_Demo_Full_17_5.png" />
-<img alt="../../../_images/New_Demo_Full_17_6.png" src="../../../_images/New_Demo_Full_17_6.png" />
+<img alt="../../../_images/gf_building_blocks_17_0.png" src="../../../_images/gf_building_blocks_17_0.png" />
+<img alt="../../../_images/gf_building_blocks_17_1.png" src="../../../_images/gf_building_blocks_17_1.png" />
+<img alt="../../../_images/gf_building_blocks_17_2.png" src="../../../_images/gf_building_blocks_17_2.png" />
+<img alt="../../../_images/gf_building_blocks_17_3.png" src="../../../_images/gf_building_blocks_17_3.png" />
+<img alt="../../../_images/gf_building_blocks_17_4.png" src="../../../_images/gf_building_blocks_17_4.png" />
+<img alt="../../../_images/gf_building_blocks_17_5.png" src="../../../_images/gf_building_blocks_17_5.png" />
+<img alt="../../../_images/gf_building_blocks_17_6.png" src="../../../_images/gf_building_blocks_17_6.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -667,7 +672,7 @@ INFO:tensorflow:Enabling control flow v2
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/New_Demo_Full_19_0.png" src="../../../_images/New_Demo_Full_19_0.png" />
+<img alt="../../../_images/gf_building_blocks_19_0.png" src="../../../_images/gf_building_blocks_19_0.png" />
 </div>
 </div>
 </div>
@@ -722,7 +727,7 @@ INFO:tensorflow:Enabling control flow v2
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/New_Demo_Full_24_0.png" src="../../../_images/New_Demo_Full_24_0.png" />
+<img alt="../../../_images/gf_building_blocks_24_0.png" src="../../../_images/gf_building_blocks_24_0.png" />
 </div>
 </div>
 </div>
@@ -742,7 +747,7 @@ INFO:tensorflow:Enabling control flow v2
 Wall time: 678 ms
 </pre></div>
 </div>
-<img alt="../../../_images/New_Demo_Full_26_1.png" src="../../../_images/New_Demo_Full_26_1.png" />
+<img alt="../../../_images/gf_building_blocks_26_1.png" src="../../../_images/gf_building_blocks_26_1.png" />
 </div>
 </div>
 </div>
@@ -763,7 +768,7 @@ Wall time: 678 ms
 Wall time: 20.7 s
 </pre></div>
 </div>
-<img alt="../../../_images/New_Demo_Full_28_1.png" src="../../../_images/New_Demo_Full_28_1.png" />
+<img alt="../../../_images/gf_building_blocks_28_1.png" src="../../../_images/gf_building_blocks_28_1.png" />
 </div>
 </div>
 </div>
@@ -837,7 +842,7 @@ Wall time: 4.01 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/New_Demo_Full_32_0.png" src="../../../_images/New_Demo_Full_32_0.png" />
+<img alt="../../../_images/gf_building_blocks_32_0.png" src="../../../_images/gf_building_blocks_32_0.png" />
 </div>
 </div>
 </div>
@@ -898,64 +903,14 @@ Wall time: 3min 23s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/New_Demo_Full_36_0.png" src="../../../_images/New_Demo_Full_36_0.png" />
-<img alt="../../../_images/New_Demo_Full_36_1.png" src="../../../_images/New_Demo_Full_36_1.png" />
+<img alt="../../../_images/gf_building_blocks_36_0.png" src="../../../_images/gf_building_blocks_36_0.png" />
+<img alt="../../../_images/gf_building_blocks_36_1.png" src="../../../_images/gf_building_blocks_36_1.png" />
 </div>
 </div>
 </div>
 </div>
 <div class="section" id="each-layer">
 <h2>Each Layer<a class="headerlink" href="#each-layer" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="original">
-<h3>Original<a class="headerlink" href="#original" title="Permalink to this headline">¶</a></h3>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">10</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">32</span> <span class="o">*</span> <span class="mi">32</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>30720
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">10</span> <span class="o">*</span> <span class="p">(</span><span class="mi">32</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">32</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2560
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>12
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="o">*</span> <span class="mi">16</span> <span class="o">*</span> <span class="mi">16</span> <span class="o">*</span> <span class="mi">3</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>768
-</pre></div>
-</div>
-</div>
-</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_g</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -976,14 +931,13 @@ Wall time: 3min 23s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/New_Demo_Full_43_0.png" src="../../../_images/New_Demo_Full_43_0.png" />
-<img alt="../../../_images/New_Demo_Full_43_1.png" src="../../../_images/New_Demo_Full_43_1.png" />
-<img alt="../../../_images/New_Demo_Full_43_2.png" src="../../../_images/New_Demo_Full_43_2.png" />
-<img alt="../../../_images/New_Demo_Full_43_3.png" src="../../../_images/New_Demo_Full_43_3.png" />
-<img alt="../../../_images/New_Demo_Full_43_4.png" src="../../../_images/New_Demo_Full_43_4.png" />
-<img alt="../../../_images/New_Demo_Full_43_5.png" src="../../../_images/New_Demo_Full_43_5.png" />
-<img alt="../../../_images/New_Demo_Full_43_6.png" src="../../../_images/New_Demo_Full_43_6.png" />
-</div>
+<img alt="../../../_images/gf_building_blocks_38_0.png" src="../../../_images/gf_building_blocks_38_0.png" />
+<img alt="../../../_images/gf_building_blocks_38_1.png" src="../../../_images/gf_building_blocks_38_1.png" />
+<img alt="../../../_images/gf_building_blocks_38_2.png" src="../../../_images/gf_building_blocks_38_2.png" />
+<img alt="../../../_images/gf_building_blocks_38_3.png" src="../../../_images/gf_building_blocks_38_3.png" />
+<img alt="../../../_images/gf_building_blocks_38_4.png" src="../../../_images/gf_building_blocks_38_4.png" />
+<img alt="../../../_images/gf_building_blocks_38_5.png" src="../../../_images/gf_building_blocks_38_5.png" />
+<img alt="../../../_images/gf_building_blocks_38_6.png" src="../../../_images/gf_building_blocks_38_6.png" />
 </div>
 </div>
 <div class="section" id="trained-model">
@@ -1008,13 +962,13 @@ Wall time: 3min 23s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/New_Demo_Full_45_0.png" src="../../../_images/New_Demo_Full_45_0.png" />
-<img alt="../../../_images/New_Demo_Full_45_1.png" src="../../../_images/New_Demo_Full_45_1.png" />
-<img alt="../../../_images/New_Demo_Full_45_2.png" src="../../../_images/New_Demo_Full_45_2.png" />
-<img alt="../../../_images/New_Demo_Full_45_3.png" src="../../../_images/New_Demo_Full_45_3.png" />
-<img alt="../../../_images/New_Demo_Full_45_4.png" src="../../../_images/New_Demo_Full_45_4.png" />
-<img alt="../../../_images/New_Demo_Full_45_5.png" src="../../../_images/New_Demo_Full_45_5.png" />
-<img alt="../../../_images/New_Demo_Full_45_6.png" src="../../../_images/New_Demo_Full_45_6.png" />
+<img alt="../../../_images/gf_building_blocks_40_0.png" src="../../../_images/gf_building_blocks_40_0.png" />
+<img alt="../../../_images/gf_building_blocks_40_1.png" src="../../../_images/gf_building_blocks_40_1.png" />
+<img alt="../../../_images/gf_building_blocks_40_2.png" src="../../../_images/gf_building_blocks_40_2.png" />
+<img alt="../../../_images/gf_building_blocks_40_3.png" src="../../../_images/gf_building_blocks_40_3.png" />
+<img alt="../../../_images/gf_building_blocks_40_4.png" src="../../../_images/gf_building_blocks_40_4.png" />
+<img alt="../../../_images/gf_building_blocks_40_5.png" src="../../../_images/gf_building_blocks_40_5.png" />
+<img alt="../../../_images/gf_building_blocks_40_6.png" src="../../../_images/gf_building_blocks_40_6.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -1027,7 +981,7 @@ Wall time: 3min 23s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/New_Demo_Full_46_0.png" src="../../../_images/New_Demo_Full_46_0.png" />
+<img alt="../../../_images/gf_building_blocks_41_0.png" src="../../../_images/gf_building_blocks_41_0.png" />
 </div>
 </div>
 </div>
@@ -1091,6 +1045,8 @@ Wall time: 3min 23s
         
         <div class='prev-next-bottom'>
             
+    <a class='left-prev' id="prev-link" href="gf_demo_plane.html" title="previous page">Demo - Gaussianization Flow</a>
+    <a class='right-next' id="next-link" href="../../experimental/plane/wandb_integration.html" title="next page">Weights and Biases Integration</a>
 
         </div>
         
