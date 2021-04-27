@@ -30,7 +30,7 @@ VERSION = "0.1.0"
 # What packages are required for this module to be executed?
 REQUIRED = [
     # Standard Libraries
-    "numpy>=1.19" "scipy>=1.5" "scikit-learn>=0.23",
+    "numpy>=1.19", "scipy>=1.5", "scikit-learn>=0.23",
     # JAX Libraries
     "jax>=0.2.11",
     "jaxlib>=0.1.62",
@@ -155,8 +155,8 @@ setup(
     # entry_points={
     #     'console_scripts': ['mycli=mymodule:cli'],
     # },
-    setup_requires=["setuptools-yaml"],
-    metadata_yaml="environment.yml",
+#     setup_requires=["setuptools-yaml"],
+#     metadata_yaml="environment.yml",
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
