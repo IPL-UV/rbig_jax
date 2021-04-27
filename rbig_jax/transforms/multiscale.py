@@ -28,7 +28,9 @@ class MultiScaleBijectorChain:
     image_shape: Tuple
 
     def __post_init__(self):
-        self.ms_reshape = init_scale_function(self.filter_shape, self.image_shape)
+        self.ms_reshape = init_scale_function(
+            self.filter_shape, self.image_shape, batch=False
+        )
 
     def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
 

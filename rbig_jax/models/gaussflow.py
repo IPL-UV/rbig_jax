@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+import numpy as np
 from typing import Iterable
 from chex import Array, dataclass
 from rbig_jax.transforms.base import BijectorChain, Bijector
@@ -51,19 +52,21 @@ def init_default_gf_model(
     mixture: str = "logistic",
     init_mixcdf: str = "gmm",
     init_rotation: str = "pca",
-    inverse_cdf: str = "logit",
+    inverse_cdf: str = "logistic",
     n_reflections: int = 10,
     plot_layers: bool = False,
     plot_blocks: bool = False,
 ):
 
     n_features = shape[0]
-    KEY = jax.random.PRNGKey(123)
+    rng = jax.random.PRNGKey(42)
+    # rng, _ = jax.random.split(jax.random.PRNGKey(123), 2)
 
     if mixture == "logistic":
         init_mixcdf_f = InitMixtureLogisticCDF(
             n_components=n_components, init_method=init_mixcdf
         )
+
     elif mixture == "gaussian":
         init_mixcdf_f = InitMixtureGaussianCDF(
             n_components=n_components, init_method=init_mixcdf
@@ -71,7 +74,7 @@ def init_default_gf_model(
     else:
         raise ValueError(f"Unrecognized mixture dist: {mixture}")
 
-    if inverse_cdf == "logit":
+    if inverse_cdf == "logistic":
         # Logit Transform
         init_icdf_f = InitLogitTransform()
     elif inverse_cdf == "gaussian":
@@ -85,7 +88,9 @@ def init_default_gf_model(
     # initialize init function
     init_hh_f = InitHouseHolder(n_reflections=n_reflections, method=init_rotation)
 
-    block_rngs = jax.random.split(KEY, num=n_blocks)
+    block_rngs = jax.random.split(rng, num=n_blocks)
+    # rng = jax.random.split(jax.random.PRNGKey(42), n_blocks)
+    # block_rngs = jax.random.split(jax.random.PRNGKey(42), n_blocks)
 
     itercount = itertools.count()
     bijectors = []
@@ -93,7 +98,7 @@ def init_default_gf_model(
     X_g = X.copy()
 
     if plot_blocks:
-        fig = corner.corner(X_g, color="red", hist_bin_factor=2)
+        fig = corner.corner(np.array(X_g), color="red", hist_bin_factor=2)
 
     pbar = tqdm.tqdm(block_rngs)
     with pbar:
@@ -116,7 +121,7 @@ def init_default_gf_model(
 
             # plot data
             if plot_layers and plot_blocks:
-                fig = corner.corner(X_g, color="red", hist_bin_factor=2)
+                fig = corner.corner(np.array(X_g), color="red", hist_bin_factor=2)
 
             # add bijector to list
             bijectors.append(layer)
@@ -136,7 +141,7 @@ def init_default_gf_model(
 
             # plot data
             if plot_layers and plot_blocks:
-                fig = corner.corner(X_g, color="red", hist_bin_factor=2)
+                fig = corner.corner(np.array(X_g), color="red", hist_bin_factor=2)
 
             # ======================
             # HOUSEHOLDER
@@ -156,8 +161,7 @@ def init_default_gf_model(
 
             # plot data
             if plot_blocks:
-                print(plot_layers)
-                fig = corner.corner(X_g, color="red", hist_bin_factor=2)
+                fig = corner.corner(np.array(X_g), color="red", hist_bin_factor=2)
 
     # create base dist
     base_dist = Normal(jnp.zeros((n_features,)), jnp.ones((n_features,)))
@@ -165,3 +169,56 @@ def init_default_gf_model(
     # create flow model
     gf_model = GaussianizationFlow(base_dist=base_dist, bijectors=bijectors)
     return gf_model
+
+
+def add_gf_model_args(parser):
+    # ====================
+    # Model Args
+    # ====================
+    parser.add_argument(
+        "--n_blocks", type=int, default=4, help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--n_init_samples",
+        type=int,
+        default=1_000,
+        help="Standardize Input Training Data",
+    )
+    # ====================
+    # Mixture CDF Args
+    # ====================
+    parser.add_argument(
+        "--n_components", type=int, default=20, help="Standardize Input Training Data"
+    )
+    parser.add_argument(
+        "--mixture",
+        type=str,
+        default="gaussian",
+        help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--init_mixcdf", type=str, default="gmm", help="Standardize Input Training Data"
+    )
+    # ====================
+    # Quantile Args
+    # ====================
+
+    parser.add_argument(
+        "--inverse_cdf",
+        type=str,
+        default="gaussian",
+        help="Standardize Input Training Data",
+    )
+    # ====================
+    # Rotation Args
+    # ====================
+    parser.add_argument(
+        "--n_reflections", type=int, default=2, help="Standardize Input Training Data"
+    )
+    parser.add_argument(
+        "--init_rotation",
+        type=str,
+        default="random",
+        help="Standardize Input Training Data",
+    )
+    return parser

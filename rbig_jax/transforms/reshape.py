@@ -39,7 +39,7 @@ class RescaleFunctions(NamedTuple):
     params: RescaleParams
 
 
-def init_scale_function(filter, image_shape):
+def init_scale_function(filter, image_shape, batch: bool = True):
 
     # create filter params
     fh, fw = filter
@@ -55,40 +55,79 @@ def init_scale_function(filter, image_shape):
 
     rescale_params = RescaleParams(fh=fh, fw=fw, H=H, W=W, C=C, Hn=Hn, Wn=Wn)
 
-    def forward(inputs):
+    if batch:
 
-        return rearrange(
-            inputs,
-            "B (Hn fh Wn fw C) -> (B Hn Wn) (fh fw C)",
-            fh=fh,
-            fw=fw,
-            C=C,
-            Wn=Wn,
-            Hn=Hn,
-        )
+        def forward(inputs):
 
-    def inverse(inputs):
+            return rearrange(
+                inputs,
+                "B (Hn fh Wn fw C) -> B Hn Wn (fh fw C)",
+                fh=fh,
+                fw=fw,
+                C=C,
+                Wn=Wn,
+                Hn=Hn,
+            )
 
-        temp = rearrange(
-            inputs,
-            "(B Hn Wn) (fh fw C) -> B Hn Wn fh fw C",
-            #             B=inputs.shape[0],
-            C=C,
-            Hn=Hn,
-            Wn=Wn,
-            fh=fh,
-            fw=fw,
-        )
-        return rearrange(
-            temp,
-            "B Hn Wn fh fw C -> B (Hn fh Wn fw C)",
-            #             B=inputs.shape[0],
-            C=C,
-            Hn=Hn,
-            Wn=Wn,
-            fh=fh,
-            fw=fw,
-        )
+        def inverse(inputs):
+
+            temp = rearrange(
+                inputs,
+                "B Hn Wn (fh fw C) -> B Hn Wn fh fw C",
+                #             B=inputs.shape[0],
+                C=C,
+                Hn=Hn,
+                Wn=Wn,
+                fh=fh,
+                fw=fw,
+            )
+            return rearrange(
+                temp,
+                "B Hn Wn fh fw C -> B (Hn fh Wn fw C)",
+                #             B=inputs.shape[0],
+                C=C,
+                Hn=Hn,
+                Wn=Wn,
+                fh=fh,
+                fw=fw,
+            )
+
+    else:
+
+        def forward(inputs):
+
+            return rearrange(
+                inputs,
+                "B (Hn fh Wn fw C) -> (B Hn Wn) (fh fw C)",
+                fh=fh,
+                fw=fw,
+                C=C,
+                Wn=Wn,
+                Hn=Hn,
+            )
+
+        def inverse(inputs):
+
+            temp = rearrange(
+                inputs,
+                "(B Hn Wn) (fh fw C) -> B Hn Wn fh fw C",
+                #             B=inputs.shape[0],
+                C=C,
+                Hn=Hn,
+                Wn=Wn,
+                fh=fh,
+                fw=fw,
+            )
+            return rearrange(
+                temp,
+                "B Hn Wn fh fw C -> B (Hn fh Wn fw C)",
+                #             B=inputs.shape[0],
+                C=C,
+                Hn=Hn,
+                Wn=Wn,
+                fh=fh,
+                fw=fw,
+            )
 
     return RescaleFunctions(forward=forward, inverse=inverse, params=rescale_params)
 

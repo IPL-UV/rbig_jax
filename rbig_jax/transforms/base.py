@@ -56,6 +56,11 @@ class Bijector:
             f"Bijector {self.name} does not implement `inverse_and_log_det`."
         )
 
+    @property
+    def name(self) -> str:
+        """Name of the bijector."""
+        return self.__class__.__name__
+
 
 class NonTrainableBijector(jittable.Jittable, metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -77,6 +82,11 @@ class NonTrainableBijector(jittable.Jittable, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def bijector(self, inputs: Array) -> Bijector:
         return NotImplementedError()
+
+    @property
+    def name(self) -> str:
+        """Name of the bijector."""
+        return self.__class__.__name__
 
 
 class InitLayersFunctions(NamedTuple):

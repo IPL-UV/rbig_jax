@@ -1,7 +1,7 @@
 from typing import Callable, Optional, Tuple
 
 import jax
-import jax.numpy as np
+import jax.numpy as jnp
 from chex import Array, dataclass
 from distrax._src.bijectors.sigmoid import _more_stable_sigmoid, _more_stable_softplus
 from jax.nn import sigmoid, softplus
@@ -15,23 +15,34 @@ EPS = 1e-5
 TEMPERATURE = 1.0
 
 
+def safe_log(x):
+    x = jnp.clip(x, a_min=1e-22)
+    return jnp.log(x)
+
+
 @dataclass
 class Logit(Bijector):
     def forward_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
 
-        # inputs = np.clip(inputs, EPS, 1 - EPS)
+        # inputs = jnp.clip(inputs, EPS, 1 - EPS)
+        outputs = -safe_log(jnp.reciprocal(inputs) - 1.0)
 
-        outputs = np.log(inputs) - np.log1p(-inputs)
+        # outputs = jnp.log(inputs) - jnp.log1p(-inputs)
 
-        # abs log determinant jacobian
-        logabsdet = -self.inverse_log_det_jacobian(outputs)
+        logabsdet = -safe_log(inputs) - safe_log(1.0 - inputs)
+
+        # # abs log determinant jacobian
+        # logabsdet = -self.inverse_log_det_jacobian(outputs)
 
         return outputs, logabsdet
 
     def inverse_log_det_jacobian(self, inputs: Array, **kwargs) -> Array:
 
-        # abs log determinant jacobian
-        logabsdet = -_more_stable_softplus(-inputs) - _more_stable_softplus(inputs)
+        # authors implementation
+        logabsdet = _more_stable_softplus(inputs) + _more_stable_softplus(-inputs)
+
+        # # distrax implementation
+        # logabsdet = -_more_stable_softplus(-inputs) - _more_stable_softplus(inputs)
         return logabsdet
 
     def inverse_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
@@ -81,6 +92,41 @@ def InitSigmoidTransform(jitted: bool = False):
 
 
 def InitLogitTransform(jitted: bool = False):
+
+    if jitted:
+        f = jax.jit(Inverse(Sigmoid()).forward)
+    else:
+        f = Inverse(Sigmoid()).forward
+
+    def init_bijector(inputs, **kwargs):
+
+        return Inverse(Sigmoid())
+
+    def bijector_and_transform(inputs, **kwargs):
+        outputs = f(inputs)
+        return outputs, Inverse(Sigmoid())
+
+    def transform(inputs, **kwargs):
+        outputs = f(inputs)
+        return outputs
+
+    def params(inputs, **kwargs):
+        return ()
+
+    def params_and_transform(inputs, **kwargs):
+        outputs = f(inputs)
+        return outputs, ()
+
+    return InitLayersFunctions(
+        bijector=init_bijector,
+        bijector_and_transform=bijector_and_transform,
+        transform=transform,
+        params=params,
+        params_and_transform=params_and_transform,
+    )
+
+
+def InitInverseLogisticTransform(jitted: bool = False):
 
     if jitted:
         f = jax.jit(Inverse(Sigmoid()).forward)

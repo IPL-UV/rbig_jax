@@ -21,12 +21,12 @@ class MixtureGaussianCDF(Bijector):
     def forward_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
 
         # forward transformation with batch dimension
-        outputs = mixture_gaussian_cdf_vectorized(
+        outputs = mixture_gaussian_cdf(
             inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
         # log abs det, all zeros
-        logabsdet = mixture_gaussian_log_pdf_vectorized(
+        logabsdet = mixture_gaussian_log_pdf(
             inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
@@ -39,7 +39,7 @@ class MixtureGaussianCDF(Bijector):
             inputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
         # log abs det, all zeros
-        logabsdet = mixture_gaussian_log_pdf_vectorized(
+        logabsdet = mixture_gaussian_log_pdf(
             outputs, self.prior_logits, self.means, softplus(self.log_scales),
         )
 
@@ -134,9 +134,11 @@ def mixture_gaussian_cdf(
     x = (x - means) / scales
 
     # normalize prior logits
-    weights = jax.nn.log_softmax(prior_logits, axis=1)
+    prior_logits = jax.nn.log_softmax(prior_logits, axis=-1)
 
-    log_cdfs = weights + jax.scipy.special.log_ndtr(x)
+    log_cdfs = prior_logits + jax.scipy.stats.norm.logcdf(
+        x
+    )  # jax.scipy.special.log_ndtr(x)
 
     # calculate log cdf
     log_cdfs = jax.nn.logsumexp(log_cdfs, axis=-1)

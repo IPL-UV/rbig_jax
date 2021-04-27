@@ -231,3 +231,23 @@ def train_model(
         valid_losses = None
     losses = {"train": train_losses, "valid": valid_losses}
     return final_params, losses
+
+
+def add_gf_train_args(parser):
+    # ====================
+    # Model Args
+    # ====================
+    parser.add_argument(
+        "--epochs", type=int, default=100, help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--lr", type=float, default=1e-2, help="Standardize Input Training Data"
+    )
+
+    parser.add_argument(
+        "--optimizer", type=str, default="adam", help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--batch_size", type=int, default=128, help="Standardize Input Training Data",
+    )
+    return parser

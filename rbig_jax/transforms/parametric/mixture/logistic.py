@@ -182,33 +182,6 @@ mixture_logistic_cdf_vectorized = jax.vmap(
 )
 
 
-def logistic_log_cdf(x: Array, mean: Array, scale: Array) -> Array:
-    """Element-wise log CDF of the logistic distribution
-
-    Parameters
-    ----------
-    x : Array
-        a feature vector to be transformed, shape=(n_features,)
-    mean : Array
-        mean components to be transformed, shape=(n_components,)
-    scale : Array
-        scale components to be transformed, shape=(n_components,)
-
-    Returns
-    -------
-    log_cdf (Array): log cdf of the distribution
-    """
-
-    # change of variables
-    z = (x - mean) / scale
-
-    # log cdf
-    # log_cdf = log_sigmoid(z)
-    log_cdf = -softplus(-z)
-
-    return log_cdf
-
-
 def mixture_logistic_invcdf(
     x: Array, prior_logits: Array, means: Array, scales: Array
 ) -> Array:
@@ -284,6 +257,37 @@ mixture_logistic_log_pdf_vectorized = jax.vmap(
 )
 
 
+def logistic_log_cdf(x: Array, mean: Array, scale: Array) -> Array:
+    """Element-wise log CDF of the logistic distribution
+
+    Parameters
+    ----------
+    x : Array
+        a feature vector to be transformed, shape=(n_features,)
+    mean : Array
+        mean components to be transformed, shape=(n_components,)
+    scale : Array
+        scale components to be transformed, shape=(n_components,)
+
+    Returns
+    -------
+    log_cdf (Array): log cdf of the distribution
+    """
+
+    # change of variables
+    z = (x - mean) / scale
+
+    # log cdf
+
+    # Original Author Implementation
+    log_cdf = log_sigmoid(z)
+
+    # # distrax implementation
+    # log_cdf = -softplus(-z)
+
+    return log_cdf
+
+
 def logistic_log_pdf(x: Array, mean: Array, scale: Array) -> Array:
     """Element-wise log PDF of the logistic distribution
 
@@ -302,7 +306,10 @@ def logistic_log_pdf(x: Array, mean: Array, scale: Array) -> Array:
     # log probability
     # log_prob = z -jnp.log(scale) - 2 * jax.nn.softplus(z)
     # log_prob = jax.scipy.stats.logistic.logpdf(z)
-    # log_prob = z - jnp.log(scale) - 2 * softplus(z)
-    log_prob = -z - 2.0 * softplus(-z) - jnp.log(scale)
+
+    # Original Author Implementation
+    log_prob = z - jnp.log(scale) - 2 * softplus(z)
+    # # distrax implementation
+    # log_prob = -z - 2.0 * softplus(-z) - jnp.log(scale)
 
     return log_prob

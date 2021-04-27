@@ -22,6 +22,34 @@ from torch.utils.data import DataLoader, Dataset
 #         return jnp.array(data, dtype=self.dtype)
 
 
+def add_dataset_args(parser):
+    parser.add_argument(
+        "--seed", type=int, default=123, help="number of data points for training",
+    )
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="noisysine",
+        help="Dataset to be used for visualization",
+    )
+    parser.add_argument(
+        "--n_samples",
+        type=int,
+        default=10_000,
+        help="number of data points for training",
+    )
+    parser.add_argument(
+        "--noise", type=float, default=0.1, help="number of data points for training",
+    )
+    parser.add_argument(
+        "--n_train", type=int, default=2_000, help="number of data points for training",
+    )
+    parser.add_argument(
+        "--n_valid", type=int, default=1_000, help="number of data points for training",
+    )
+    return parser
+
+
 class DensityDataset(Dataset):
     def __init__(self, n_samples: int = 10_000, noise: float = 0.1, seed: int = 123):
         self.n_samples = n_samples
@@ -119,6 +147,16 @@ class NoisySineDataset(DensityDataset):
         x = np.abs(2 * rng.randn(1, self.n_samples))
         y = np.sin(x) + 0.25 * rng.randn(1, self.n_samples)
         self.data = np.vstack((x, y)).T
+
+
+class CheckBoard(DensityDataset):
+    def _create_data(self):
+        rng = np.random.RandomState(self.seed)
+        x1 = rng.rand(self.n_samples) * 4 - 2
+        x2_ = rng.rand(self.n_samples) - rng.randint(0, 2, self.n_samples) * 2
+        x2 = x2_ + (np.floor(x1) % 2)
+        data = np.concatenate([x1[:, None], x2[:, None]], 1) * 2
+        self.data = data + 0.001 * rng.randn(*data.shape)
 
 
 def get_classic(n_samples=10_000, seed=123):
