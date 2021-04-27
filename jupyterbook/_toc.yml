@@ -5,16 +5,16 @@
 
 - part: Iterative Gaussianization
   chapters: 
-  - file: content/iterative/demos/rbig_demo_plane.md
-  - file: content/iterative/demos/rbig_building_blocks.md
-  - file: content/iterative/demos/rbig_building_blocks_better_sampling.md
+  - file: content/iterative/demos/rbig_demo_plane.ipynb
+  - file: content/iterative/demos/rbig_building_blocks.ipynb
+  - file: content/iterative/demos/rbig_building_blocks_sampling.ipynb
 
 - part: Parametric Gaussianization
   chapters: 
   - file: content/parametric/demos/gf_demo_plane.md
+  - file: content/parametric/demos/gf_building_blocks.md
+  - file: content/experimental/plane/wandb_integration.ipynb
 
 - part: Exploration
   chapters: 
-  - file: content/experimental/overview.md
-    sections:
-    - file: literature
+  - file: content/literature.md

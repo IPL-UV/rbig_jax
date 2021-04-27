@@ -1,23 +1,23 @@
 from typing import Optional, Tuple, Union, NamedTuple
 
 import jax.numpy as jnp
-import tensor_annotations.jax as tjax
+# import tensor_annotations.jax as tjax
 from chex import Array, dataclass
 from einops import rearrange
 from jax.random import PRNGKey
-from tensor_annotations import axes
+# from tensor_annotations import axes
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
 from rbig_jax.transforms.base import Bijector, TransformInfo
 
-Batch = axes.Batch
-Channels = axes.Channels
-Height = axes.Height
-Width = axes.Width
-Features = axes.Features
-ImageInputs = tjax.Array4[Batch, Channels, Height, Width]
-ImageOutput = tjax.Array4[Batch, Channels, Height, Width]
-MLOutputs = tjax.Array2[Batch, Features]
-Outputs = Union[ImageOutput, MLOutputs]
+# Batch = axes.Batch
+# Channels = axes.Channels
+# Height = axes.Height
+# Width = axes.Width
+# Features = axes.Features
+# ImageInputs = tjax.Array4[Batch, Channels, Height, Width]
+# ImageOutput = tjax.Array4[Batch, Channels, Height, Width]
+# MLOutputs = tjax.Array2[Batch, Features]
+# Outputs = Union[ImageOutput, MLOutputs]
 
 
 from typing import Callable
@@ -349,16 +349,16 @@ def init_scale_function(filter, image_shape, batch: bool = True):
 #         return outputs, log_det
 
 
-def InitCollapseLayer(collapse: Optional[str] = None):
+# def InitCollapseLayer(collapse: Optional[str] = None):
 
-    collapse_shape = _get_collapse_shape(collapse)
+#     collapse_shape = _get_collapse_shape(collapse)
 
-    def init_func(rng: PRNGKey, shape: Tuple, **kwargs):
-        H, W, C = shape
+#     def init_func(rng: PRNGKey, shape: Tuple, **kwargs):
+#         H, W, C = shape
 
-        return CollapseLayer(collapse_shape=collapse_shape, H=H, W=W, C=C,)
+#         return CollapseLayer(collapse_shape=collapse_shape, H=H, W=W, C=C,)
 
-    return init_func
+#     return init_func
 
 
 # def Squeeze(

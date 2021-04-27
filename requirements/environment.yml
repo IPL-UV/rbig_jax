@@ -1,0 +1,50 @@
+name: jpy38
+channels:
+- defaults
+- conda-forge
+dependencies:
+- python=3.8
+# Standard Libraries
+- numpy>1.19
+- scipy>1.5
+- scikit-learn>0.23
+- matplotlib>3.3
+- scikit-image
+- pytorch::pytorch>=1.6
+- pytorch::torchvision
+- pytorch::torchaudio
+- pytorch::cpuonly
+- pip
+- pip:
+  # Jax framework
+  - jax
+  - jaxlib
+  - chex
+  - optax
+  - numpyro
+  - distrax
+  - tfp-nightly
+  - einops
+  # PyTorch
+  - pytorch-lightning>=1.2
+  - lightning-bolts>=0.3
+  # formatting
+  - black
+  - isort
+  - mypy
+  - pytest
+  - flake8
+  # Notebook stuff
+  - jupyter
+  - ipykernel
+  - ipython
+  - nb_black
+  - pyprojroot
+  - tqdm
+  # logging
+  - wandb
+  - loguru
+  # plotting
+  - seaborn
+  - celluloid
+  - corner
