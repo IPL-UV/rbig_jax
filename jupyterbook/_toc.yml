@@ -17,6 +17,4 @@
 
 - part: Exploration
   chapters: 
-  - file: content/experimental/overview.md
-    sections:
-    - file: literature
+  - file: content/literature.md
