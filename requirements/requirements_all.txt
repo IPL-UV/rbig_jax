@@ -1,39 +1,32 @@
-# Standard Libraries
 numpy>=1.19
 scipy>=1.5
 scikit-learn>=0.23
-# JAX Libraries
 jax>=0.2.11
 jaxlib>=0.1.62
-numpyro
-chex
-optax
+numpyro>=0.6.0
+chex>=0.0.6
+optax>=0.0.6
 distrax>=0.0.1
 tfp-nightly
-tqdm
-einops
-tensor_annotations
-# PyTorch and Co
+tqdm>=4.60.0
+einops>=0.3.0
+scikit-image>=0.18.1
 torch>=1.6
 torchvision>=0.9
 torchaudio>=0.8
 torchmetrics>=0.2.0
 pytorch-lightning>=1.2
 lightning-bolts>=0.3
-# Testing & Formatting
 black
-flake8
+flake8>=3.9.1
 isort>=5.0
-pytest>4.1
-# Jupyter Notebooks
-ipykernel
-nb_black
+pytest>=4.1
+ipykernel>=5.5.3
+nb_black>=1.0.7
 pyprojroot
-# Logging
-loguru
-wandb
-# Plot Libraries
+loguru>=0.5.3
+wandb>=0.10.27
 matplotlib>=3.3
-seaborn
-celluloid
-corner
+seaborn>=0.11.1
+celluloid>=0.2.0
+corner>=2.2.1
