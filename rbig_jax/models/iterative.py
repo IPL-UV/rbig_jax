@@ -80,7 +80,7 @@ def RBIG(
 ):
 
     # init rbig_block
-    rbig_block_init = init_default_rbig_block(
+    rbig_block_init_fs = init_default_rbig_block(
         shape=X.shape,
         support_extension=support_extension,
         alpha=alpha,
@@ -91,6 +91,8 @@ def RBIG(
         eps=eps,
         method=method,
     )
+
+    rbig_block_init = RBIGBlockInit(init_functions=rbig_block_init_fs)
 
     from rbig_jax.losses import init_info_loss
 

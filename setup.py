@@ -11,6 +11,13 @@ from shutil import rmtree
 
 from setuptools import Command, find_packages, setup
 
+
+def parse_requirements_file(filename):
+    with open(filename, encoding="utf-8") as fid:
+        requires = [l.strip() for l in fid.readlines() if l]
+    return requires
+
+
 # Package meta-data.
 NAME = "rbig_jax"
 DESCRIPTION = "Gaussianization with JAX."
@@ -22,14 +29,44 @@ VERSION = "0.1.0"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    "jax",
-    "jaxlib",
-    "numpy",
-    "scikit-learn",
-    "objax",
+    # Standard Libraries
+    "numpy>=1.19" "scipy>=1.5" "scikit-learn>=0.23",
+    # JAX Libraries
+    "jax>=0.2.11",
+    "jaxlib>=0.1.62",
+    "numpyro",
     "chex",
-    "matplotlib",
+    "optax",
+    "distrax>=0.0.1",
+    "tfp-nightly",
+    "tqdm",
+    "einops",
+    "tensor_annotations",
+    "scikit-image",
+    # PyTorch and Co
+    "torch>=1.6",
+    "torchvision>=0.9",
+    "torchaudio>=0.8",
+    "torchmetrics>=0.2.0",
+    "pytorch-lightning>=1.2",
+    "lightning-bolts>=0.3",
+    # Testing & Formatting
+    "black",
+    "flake8",
+    "isort>=5.0",
+    "pytest>4.1",
+    # Jupyter Notebooks
+    "ipykernel",
+    "nb_black",
+    "pyprojroot",
+    # Logging
+    "loguru",
+    "wandb,"
+    # Plot Libraries
+    "matplotlib>=3.3",
     "seaborn",
+    "celluloid",
+    "corner",
 ]
 
 # What packages are optional?
