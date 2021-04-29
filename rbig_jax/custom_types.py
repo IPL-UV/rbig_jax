@@ -2,7 +2,7 @@
 Taken from: 
 https://github.com/aidanscannell/GPJax/blob/master/gpjax/custom_types.py
 """
-from typing import Tuple, Union
+from typing import NamedTuple, Tuple, Union
 
 from jax import numpy as jnp
 
@@ -14,11 +14,9 @@ MeanFunc = jnp.float64
 Variance = Union[jnp.float64, jnp.ndarray]
 Lengthscales = Union[jnp.float64, jnp.ndarray]
 
-from typing import NamedTuple
 
 
 class ImageShape(NamedTuple):
     H: int
     W: int
     C: int
-

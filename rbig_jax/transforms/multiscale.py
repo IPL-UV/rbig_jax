@@ -1,8 +1,10 @@
-from rbig_jax.transforms.reshape import init_scale_function
-from typing import Iterable, Tuple, Optional, NamedTuple, Callable, List
-from chex import dataclass, Array
-from rbig_jax.transforms.base import Bijector
+from typing import Callable, Iterable, List, NamedTuple, Optional, Tuple
+
 import jax.numpy as jnp
+from chex import Array, dataclass
+
+from rbig_jax.transforms.base import Bijector
+from rbig_jax.transforms.reshape import init_scale_function
 
 
 class RescaleParams(NamedTuple):

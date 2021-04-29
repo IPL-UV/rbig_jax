@@ -1,5 +1,4 @@
 import collections
-from rbig_jax.transforms.rotation import compute_projection
 from typing import Callable, Optional, Tuple
 
 import jax
@@ -8,6 +7,7 @@ from chex import Array, dataclass
 from jax.random import PRNGKey
 
 from rbig_jax.transforms.base import Bijector, InitLayersFunctions
+from rbig_jax.transforms.rotation import compute_projection
 
 # RotParams = collections.namedtuple("Params", ["projection"])
 

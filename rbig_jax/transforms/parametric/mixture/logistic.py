@@ -1,4 +1,3 @@
-from rbig_jax.transforms.parametric.mixture.init import init_mixture_weights
 from typing import Callable, Tuple
 
 import jax
@@ -8,9 +7,9 @@ from jax.nn import log_sigmoid, log_softmax, softplus
 from jax.random import PRNGKey
 from jax.scipy.special import logsumexp
 
-from rbig_jax.transforms.base import Bijector
+from rbig_jax.transforms.base import Bijector, InitLayersFunctions
+from rbig_jax.transforms.parametric.mixture.init import init_mixture_weights
 from rbig_jax.utils import bisection_search
-from rbig_jax.transforms.base import InitLayersFunctions
 
 
 @dataclass

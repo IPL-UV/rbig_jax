@@ -1,10 +1,13 @@
-from rbig_jax.models.gaussflow import GaussianizationFlow
-from chex import dataclass, Array
+from copy import deepcopy
+from typing import Callable, Iterable, Tuple
+
+import jax.numpy as jnp
+import tqdm
+from chex import Array, dataclass
+from distrax._src.distributions.distribution import Distribution
+
 from rbig_jax.models.gaussflow import GaussianizationFlow
 from rbig_jax.transforms.base import Bijector
-from typing import Iterable, Callable, Tuple
-from distrax._src.distributions.distribution import Distribution
-import jax.numpy as jnp
 
 
 @dataclass
@@ -89,8 +92,6 @@ class InverseSampler:
         return self.__class__.__name__
 
 
-from copy import deepcopy
-import tqdm
 
 
 def init_gf_inverse_sampler(model, marginal_init_f: Iterable[Callable]):

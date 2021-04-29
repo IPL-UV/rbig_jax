@@ -1,17 +1,15 @@
 from typing import Callable, Tuple
 
 import jax
-import numpy as np
 import jax.numpy as jnp
+import numpy as np
 from chex import Array, dataclass
 from jax.lax import conv_general_dilated
 from jax.random import PRNGKey
-from rbig_jax.transforms.base import Bijector
 
+from rbig_jax.transforms.base import Bijector
 from rbig_jax.transforms.parametric.householder import (
-    householder_inverse_transform,
-    householder_transform,
-)
+    householder_inverse_transform, householder_transform)
 
 
 @dataclass
@@ -287,4 +285,3 @@ def convolutions_1x1(x: Array, kernel: Array) -> Array:
 #         return init_params, forward_func, inverse_func
 
 #     return init_func
-

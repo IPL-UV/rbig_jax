@@ -1,10 +1,12 @@
+import math
 from typing import Callable, Optional, Tuple
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
-from jax.random import PRNGKey
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
+from jax.random import PRNGKey
+
 from rbig_jax.transforms.base import InitFunctionsPlus, InitLayersFunctions
 
 
@@ -66,7 +68,6 @@ class GaussCDF(distaxBijector):
         return outputs, logabsdet
 
 
-import math
 
 _half_log2pi = 0.5 * math.log(2 * math.pi)
 # _half_log2pi = jnp.log(jnp.sqrt(2 * jnp.pi))

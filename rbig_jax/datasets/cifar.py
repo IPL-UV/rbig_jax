@@ -1,16 +1,17 @@
-import pytorch_lightning as pl
-from torchvision.datasets import CIFAR
-from rbig_jax.custom_types import ImageShape
-from rbig_jax.transforms.reshape import flatten_image, unflatten_image
-from typing import Optional
-from sklearn.model_selection import train_test_split
-import numpy as np
-from torch.utils.data import DataLoader
-from rbig_jax.data import GenericDataset
-from pyprojroot import here
-
 # spyder up to find the root
 from pathlib import Path
+from typing import Optional
+
+import numpy as np
+import pytorch_lightning as pl
+from pyprojroot import here
+from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
+from torchvision.datasets import CIFAR
+
+from rbig_jax.custom_types import ImageShape
+from rbig_jax.data import GenericDataset
+from rbig_jax.transforms.reshape import flatten_image, unflatten_image
 
 root = here(project_files=[".here"])
 

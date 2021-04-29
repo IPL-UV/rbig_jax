@@ -1,10 +1,12 @@
 import collections
 from typing import NamedTuple, Tuple
-from chex._src.pytypes import PRNGKey
-import jax.numpy as jnp
+
 import jax
+import jax.numpy as jnp
 from chex import Array, dataclass
+from chex._src.pytypes import PRNGKey
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
+
 from rbig_jax.transforms.base import InitFunctions, InitLayersFunctions
 
 RotParams = collections.namedtuple("Params", ["rotation"])

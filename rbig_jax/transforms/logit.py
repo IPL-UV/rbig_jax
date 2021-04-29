@@ -3,13 +3,14 @@ from typing import Callable, Optional, Tuple
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
-from distrax._src.bijectors.sigmoid import _more_stable_sigmoid, _more_stable_softplus
+from distrax._src.bijectors.inverse import Inverse
+from distrax._src.bijectors.sigmoid import (Sigmoid, _more_stable_sigmoid,
+                                            _more_stable_softplus)
 from jax.nn import sigmoid, softplus
 from jax.random import PRNGKey
 
-from rbig_jax.transforms.base import Bijector, InitFunctionsPlus, InitLayersFunctions
-from distrax._src.bijectors.sigmoid import Sigmoid
-from distrax._src.bijectors.inverse import Inverse
+from rbig_jax.transforms.base import (Bijector, InitFunctionsPlus,
+                                      InitLayersFunctions)
 
 EPS = 1e-5
 TEMPERATURE = 1.0

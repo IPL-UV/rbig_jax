@@ -1,6 +1,11 @@
+from typing import Optional
+
 import jax.numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from mpl_toolkits.axes_grid1 import ImageGrid
+
+from rbig_jax.transforms.reshape import unflatten_image
 
 sns.reset_defaults()
 sns.set_context(context="talk", font_scale=0.7)
@@ -79,9 +84,6 @@ def plot_info_loss(
         plt.show()
 
 
-from mpl_toolkits.axes_grid1 import ImageGrid
-from rbig_jax.transforms.reshape import unflatten_image
-from typing import Optional
 
 
 def plot_image_grid(image, image_shape: Optional = None):

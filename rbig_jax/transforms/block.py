@@ -1,9 +1,11 @@
-from typing import Callable, Optional, Tuple, List
+from typing import Callable, List, Optional, Tuple
+
 import jax.numpy as jnp
 from chex import Array, dataclass
+
 from rbig_jax.transforms.histogram import InitUniHistTransform
-from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
+from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.rotation import InitPCARotation
 
 # from rbig_jax.transforms.histogram import InitUniHistUniformize

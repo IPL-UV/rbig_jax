@@ -1,14 +1,16 @@
 import collections
-from typing import NamedTuple, Optional, Union, Tuple, Callable
-from chex._src.pytypes import PRNGKey
+import math
+from typing import Callable, NamedTuple, Optional, Tuple, Union
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
+from chex._src.pytypes import PRNGKey
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
-from rbig_jax.utils import get_domain_extension, marginal_transform
+
 from rbig_jax.transforms.base import InitLayersFunctions, NonTrainableBijector
 from rbig_jax.transforms.marginal import MarginalUniformizeTransform
+from rbig_jax.utils import get_domain_extension, marginal_transform
 
 
 class UniHistParams(NamedTuple):
@@ -514,7 +516,6 @@ def _ptp(x):
     return jnp.ptp(x).astype(jnp.uint32)
 
 
-import math
 
 
 def hist_bin_sqrt(x):
@@ -546,4 +547,3 @@ def hist_bin_auto(x):
     min_bin = jnp.minimum(fd_bw, sturges_bw)
     # if fd 0, use sturges
     return jnp.where(min_bin > 0, min_bin, sturges_bw)
-

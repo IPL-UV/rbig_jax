@@ -1,6 +1,7 @@
+from typing import Callable, NamedTuple, Tuple
+
 import jax.numpy as jnp
-from chex import dataclass, Array
-from typing import NamedTuple, Tuple, Callable
+from chex import Array, dataclass
 
 
 def cascade_forward(bijectors: dataclass, inputs: Array) -> Tuple[Array, Array]:
@@ -52,4 +53,3 @@ CascadeTransform = _CascadeTransform(
     forward_and_log_det=cascade_forward_and_log_det,
     inverse_and_log_det=cascade_inverse_and_log_det,
 )
-

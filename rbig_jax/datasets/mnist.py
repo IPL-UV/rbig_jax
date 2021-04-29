@@ -1,16 +1,18 @@
-import pytorch_lightning as pl
-from torchvision.datasets import MNIST
-from rbig_jax.custom_types import ImageShape
-from rbig_jax.transforms.reshape import flatten_image, unflatten_image
-from typing import Optional
-from sklearn.model_selection import train_test_split
-import numpy as np
-from torch.utils.data import DataLoader
-from rbig_jax.data import GenericDataset
-from pyprojroot import here
-
 # spyder up to find the root
 from pathlib import Path
+from typing import Optional, Tuple
+
+import numpy as np
+import pytorch_lightning as pl
+from pyprojroot import here
+from skimage.transform import downscale_local_mean
+from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
+from torchvision.datasets import MNIST
+
+from rbig_jax.custom_types import ImageShape
+from rbig_jax.data import GenericDataset
+from rbig_jax.transforms.reshape import flatten_image, unflatten_image
 
 root = here(project_files=[".here"])
 
@@ -26,6 +28,7 @@ class MNISTDataModule(pl.LightningDataModule):
         flatten: bool = True,
         subset: Optional[int] = None,
         dataset_dir: str = None,
+        downscale_factor: Optional[int] = None,
     ):
 
         self.val_split = val_split
@@ -37,6 +40,7 @@ class MNISTDataModule(pl.LightningDataModule):
         if dataset_dir is None:
             dataset_dir = str(Path(root).joinpath("datasets/mnist"))
         self.dataset_dir = dataset_dir
+        self.downscale_factor = downscale_factor
 
     def prepare_data(self):
         # download
@@ -56,6 +60,16 @@ class MNISTDataModule(pl.LightningDataModule):
 
         if self.subset is not None:
             Xtrain = Xtrain[: self.subset]
+
+        if self.downscale_factor:
+            Xtrain = downscale_local_mean(
+                Xtrain, (1, self.downscale_factor, self.downscale_factor, 1)
+            )
+            _, H, W, C = Xtrain.shape
+            self.image_shape = ImageShape(C=C, H=H, W=W)
+            Xval = downscale_local_mean(
+                Xval, (1, self.downscale_factor, self.downscale_factor, 1)
+            )
 
         if self.flatten:
             Xtrain = flatten_image(Xtrain, self.image_shape, batch=True)

@@ -6,32 +6,57 @@ from argparse import ArgumentParser
 from functools import partial
 
 import chex
+import corner
 import jax
+# ================================
+# TRAINING
+# ================================
 import jax.numpy as jnp
-import numpy as np
-
+# =======================
+# Save Model
+# =======================
+import joblib
 # plot methods
 import matplotlib.pyplot as plt
-from matplotlib import cm
+import numpy as np
 import seaborn as sns
-import corner
-
-sns.reset_defaults()
-sns.set_context(context="poster", font_scale=0.7)
-
 # logging
 import tqdm
 import wandb
 from celluloid import Camera
 from jax import device_put, random
 from jax.config import config
+from jax.experimental import optimizers
+from matplotlib import cm
 from pyprojroot import here
 from sklearn import datasets
 from sklearn.preprocessing import StandardScaler
+# ==========================
+# Train-Test Split
+# ==========================
+from torch.utils.data import DataLoader
 from wandb.sdk import wandb_config
 
+# LOG PROBABILITY
+# ======================
+# Dataset
+# ======================
+from rbig_jax.data import add_dataset_args, generate_2d_grid
+# ======================
+# Model
+# ======================
 # library functions
-from rbig_jax.models.gaussflow import GaussianizationFlow, init_default_gf_model
+from rbig_jax.models.gaussflow import (GaussianizationFlow, add_gf_model_args,
+                                       init_default_gf_model)
+# ======================
+# Model Training
+# ======================
+from rbig_jax.training.parametric import add_gf_train_args
+
+sns.reset_defaults()
+sns.set_context(context="poster", font_scale=0.7)
+
+
 
 
 # spyder up to find the root
@@ -56,10 +81,6 @@ parser = ArgumentParser(
     description="2D Data Demo with Iterative Gaussianization method"
 )
 
-# ======================
-# Dataset
-# ======================
-from rbig_jax.data import add_dataset_args
 
 parser = add_dataset_args(parser)
 
@@ -71,17 +92,9 @@ parser.add_argument(
     "--standardize", type=bool, default=True, help="Standardize Input Training Data"
 )
 
-# ======================
-# Model
-# ======================
-from rbig_jax.models.gaussflow import add_gf_model_args
 
 parser = add_gf_model_args(parser)
 
-# ======================
-# Model Training
-# ======================
-from rbig_jax.training.parametric import add_gf_train_args
 
 parser = add_gf_train_args(parser)
 
@@ -146,10 +159,6 @@ ds_train = PlaneDataset(n_samples=args.n_train, noise=args.noise, seed=args.seed
 ds_valid = PlaneDataset(n_samples=args.n_valid, noise=args.noise, seed=args.seed + 1)
 ds_plot = PlaneDataset(n_samples=1_000_000, noise=args.noise, seed=args.seed + 2)
 
-# ==========================
-# Train-Test Split
-# ==========================
-from torch.utils.data import DataLoader
 
 # initialize dataloader
 batch_size = 256
@@ -209,7 +218,6 @@ wandb.log({"initial_latent": wandb.Image(plt)})
 #  TRAINING
 # ==========================
 
-from jax.experimental import optimizers
 
 
 if args.optimizer == "adam":
@@ -249,10 +257,6 @@ def train_op(i, opt_state, inputs):
 
 train_op = jax.jit(train_op)
 
-# ================================
-# TRAINING
-# ================================
-import jax.numpy as jnp
 
 train_losses = list()
 valid_losses = list()
@@ -390,8 +394,6 @@ X_approx = final_bijector.inverse(X_trans)
 fig = corner.corner(X_approx, color="green")
 wandb.log({"inverse_space": wandb.Image(plt)})
 
-# LOG PROBABILITY
-from rbig_jax.data import generate_2d_grid
 
 cmap = cm.magma  # "Reds"
 X_plot = ds_plot[:]
@@ -434,10 +436,6 @@ ax.set(
 )
 plt.tight_layout()
 wandb.log({"estimated_density": wandb.Image(plt)})
-# =======================
-# Save Model
-# =======================
-import joblib
 
 model_save_name = os.path.join(wandb.run.dir, "trained_model.pckl")
 joblib.dump(final_bijector, model_save_name)

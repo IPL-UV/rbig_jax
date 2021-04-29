@@ -1,13 +1,14 @@
-from typing import List, Tuple, Optional
-from rbig_jax.losses import IterativeInfoLoss, init_info_loss
+import time
+from typing import List, Optional, Tuple
+
 import jax
 import jax.numpy as jnp
-
-from rbig_jax.transforms.block import RBIGBlockInit
 from chex import Array, dataclass
-from rbig_jax.models import GaussianizationFlow
 from distrax._src.distributions.normal import Normal
-import time
+
+from rbig_jax.losses import IterativeInfoLoss, init_info_loss
+from rbig_jax.models import GaussianizationFlow
+from rbig_jax.transforms.block import RBIGBlockInit
 
 
 def train_max_layers_model(

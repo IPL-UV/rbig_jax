@@ -1,12 +1,13 @@
-from typing import Optional, Tuple, Union, NamedTuple
+from typing import Callable, NamedTuple, Optional, Tuple, Union
 
 import jax.numpy as jnp
 import tensor_annotations.jax as tjax
 from chex import Array, dataclass
+from distrax._src.bijectors.bijector import Bijector as distaxBijector
 from einops import rearrange
 from jax.random import PRNGKey
 from tensor_annotations import axes
-from distrax._src.bijectors.bijector import Bijector as distaxBijector
+
 from rbig_jax.transforms.base import Bijector, TransformInfo
 
 Batch = axes.Batch
@@ -20,7 +21,6 @@ MLOutputs = tjax.Array2[Batch, Features]
 Outputs = Union[ImageOutput, MLOutputs]
 
 
-from typing import Callable
 
 
 class RescaleParams(NamedTuple):
@@ -496,8 +496,6 @@ def _get_new_shapes(
     return height, width, channels
 
 
-from einops import rearrange
-from typing import NamedTuple
 
 
 class ImageShape(NamedTuple):

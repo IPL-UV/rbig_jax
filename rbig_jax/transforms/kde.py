@@ -1,12 +1,12 @@
 from functools import partial
-from rbig_jax.transforms.base import InitFunctions, InitLayersFunctions
-from rbig_jax.transforms.marginal import MarginalUniformizeTransform
-from typing import Callable, Union, NamedTuple, Tuple
+from typing import Callable, NamedTuple, Tuple, Union
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
 
+from rbig_jax.transforms.base import InitFunctions, InitLayersFunctions
+from rbig_jax.transforms.marginal import MarginalUniformizeTransform
 from rbig_jax.utils import get_domain_extension
 
 

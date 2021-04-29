@@ -1,16 +1,16 @@
-from chex import Array, dataclass
-from rbig_jax.models.gaussflow import GaussianizationFlow
+from typing import Iterable, Optional, Tuple
 
-from typing import Optional, Iterable, Tuple
-
-from rbig_jax.transforms.base import Bijector
 import jax.numpy as jnp
+from chex import Array, dataclass
 from distrax._src.distributions.distribution import Distribution
+
+from rbig_jax.models.gaussflow import GaussianizationFlow
+from rbig_jax.transforms.base import Bijector
+from rbig_jax.transforms.block import RBIGBlockInit
 from rbig_jax.transforms.histogram import InitUniHistTransform
+from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
 from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.rotation import InitPCARotation
-from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
-from rbig_jax.transforms.block import RBIGBlockInit
 
 
 def init_default_rbig_block(
@@ -118,4 +118,3 @@ def RBIG(
         n_layers_remove=n_layers_remove,
     )
     return X_g, rbig_model
-

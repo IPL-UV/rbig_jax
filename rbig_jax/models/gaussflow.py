@@ -1,19 +1,23 @@
+import itertools
+from typing import Iterable
+
+import corner
+import jax
 import jax.numpy as jnp
 import numpy as np
-from typing import Iterable
-from chex import Array, dataclass
-from rbig_jax.transforms.base import BijectorChain, Bijector
-from distrax._src.distributions.distribution import Distribution
-from rbig_jax.transforms.parametric.mixture.logistic import InitMixtureLogisticCDF
-from rbig_jax.transforms.parametric.mixture.gaussian import InitMixtureGaussianCDF
-from rbig_jax.transforms.logit import InitLogitTransform
-from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
-from rbig_jax.transforms.parametric.householder import InitHouseHolder
-import jax
-import corner
-from distrax._src.distributions.normal import Normal
 import tqdm
-import itertools
+from chex import Array, dataclass
+from distrax._src.distributions.distribution import Distribution
+from distrax._src.distributions.normal import Normal
+
+from rbig_jax.transforms.base import Bijector, BijectorChain
+from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
+from rbig_jax.transforms.logit import InitLogitTransform
+from rbig_jax.transforms.parametric.householder import InitHouseHolder
+from rbig_jax.transforms.parametric.mixture.gaussian import \
+    InitMixtureGaussianCDF
+from rbig_jax.transforms.parametric.mixture.logistic import \
+    InitMixtureLogisticCDF
 
 
 @dataclass

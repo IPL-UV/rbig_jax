@@ -1,8 +1,10 @@
-from chex import Array, dataclass
+from typing import Callable, NamedTuple, Optional
+
 import jax
 import jax.numpy as jnp
+from chex import Array, dataclass
+
 from rbig_jax.information.total_corr import init_information_reduction_loss
-from typing import Callable, NamedTuple, Optional
 
 
 class IterativeLoss(NamedTuple):

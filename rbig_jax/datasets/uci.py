@@ -1,11 +1,13 @@
-import pytorch_lightning as pl
-from rbig_jax.data import GenericDataset
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
 from pathlib import Path
-from pyprojroot import here
+
 import numpy as np
+import pandas as pd
+import pytorch_lightning as pl
+from pyprojroot import here
+from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader
+
+from rbig_jax.data import GenericDataset
 
 # spyder up to find the root
 root = here(project_files=[".here"])

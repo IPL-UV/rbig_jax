@@ -7,8 +7,8 @@ import numpy as np
 import tqdm
 from chex import dataclass
 from distrax._src.distributions import distribution as dist_base
-from jax import scipy as jscipy
 from distrax._src.utils.math import sum_last
+from jax import scipy as jscipy
 from jax.experimental import optimizers
 
 DistributionLike = dist_base.DistributionLike

@@ -1,8 +1,10 @@
-from sklearn.mixture import GaussianMixture
-import numpy as np
-import jax.numpy as jnp
 import jax
+import jax.numpy as jnp
+import numpy as np
 import tensorflow_probability.substrates.jax as tfp
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+
 from rbig_jax.transforms.kde import scotts_method
 
 
@@ -53,8 +55,6 @@ def softplus_inverse(x):
     return jnp.log(jnp.exp(x) - 1.0)
 
 
-from sklearn.cluster import KMeans
-import numpy as np
 
 
 def init_means_kmeans_marginal(X: np.ndarray, n_components: int, **kwargs):
