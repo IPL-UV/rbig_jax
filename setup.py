@@ -24,49 +24,41 @@ DESCRIPTION = "Gaussianization with JAX."
 URL = "https://github.com/ipl-uv/rbig_jax"
 EMAIL = "jemanjohnson34@gmail.com"
 AUTHOR = "J. Emmanuel Johnson"
-REQUIRES_PYTHON = ">=3.7.0"
+REQUIRES_PYTHON = ">=3.8"
 VERSION = "0.1.0"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    # Standard Libraries
     "numpy>=1.19", "scipy>=1.5", "scikit-learn>=0.23",
-    # JAX Libraries
     "jax>=0.2.11",
     "jaxlib>=0.1.62",
-    "numpyro",
-    "chex",
-    "optax",
+    "numpyro>=0.6.0",
+    "chex>=0.0.6",
+    "optax>=0.0.6",
     "distrax>=0.0.1",
     "tfp-nightly",
-    "tqdm",
-    "einops",
-    "tensor_annotations",
-    "scikit-image",
-    # PyTorch and Co
+    "tqdm>=4.60.0",
+    "einops>=0.3.0",
+    "scikit-image>=0.18.1",
     "torch>=1.6",
     "torchvision>=0.9",
     "torchaudio>=0.8",
     "torchmetrics>=0.2.0",
     "pytorch-lightning>=1.2",
     "lightning-bolts>=0.3",
-    # Testing & Formatting
     "black",
-    "flake8",
+    "flake8>=3.9.1",
     "isort>=5.0",
-    "pytest>4.1",
-    # Jupyter Notebooks
-    "ipykernel",
-    "nb_black",
+    "pytest>=4.1",
+    "ipykernel>=5.5.3",
+    "nb_black>=1.0.7",
     "pyprojroot",
-    # Logging
-    "loguru",
-    "wandb,"
-    # Plot Libraries
+    "loguru>=0.5.3",
+    "wandb>=0.10.27",
     "matplotlib>=3.3",
-    "seaborn",
-    "celluloid",
-    "corner",
+    "seaborn>=0.11.1",
+    "celluloid>=0.2.0",
+    "corner>=2.2.1",
 ]
 
 # What packages are optional?
@@ -147,7 +139,7 @@ setup(
     long_description_content_type="text/markdown",
     author=AUTHOR,
     author_email=EMAIL,
-    python_requires=REQUIRES_PYTHON,
+    # python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     # If your package is a single module, use this instead of 'packages':
@@ -155,8 +147,8 @@ setup(
     # entry_points={
     #     'console_scripts': ['mycli=mymodule:cli'],
     # },
-#     setup_requires=["setuptools-yaml"],
-#     metadata_yaml="environment.yml",
+    setup_requires=["setuptools-yaml"],
+    # metadata_yaml="requrirements/environment.yml",
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,

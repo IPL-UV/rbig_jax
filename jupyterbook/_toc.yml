@@ -12,9 +12,9 @@
 - part: Parametric Gaussianization
   chapters: 
   - file: content/public/gf_demo_plane.md
+  - file: content/public/gf_building_blocks.md
+  - file: content/public/wandb_integration.ipynb
 
 - part: Exploration
   chapters: 
-  - file: content/experimental/overview.md
-    sections:
-    - file: literature
+  - file: content/literature.md
