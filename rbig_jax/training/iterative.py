@@ -54,7 +54,7 @@ def train_max_layers_model(
     while ilayer < max_layers:
 
         # fit RBIG block
-        X_g, ibijector = rbig_block.forward_and_params(X_g)
+        X_g, ibijector = rbig_block.forward_and_bijector(X_g)
 
         # append bijectors
         bijectors += ibijector
@@ -151,7 +151,7 @@ def train_info_loss_model(
         layer_loss = jax.partial(loss_f, X_before=X_g)
 
         # fit RBIG block
-        X_g, ibijector = rbig_block_init.forward_and_params(X_g)
+        X_g, ibijector = rbig_block_init.forward_and_bijector(X_g)
 
         # get information reduction
         layer_loss = layer_loss(X_after=X_g)

@@ -47,7 +47,7 @@ class MixtureGaussianCDF(Bijector):
 
 
 def InitMixtureGaussianCDF(
-    n_components: int, init_method: str = "standard",
+    n_components: int, init_method: str = "standard", seed: int = 123
 ) -> Callable:
     """Performs the householder transformation.
 
@@ -61,11 +61,11 @@ def InitMixtureGaussianCDF(
         the number of householder reflections
     """
 
-    def init_bijector(
-        rng: PRNGKey, n_features: int, inputs=None, **kwargs
+    def bijector(
+        inputs, n_features: int, rng: PRNGKey = None, **kwargs
     ) -> MixtureGaussianCDF:
         prior_logits, means, log_scales = init_mixture_weights(
-            rng=rng,
+            rng=seed if rng is None else rng,
             n_features=n_features,
             n_components=n_components,
             method=init_method,
@@ -78,36 +78,67 @@ def InitMixtureGaussianCDF(
 
         return bijector
 
-    def bijector_and_transform(
-        rng: PRNGKey, n_features: int, inputs: Array, **kwargs
+    def transform_and_bijector(
+        inputs, n_features: int, rng: PRNGKey = None, **kwargs
     ) -> MixtureGaussianCDF:
-
-        # init bijector
-        bijector = init_bijector(
-            rng=rng, n_features=n_features, inputs=inputs, **kwargs
+        prior_logits, means, log_scales = init_mixture_weights(
+            rng=seed if rng is None else rng,
+            n_features=n_features,
+            n_components=n_components,
+            method=init_method,
+            X=inputs,
         )
 
+        bijector = MixtureGaussianCDF(
+            means=means, log_scales=log_scales, prior_logits=prior_logits
+        )
         # forward transform
         outputs = bijector.forward(inputs=inputs)
         return outputs, bijector
 
     def transform(
-        rng: PRNGKey, n_features: int, inputs: Array, **kwargs
+        inputs, n_features: int, rng: PRNGKey = None, **kwargs
     ) -> MixtureGaussianCDF:
 
-        # init bijector
-        outputs = init_bijector(
-            rng=rng, n_features=n_features, inputs=inputs, **kwargs
-        ).forward(inputs=inputs)
+        prior_logits, means, log_scales = init_mixture_weights(
+            rng=seed if rng is None else rng,
+            n_features=n_features,
+            n_components=n_components,
+            method=init_method,
+            X=inputs,
+        )
+
+        bijector = MixtureGaussianCDF(
+            means=means, log_scales=log_scales, prior_logits=prior_logits
+        )
+        # forward transform
+        outputs = bijector.forward(inputs=inputs)
 
         return outputs
 
+    def transform_gradient_bijector(
+        inputs, n_features: int, rng: PRNGKey = None, **kwargs
+    ) -> MixtureGaussianCDF:
+        prior_logits, means, log_scales = init_mixture_weights(
+            rng=seed if rng is None else rng,
+            n_features=n_features,
+            n_components=n_components,
+            method=init_method,
+            X=inputs,
+        )
+
+        bijector = MixtureGaussianCDF(
+            means=means, log_scales=log_scales, prior_logits=prior_logits
+        )
+        # forward transform
+        outputs, logabsdet = bijector.forward_and_log_Det(inputs=inputs)
+        return outputs, logabsdet, bijector
+
     return InitLayersFunctions(
-        bijector=init_bijector,
-        bijector_and_transform=bijector_and_transform,
         transform=transform,
-        params=None,
-        params_and_transform=None,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
     )
 
 

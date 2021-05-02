@@ -79,36 +79,42 @@ def InitPCARotation(jitted=False):
         f = jax.jit(f)
         f_slim = jax.jit(f_slim)
 
-    def init_params(inputs, **kwargs):
-        _, params = f(inputs)
-        return params
-
-    def params_and_transform(inputs, **kwargs):
-
-        outputs, params = f(inputs)
-        return outputs, params
-
     def transform(inputs, **kwargs):
+        params = f(inputs, **kwargs)
 
-        outputs = f_slim(inputs)
+        outputs = Rotation(rotation=params.rotation).forward(inputs)
         return outputs
 
+        outputs = f(inputs)
+
     def bijector(inputs, **kwargs):
-        params = init_params(inputs, **kwargs)
-        bijector = Rotation(rotation=params.rotation,)
+        params = f(inputs, **kwargs)
+
+        bijector = Rotation(rotation=params.rotation)
         return bijector
 
-    def bijector_and_transform(inputs, **kwargs):
-        outputs, params = params_and_transform(inputs, **kwargs)
-        bijector = Rotation(rotation=params.rotation,)
+    def transform_and_bijector(inputs, **kwargs):
+        params = f(inputs, **kwargs)
+
+        bijector = Rotation(rotation=params.rotation)
+
+        outputs = bijector.forward(inputs)
         return outputs, bijector
 
+    def transform_gradient_bijector(inputs, **kwargs):
+        params = f(inputs, **kwargs)
+
+        bijector = Rotation(rotation=params.rotation)
+
+        outputs, logabsdet = bijector.forward_and_log_det(inputs)
+
+        return outputs, logabsdet, bijector
+
     return InitLayersFunctions(
-        bijector=bijector,
-        bijector_and_transform=bijector_and_transform,
         transform=transform,
-        params=init_params,
-        params_and_transform=params_and_transform,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
     )
 
 
@@ -164,18 +170,12 @@ def InitRandomRotation(rng: PRNGKey, jitted=False):
     )
 
 
-def get_pca_params(
-    inputs: Array, full_matrices: bool = False, return_params: bool = True
-) -> Array:
+def get_pca_params(inputs: Array, full_matrices: bool = False, **kwargs) -> Array:
 
     # rotation
     rotation = compute_projection(inputs, full_matrices=full_matrices)
-    outputs = jnp.dot(inputs, rotation)
 
-    if return_params:
-        return outputs, RotationParams(rotation=rotation)
-    else:
-        return outputs
+    return RotationParams(rotation=rotation)
 
 
 def get_random_rotation(
@@ -186,13 +186,7 @@ def get_random_rotation(
     rotation = jax.nn.initializers.orthogonal()(
         key=rng, shape=(inputs.shape[1], inputs.shape[1])
     )
-    # compute dot product
-    outputs = jnp.dot(inputs, rotation)
-
-    if return_params:
-        return outputs, RotationParams(rotation=rotation)
-    else:
-        return outputs
+    return RotationParams(rotation=rotation)
 
 
 def compute_projection(X: jnp.ndarray, full_matrices: bool = False) -> jnp.ndarray:

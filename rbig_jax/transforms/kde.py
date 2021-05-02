@@ -37,60 +37,63 @@ def InitUniKDETransform(
         return_params=True,
     )
 
-    f_slim = jax.partial(
-        init_kde_params,
-        support_extension=support_extension,
-        precision=precision,
-        bw=bw,
-        return_params=False,
-    )
     if jitted:
         f = jax.jit(f)
-        f_slim = jax.jit(f_slim)
-
-    def params_and_transform(inputs, **kwargs):
-
-        outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
-        return outputs, params
-
-    def init_params(inputs, **kwargs):
-
-        _, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
-        return params
 
     def transform(inputs, **kwargs):
 
-        outputs = jax.vmap(f_slim, out_axes=1, in_axes=(1,))(inputs)
+        params = jax.vmap(f, out_axes=0, in_axes=(1,))(inputs)
+        bijector = MarginalUniformizeTransform(
+            support=params.support,
+            quantiles=params.quantiles,
+            support_pdf=params.support,
+            empirical_pdf=params.empirical_pdf,
+        )
+        outputs = bijector.forward(inputs)
+
         return outputs
 
-    def bijector_and_transform(inputs, **kwargs):
-        outputs, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(inputs)
-
+    def bijector(inputs, **kwargs):
+        params = jax.vmap(f, out_axes=0, in_axes=(1,))(inputs)
         bijector = MarginalUniformizeTransform(
             support=params.support,
             quantiles=params.quantiles,
             support_pdf=params.support_pdf,
             empirical_pdf=params.empirical_pdf,
         )
+        outputs = bijector.forward(inputs)
+
         return outputs, bijector
 
-    def bijector(X, **kwargs):
-        _, params = jax.vmap(f, out_axes=(1, 0), in_axes=(1,))(X)
-
+    def transform_and_bijector(inputs, **kwargs):
+        params = jax.vmap(f, out_axes=0, in_axes=(1,))(inputs)
         bijector = MarginalUniformizeTransform(
             support=params.support,
             quantiles=params.quantiles,
             support_pdf=params.support_pdf,
             empirical_pdf=params.empirical_pdf,
         )
-        return bijector
+        outputs = bijector.forward(inputs)
+
+        return outputs, bijector
+
+    def transform_gradient_bijector(inputs, **kwargs):
+        params = jax.vmap(f, out_axes=0, in_axes=(1,))(inputs)
+        bijector = MarginalUniformizeTransform(
+            support=params.support,
+            quantiles=params.quantiles,
+            support_pdf=params.support_pdf,
+            empirical_pdf=params.empirical_pdf,
+        )
+        outputs, logabsdet = bijector.forward_and_log_det(inputs)
+
+        return outputs, logabsdet, bijector
 
     return InitLayersFunctions(
-        bijector=bijector,
-        bijector_and_transform=bijector_and_transform,
         transform=transform,
-        params=init_params,
-        params_and_transform=params_and_transform,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
     )
 
 
@@ -113,22 +116,12 @@ def init_kde_params(
 
     quantiles = broadcast_kde_cdf(support, X, factor)
 
-    # forward transformation
-    outputs = jnp.interp(X, support, quantiles)
-
-    if return_params is True:
-
-        # initialize parameters
-        params = UniKDEParams(
-            support=support,
-            quantiles=quantiles,
-            support_pdf=support,
-            empirical_pdf=pdf_support,
-        )
-
-        return outputs, params
-    else:
-        return outputs
+    return UniKDEParams(
+        support=support,
+        quantiles=quantiles,
+        support_pdf=support,
+        empirical_pdf=pdf_support,
+    )
 
 
 def kde_transform(

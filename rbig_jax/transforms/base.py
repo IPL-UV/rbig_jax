@@ -1,6 +1,5 @@
 import abc
-from typing import (Callable, Iterable, List, NamedTuple, Optional, Sequence,
-                    Tuple)
+from typing import Callable, Iterable, List, NamedTuple, Optional, Sequence, Tuple
 
 import jax
 import jax.numpy as jnp
@@ -91,17 +90,9 @@ class NonTrainableBijector(jittable.Jittable, metaclass=abc.ABCMeta):
 
 class InitLayersFunctions(NamedTuple):
     bijector: Optional[Callable]
-    bijector_and_transform: Optional[Callable]
+    transform_and_bijector: Optional[Callable]
     transform: Optional[Callable]
-    params: Optional[Callable]
-    params_and_transform: Optional[Callable]
-
-
-class InitFunctionsPlus(NamedTuple):
-    init_params: Callable
-    init_bijector: Callable
-    init_transform: Callable
-    init_layer: Callable
+    transform_gradient_bijector: Optional[Callable]
 
 
 @dataclass(frozen=True)

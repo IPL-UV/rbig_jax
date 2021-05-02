@@ -4,13 +4,15 @@ import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
 from distrax._src.bijectors.inverse import Inverse
-from distrax._src.bijectors.sigmoid import (Sigmoid, _more_stable_sigmoid,
-                                            _more_stable_softplus)
+from distrax._src.bijectors.sigmoid import (
+    Sigmoid,
+    _more_stable_sigmoid,
+    _more_stable_softplus,
+)
 from jax.nn import sigmoid, softplus
 from jax.random import PRNGKey
 
-from rbig_jax.transforms.base import (Bijector, InitFunctionsPlus,
-                                      InitLayersFunctions)
+from rbig_jax.transforms.base import Bijector, InitLayersFunctions
 
 EPS = 1e-5
 TEMPERATURE = 1.0
@@ -64,31 +66,32 @@ def InitSigmoidTransform(jitted: bool = False):
     else:
         f = Sigmoid().forward
 
-    def init_bijector(inputs, **kwargs):
+    def transform(inputs, **kwargs):
+
+        outputs = f(inputs)
+
+        return outputs
+
+    def bijector(inputs=None, **kwargs):
 
         return Sigmoid()
 
-    def bijector_and_transform(inputs, **kwargs):
+    def transform_and_bijector(inputs, **kwargs):
         outputs = f(inputs)
         return outputs, Sigmoid()
 
-    def transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs
+    def transform_gradient_bijector(inputs, **kwargs):
+        bijector = Sigmoid()
 
-    def params(inputs, **kwargs):
-        return ()
+        outputs, logabsdet = bijector.forward_and_log_det(inputs)
 
-    def params_and_transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs, ()
+        return outputs, logabsdet, bijector
 
     return InitLayersFunctions(
-        bijector=init_bijector,
-        bijector_and_transform=bijector_and_transform,
         transform=transform,
-        params=params,
-        params_and_transform=params_and_transform,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
     )
 
 
@@ -99,64 +102,30 @@ def InitLogitTransform(jitted: bool = False):
     else:
         f = Inverse(Sigmoid()).forward
 
-    def init_bijector(inputs, **kwargs):
+    def transform(inputs, **kwargs):
+
+        outputs = f(inputs)
+
+        return outputs
+
+    def bijector(inputs=None, **kwargs):
 
         return Inverse(Sigmoid())
 
-    def bijector_and_transform(inputs, **kwargs):
+    def transform_and_bijector(inputs, **kwargs):
         outputs = f(inputs)
         return outputs, Inverse(Sigmoid())
 
-    def transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs
+    def transform_gradient_bijector(inputs, **kwargs):
+        bijector = Inverse(Sigmoid())
 
-    def params(inputs, **kwargs):
-        return ()
+        outputs, logabsdet = bijector.forward_and_log_det(inputs)
 
-    def params_and_transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs, ()
+        return outputs, logabsdet, bijector
 
     return InitLayersFunctions(
-        bijector=init_bijector,
-        bijector_and_transform=bijector_and_transform,
         transform=transform,
-        params=params,
-        params_and_transform=params_and_transform,
-    )
-
-
-def InitInverseLogisticTransform(jitted: bool = False):
-
-    if jitted:
-        f = jax.jit(Inverse(Sigmoid()).forward)
-    else:
-        f = Inverse(Sigmoid()).forward
-
-    def init_bijector(inputs, **kwargs):
-
-        return Inverse(Sigmoid())
-
-    def bijector_and_transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs, Inverse(Sigmoid())
-
-    def transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs
-
-    def params(inputs, **kwargs):
-        return ()
-
-    def params_and_transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs, ()
-
-    return InitLayersFunctions(
-        bijector=init_bijector,
-        bijector_and_transform=bijector_and_transform,
-        transform=transform,
-        params=params,
-        params_and_transform=params_and_transform,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
     )
