@@ -10,6 +10,7 @@ from jax.scipy.special import logsumexp
 from rbig_jax.transforms.base import Bijector, InitLayersFunctions
 from rbig_jax.transforms.parametric.mixture.init import init_mixture_weights
 from rbig_jax.utils import bisection_search
+from distrax import Normal
 
 
 @dataclass
@@ -32,6 +33,22 @@ class MixtureGaussianCDF(Bijector):
 
         return outputs, logabsdet  # .sum(axis=1)
 
+    def forward(self, inputs: Array, **kwargs) -> Array:
+        # forward transformation with batch dimension
+        outputs = mixture_gaussian_cdf(
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
+        )
+        return outputs
+
+    def forward_log_det_jacobian(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
+
+        # log abs det, all zeros
+        logabsdet = mixture_gaussian_log_pdf(
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
+        )
+
+        return logabsdet  # .sum(axis=1)
+
     def inverse_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
 
         # transformation
@@ -44,6 +61,15 @@ class MixtureGaussianCDF(Bijector):
         )
 
         return outputs, logabsdet  # .sum(axis=1)
+
+    def inverse(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
+
+        # transformation
+        outputs = mixture_gaussian_invcdf_vectorized(
+            inputs, self.prior_logits, self.means, softplus(self.log_scales),
+        )
+
+        return outputs  # .sum(axis=1)
 
 
 def InitMixtureGaussianCDF(
@@ -62,11 +88,11 @@ def InitMixtureGaussianCDF(
     """
 
     def bijector(
-        inputs, n_features: int, rng: PRNGKey = None, **kwargs
+        inputs, n_features: int = None, rng: PRNGKey = None, **kwargs
     ) -> MixtureGaussianCDF:
         prior_logits, means, log_scales = init_mixture_weights(
-            rng=seed if rng is None else rng,
-            n_features=n_features,
+            seed=seed if rng is None else rng,
+            n_features=n_features if n_features is not None else inputs.shape[1],
             n_components=n_components,
             method=init_method,
             X=inputs,
@@ -79,11 +105,11 @@ def InitMixtureGaussianCDF(
         return bijector
 
     def transform_and_bijector(
-        inputs, n_features: int, rng: PRNGKey = None, **kwargs
+        inputs, n_features: int = None, rng: PRNGKey = None, **kwargs
     ) -> MixtureGaussianCDF:
         prior_logits, means, log_scales = init_mixture_weights(
             rng=seed if rng is None else rng,
-            n_features=n_features,
+            n_features=n_features if n_features is not None else inputs.shape[1],
             n_components=n_components,
             method=init_method,
             X=inputs,
@@ -97,12 +123,12 @@ def InitMixtureGaussianCDF(
         return outputs, bijector
 
     def transform(
-        inputs, n_features: int, rng: PRNGKey = None, **kwargs
+        inputs, n_features: int = None, rng: PRNGKey = None, **kwargs
     ) -> MixtureGaussianCDF:
 
         prior_logits, means, log_scales = init_mixture_weights(
             rng=seed if rng is None else rng,
-            n_features=n_features,
+            n_features=n_features if n_features is not None else inputs.shape[1],
             n_components=n_components,
             method=init_method,
             X=inputs,
@@ -117,11 +143,11 @@ def InitMixtureGaussianCDF(
         return outputs
 
     def transform_gradient_bijector(
-        inputs, n_features: int, rng: PRNGKey = None, **kwargs
+        inputs, n_features: int = None, rng: PRNGKey = None, **kwargs
     ) -> MixtureGaussianCDF:
         prior_logits, means, log_scales = init_mixture_weights(
             rng=seed if rng is None else rng,
-            n_features=n_features,
+            n_features=n_features if n_features is not None else inputs.shape[1],
             n_components=n_components,
             method=init_method,
             X=inputs,
@@ -161,15 +187,15 @@ def mixture_gaussian_cdf(
 
     x = jnp.expand_dims(x, axis=-1)
 
-    # normalize
-    x = (x - means) / scales
+    base_dist = Normal(loc=means, scale=scales)
+
+    # # normalize
+    # x = (x - means) / scales
 
     # normalize prior logits
     prior_logits = jax.nn.log_softmax(prior_logits, axis=-1)
 
-    log_cdfs = prior_logits + jax.scipy.stats.norm.logcdf(
-        x
-    )  # jax.scipy.special.log_ndtr(x)
+    log_cdfs = prior_logits + base_dist.log_cdf(x)  # jax.scipy.special.log_ndtr(x)
 
     # calculate log cdf
     log_cdfs = jax.nn.logsumexp(log_cdfs, axis=-1)
@@ -237,12 +263,14 @@ def mixture_gaussian_log_pdf(
     # x_r = x.reshape(-1, 1)
     x = jnp.expand_dims(x, axis=-1)
 
-    x = (x - means) / scales
+    base_dist = Normal(loc=means, scale=scales)
+
+    # x = (x - means) / scales
     # normalize logit weights to 1, (D,K)->(D,K)
     prior_logits = log_softmax(prior_logits, axis=-1)
 
     # calculate the log pdf, (D,K)->(D,K)
-    log_pdfs = prior_logits + jax.scipy.stats.norm.logpdf(x)
+    log_pdfs = prior_logits + base_dist.log_prob(x)
 
     # normalize distribution for components, (D,K)->(D,)
     log_pdf = logsumexp(log_pdfs, axis=-1)

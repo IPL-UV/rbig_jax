@@ -8,10 +8,13 @@ from typing import Callable, Tuple
 import jax.numpy as jnp
 import jax.random as jr
 from chex import Array, dataclass
-from distrax._src.bijectors.rational_quadratic_spline import \
-    RationalQuadraticSpline as distrax_rqs
 from distrax._src.bijectors.rational_quadratic_spline import (
-    _rational_quadratic_spline_fwd, _rational_quadratic_spline_inv)
+    RationalQuadraticSpline as distrax_rqs,
+)
+from distrax._src.bijectors.rational_quadratic_spline import (
+    _rational_quadratic_spline_fwd,
+    _rational_quadratic_spline_inv,
+)
 from jax.nn import softmax, softplus
 from jax.random import PRNGKey
 
@@ -61,7 +64,7 @@ def InitPiecewiseRationalQuadraticCDF(
             f"Minimum knot slope must be positive; " f"Got {min_knot_slope}"
         )
 
-    def init_bijector(
+    def bijector(
         inputs: Array = None, rng: PRNGKey = None, shape: int = None, **kwargs
     ) -> Bijector:
 
@@ -78,37 +81,69 @@ def InitPiecewiseRationalQuadraticCDF(
 
         return bijector
 
-    def bijector_and_transform(
-        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+    def transform_and_bijector(
+        inputs: Array = None, rng: PRNGKey = None, shape: int = None, **kwargs
     ) -> Tuple[Array, Bijector]:
 
         # init bijector
-        bijector = init_bijector(
-            rng=rng, n_features=n_features, inputs=inputs, **kwargs,
+        bijector = init_spline_params(
+            n_bins=n_bins,
+            rng=rng,
+            shape=shape,
+            identity_init=identity_init,
+            min_knot_slope=min_knot_slope,
+            range_min=range_min,
+            range_max=range_max,
+            boundary_slopes=boundary_slopes,
         )
-
         # forward transform
         outputs = bijector.forward(inputs=inputs)
 
         return outputs, bijector
 
     def transform(
-        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+        inputs: Array = None, rng: PRNGKey = None, shape: int = None, **kwargs
     ) -> Array:
 
         # init bijector
-        outputs = init_bijector(
-            rng=rng, n_features=n_features, inputs=inputs, **kwargs,
-        ).forward(inputs=inputs)
+        bijector = init_spline_params(
+            n_bins=n_bins,
+            rng=rng,
+            shape=shape,
+            identity_init=identity_init,
+            min_knot_slope=min_knot_slope,
+            range_min=range_min,
+            range_max=range_max,
+            boundary_slopes=boundary_slopes,
+        )
+        outputs = bijector.forward(inputs=inputs)
 
         return outputs
 
+    def transform_gradient_bijector(
+        inputs: Array = None, rng: PRNGKey = None, shape: int = None, **kwargs
+    ) -> Array:
+
+        # init bijector
+        bijector = init_spline_params(
+            n_bins=n_bins,
+            rng=rng,
+            shape=shape,
+            identity_init=identity_init,
+            min_knot_slope=min_knot_slope,
+            range_min=range_min,
+            range_max=range_max,
+            boundary_slopes=boundary_slopes,
+        )
+        outputs, logabsdet = bijector.forward_and_log_det(inputs=inputs)
+
+        return outputs, logabsdet, bijector
+
     return InitLayersFunctions(
-        bijector=init_bijector,
-        bijector_and_transform=bijector_and_transform,
         transform=transform,
-        params=None,
-        params_and_transform=None,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
     )
 
 

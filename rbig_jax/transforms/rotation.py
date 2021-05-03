@@ -3,9 +3,12 @@ from typing import NamedTuple, Tuple
 
 import jax
 import jax.numpy as jnp
+import numpy as np
 from chex import Array, dataclass
 from chex._src.pytypes import PRNGKey
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
+from sklearn.decomposition import FastICA
+from scipy.linalg import sqrtm
 
 from rbig_jax.transforms.base import InitFunctions, InitLayersFunctions
 
@@ -73,11 +76,52 @@ def InitPCARotation(jitted=False):
 
     f = jax.partial(get_pca_params, return_params=True,)
 
-    f_slim = jax.partial(get_pca_params, return_params=False,)
-
     if jitted:
         f = jax.jit(f)
-        f_slim = jax.jit(f_slim)
+
+    def transform(inputs, **kwargs):
+        params = f(inputs, **kwargs)
+
+        outputs = Rotation(rotation=params.rotation).forward(inputs)
+        return outputs
+
+        outputs = f(inputs)
+
+    def bijector(inputs, **kwargs):
+        params = f(inputs, **kwargs)
+
+        bijector = Rotation(rotation=params.rotation)
+        return bijector
+
+    def transform_and_bijector(inputs, **kwargs):
+        params = f(inputs, **kwargs)
+
+        bijector = Rotation(rotation=params.rotation)
+
+        outputs = bijector.forward(inputs)
+        return outputs, bijector
+
+    def transform_gradient_bijector(inputs, **kwargs):
+        params = f(inputs, **kwargs)
+
+        bijector = Rotation(rotation=params.rotation)
+
+        outputs, logabsdet = bijector.forward_and_log_det(inputs)
+
+        return outputs, logabsdet, bijector
+
+    return InitLayersFunctions(
+        transform=transform,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
+    )
+
+
+def InitICARotation(jitted=False):
+    # create marginal functions
+
+    f = jax.partial(get_ica_params)
 
     def transform(inputs, **kwargs):
         params = f(inputs, **kwargs)
@@ -176,6 +220,20 @@ def get_pca_params(inputs: Array, full_matrices: bool = False, **kwargs) -> Arra
     rotation = compute_projection(inputs, full_matrices=full_matrices)
 
     return RotationParams(rotation=rotation)
+
+
+def get_ica_params(inputs: Array, **kwargs) -> Array:
+
+    ica_clf = FastICA(random_state=123, whiten=False, max_iter=1_000, tol=0.01).fit(
+        np.array(inputs)
+    )
+
+    rotation = ica_clf.components_
+
+    # orthogonal
+    rotation = rotation @ np.linalg.inv(sqrtm(rotation.T @ rotation))
+
+    return RotationParams(rotation=jnp.array(rotation.T, dtype=inputs.dtype))
 
 
 def get_random_rotation(

@@ -84,8 +84,6 @@ def plot_info_loss(
         plt.show()
 
 
-
-
 def plot_image_grid(image, image_shape: Optional = None):
 
     fig = plt.figure(figsize=(10.0, 10.0))
