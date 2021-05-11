@@ -1,0 +1,22 @@
+program: experiments/natural_images/gf_mnist.py
+project: "gf_2d_data"
+entity: "ipl_uv"
+name : "gf_2d_moons"
+description : "Finding the Best parameters for 2D dataset with GF"
+method: grid
+metric: 
+  name: train_loss
+  goal: minimize
+parameters:
+  batch_size:
+    values: [64, 128]
+  model:
+    values: ["rqsplines"]
+  n_blocks:
+    values: [4, 5, 6]
+  n_bins:
+    values: [8, 16, 32]
+  n_reflections:
+    values: [10, 20, 50]
+  learning_rate:
+    values: [0.001]

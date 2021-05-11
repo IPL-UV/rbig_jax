@@ -5,7 +5,7 @@ import jax.numpy as np
 from chex import Array
 
 
-def histogram_entropy(data, base=2, nbins: int = 10):
+def histogram_entropy(data, nbins: int = 10):
     """Calculates the histogram entropy of 1D data.
     This function uses the histogram and then calculates
     the entropy. Does the miller-maddow correction
@@ -36,7 +36,7 @@ def histogram_entropy(data, base=2, nbins: int = 10):
     pk = 1.0 * np.array(counts) / np.sum(counts)
 
     # calculate the entropy
-    S = univariate_entropy(pk, base=base)
+    S = univariate_entropy(pk)
 
     # Miller Maddow Correction
     correction = 0.5 * (np.sum(counts > 0) - 1) / counts.sum()
@@ -44,17 +44,38 @@ def histogram_entropy(data, base=2, nbins: int = 10):
     return S + correction + np.log2(delta)
 
 
-def marginal_histogram_entropy_f(data, base: int = 2, nbins: int = 10):
-    return jax.vmap(jax.partial(histogram_entropy, base=base, nbins=nbins))
+def init_marginal_histogram_entropy(nbins: int = 10):
+    """A wrapper to create a marginal histogram transformation.
+    This makes it easier for jit compilation and it also
+    parallelizes the computations via `vmap`.
+
+    Parameters
+    ----------
+    base : int, optional
+        [description], by default 2
+    nbins : int, optional
+        [description], by default 10
+
+    Returns
+    -------
+    f : callable
+        a function to be called
+    """
+    return jax.vmap(jax.partial(histogram_entropy, nbins=nbins))
 
 
-def univariate_entropy(pk: np.ndarray, base: int = 2) -> np.ndarray:
-    """calculate the entropy
-    
-    Notes
-    -----
-    Source of this module is the scipy entropy
-    module which can be found - shorturl.at/pyABR
+def univariate_entropy(pk: np.ndarray) -> float:
+    """univariate entropies
+
+    Parameters
+    ----------
+    pk : np.ndarray
+        the normalized probabilities
+
+    Returns
+    -------
+    H : np.ndarray
+        the entropy (nats)
     """
     # calculate entropy
     vec = jax.scipy.special.entr(pk)
@@ -62,22 +83,17 @@ def univariate_entropy(pk: np.ndarray, base: int = 2) -> np.ndarray:
     # sum all values
     S = np.sum(vec)
 
-    # change base
-    S /= np.log(base)
-
     return S
 
 
 def get_default_entropy(n_samples: int):
     nbins = int(np.sqrt(n_samples))
-    entropy_f = jax.partial(histogram_entropy, nbins=nbins, base=2)
+    entropy_f = jax.partial(histogram_entropy, nbins=nbins)
 
     return entropy_f
 
 
-def rbig_multivariate_entropy(
-    X: Array, base: int = 2, nbins: Optional[int] = None, **kwargs
-):
+def rbig_multivariate_entropy(X: Array, nbins: Optional[int] = None, **kwargs):
 
     n_samples = X.shape[0]
 
@@ -85,10 +101,10 @@ def rbig_multivariate_entropy(
         nbins = int(np.sqrt(n_samples))
 
     # Calculate entropy in data domain
-    H_x = jax.vmap(histogram_entropy, in_axes=(1, None, None))(X, base, nbins).sum()
+    H_x = jax.vmap(histogram_entropy, in_axes=(1, None))(X, nbins).sum()
 
     from rbig_jax.information.total_corr import rbig_total_correlation
 
     # calculate the total correlation
-    tc = rbig_total_correlation(X=X, nbins=nbins, base=base, return_all=False, **kwargs)
+    tc = rbig_total_correlation(X=X, nbins=nbins, return_all=False, **kwargs)
     return H_x - tc

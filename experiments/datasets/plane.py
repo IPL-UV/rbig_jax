@@ -35,7 +35,7 @@ def add_dataset_args(parser):
     parser.add_argument(
         "--n_samples",
         type=int,
-        default=10_000,
+        default=5_000,
         help="number of data points for training",
     )
     parser.add_argument(

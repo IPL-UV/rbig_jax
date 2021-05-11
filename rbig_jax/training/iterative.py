@@ -91,7 +91,6 @@ def train_info_loss_model(
     loss: Optional[IterativeInfoLoss] = None,
     verbose: bool = True,
     interval: int = 5,
-    base: int = 2,
     p: float = 0.25,
     n_layers_remove: Optional[int] = 10,
     jitted: bool = True,
@@ -133,7 +132,6 @@ def train_info_loss_model(
             max_layers=max_layers,
             zero_tolerance=zero_tolerance,
             p=p,
-            base=base,
             jitted=jitted,
         )
     loss_f, condition, state, name = loss

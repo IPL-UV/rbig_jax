@@ -73,7 +73,6 @@ def RBIG(
     max_layers: int = 1_000,
     zero_tolerance: int = 30,
     p: float = 0.25,
-    base: int = 2,
     verbose: bool = True,
     n_layers_remove: int = 40,
     interval: int = 5,
@@ -102,7 +101,6 @@ def RBIG(
         max_layers=max_layers,
         zero_tolerance=zero_tolerance,
         p=p,
-        base=base,
         jitted=jitted,
     )
 

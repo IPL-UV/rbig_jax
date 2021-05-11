@@ -362,12 +362,42 @@ def add_gf_model_args(parser):
     # Model Args
     # ====================
     parser.add_argument(
+        "--model",
+        type=str,
+        default="rqsplines",
+        help="Standardize Input Training Data",
+    )
+    parser.add_argument(
         "--n_blocks", type=int, default=4, help="Standardize Input Training Data",
     )
     parser.add_argument(
         "--n_init_samples",
         type=int,
         default=1_000,
+        help="Standardize Input Training Data",
+    )
+    # ====================
+    # Spline Arguments
+    # ====================
+    parser.add_argument(
+        "--n_bins", type=int, default=20, help="Standardize Input Training Data"
+    )
+    parser.add_argument(
+        "--range_min", type=int, default=-12, help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--range_max", type=int, default=12, help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--boundary_slopes",
+        type=str,
+        default="unconstrained",
+        help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--identity_init",
+        type=bool,
+        default=False,
         help="Standardize Input Training Data",
     )
     # ====================
@@ -393,6 +423,58 @@ def add_gf_model_args(parser):
         "--inverse_cdf",
         type=str,
         default="gaussian",
+        help="Standardize Input Training Data",
+    )
+    # ====================
+    # Rotation Args
+    # ====================
+    parser.add_argument(
+        "--n_reflections", type=int, default=2, help="Standardize Input Training Data"
+    )
+    parser.add_argument(
+        "--init_rotation",
+        type=str,
+        default="random",
+        help="Standardize Input Training Data",
+    )
+    return parser
+
+
+def add_gf_model_spline_args(parser):
+    # ====================
+    # Model Args
+    # ====================
+    parser.add_argument(
+        "--n_blocks", type=int, default=4, help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--n_init_samples",
+        type=int,
+        default=1_000,
+        help="Standardize Input Training Data",
+    )
+    # ====================
+    # Spline Arguments
+    # ====================
+    parser.add_argument(
+        "--n_bins", type=int, default=20, help="Standardize Input Training Data"
+    )
+    parser.add_argument(
+        "--range_min", type=int, default=-12, help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--range_max", type=int, default=12, help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--boundary_slopes",
+        type=str,
+        default="unconstrained",
+        help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--identity_init",
+        type=bool,
+        default=False,
         help="Standardize Input Training Data",
     )
     # ====================

@@ -241,11 +241,20 @@ def add_gf_train_args(parser):
         "--epochs", type=int, default=100, help="Standardize Input Training Data",
     )
     parser.add_argument(
-        "--lr", type=float, default=1e-2, help="Standardize Input Training Data"
+        "--lr", type=float, default=1e-4, help="Standardize Input Training Data"
+    )
+    parser.add_argument(
+        "--eval_freq", type=int, default=50, help="Standardize Input Training Data"
     )
 
     parser.add_argument(
         "--optimizer", type=str, default="adam", help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--gradient_clip",
+        type=float,
+        default=1.0,
+        help="Standardize Input Training Data",
     )
     parser.add_argument(
         "--batch_size", type=int, default=128, help="Standardize Input Training Data",

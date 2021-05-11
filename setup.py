@@ -29,32 +29,23 @@ VERSION = "0.1.0"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    "numpy>=1.19", "scipy>=1.5", "scikit-learn>=0.23",
+    "numpy>=1.19",
+    "scipy>=1.6",
+    "scikit-learn>=0.23",
+    "scikit-image>=0.18.1",
     "jax>=0.2.11",
     "jaxlib>=0.1.62",
     "numpyro>=0.6.0",
-    "chex>=0.0.6",
-    "optax>=0.0.6",
+    "chex>=0.0.7",
+    "optax>=0.0.7",
     "distrax>=0.0.1",
     "tfp-nightly",
     "tqdm>=4.60.0",
     "einops>=0.3.0",
-    "scikit-image>=0.18.1",
-    "torch>=1.6",
-    "torchvision>=0.9",
-    "torchaudio>=0.8",
-    "torchmetrics>=0.2.0",
-    "pytorch-lightning>=1.2",
-    "lightning-bolts>=0.3",
-    "black",
-    "flake8>=3.9.1",
-    "isort>=5.0",
-    "pytest>=4.1",
     "ipykernel>=5.5.3",
     "nb_black>=1.0.7",
     "pyprojroot",
     "loguru>=0.5.3",
-    "wandb>=0.10.27",
     "matplotlib>=3.3",
     "seaborn>=0.11.1",
     "celluloid>=0.2.0",
@@ -63,9 +54,9 @@ REQUIRED = [
 
 # What packages are optional?
 EXTRAS = {
-    "dev": ["black", "isort", "mypy"],
-    "tests": ["pytest", "scikit-learn"],
-    "extras": ["tqdm", "wandb", "scipy", "corner", "celluloid",],
+    "experiments": ["tensorflow", "tensorflow-datasets", "wandb"],
+    "dev": ["black", "isort>=5.0", "mypy", "flake8>=3.9.1", "pytest>=4.1"],
+    "tests": ["pytest>=4.1"],
 }
 
 # The rest you shouldn't have to touch too much :)

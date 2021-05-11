@@ -296,7 +296,21 @@ def hist_bin_sqrt(x):
     return math.ceil(math.sqrt(x.size))
 
 
-def hist_bin_scott(x):
+def hist_bin_scott(x: Array) -> Array:
+    """Optimal histogram bin width based on scotts method.
+    Uses the 'normal reference rule' which assumes the data
+    is Gaussian
+
+    Parameters
+    ----------
+    x : Array
+        The input array, (n_samples)
+
+    Returns
+    -------
+    bin_width : Array
+        The optimal bin width, ()
+    """
     return (24.0 * math.pi ** 0.5 / x.size) ** (1.0 / 3.0) * jnp.std(x)
 
 
