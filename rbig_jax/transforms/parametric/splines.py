@@ -19,9 +19,10 @@ from jax.nn import softmax, softplus
 from jax.random import PRNGKey
 
 from rbig_jax.transforms.base import Bijector, InitLayersFunctions
+from flax import struct
 
 
-@dataclass
+@struct.dataclass
 class RationalQuadraticSpline(Bijector):
     x_pos: Array
     y_pos: Array

@@ -12,14 +12,18 @@ from distrax._src.distributions.normal import Normal
 
 from rbig_jax.transforms.base import Bijector, BijectorChain
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF, InitGaussCDF
-from rbig_jax.transforms.logit import InitLogitTransform, InitSigmoidTransform
+from rbig_jax.transforms.logit import (
+    InitLogitTempTransform,
+    InitLogitTransform,
+)
 from rbig_jax.transforms.parametric.householder import InitHouseHolder
 from rbig_jax.transforms.parametric.mixture.gaussian import InitMixtureGaussianCDF
 from rbig_jax.transforms.parametric.mixture.logistic import InitMixtureLogisticCDF
 from rbig_jax.transforms.parametric.splines import InitPiecewiseRationalQuadraticCDF
+from flax import struct
 
 
-@dataclass
+@struct.dataclass
 class GaussianizationFlow(BijectorChain):
     bijectors: Iterable[Bijector]
     base_dist: Distribution
@@ -77,6 +81,9 @@ def init_default_gf_model(
     if inverse_cdf == "logistic":
         # Logit Transform
         init_icdf_f = InitLogitTransform()
+    elif inverse_cdf == "logistictemp":
+        # Logit Transform
+        init_icdf_f = InitLogitTempTransform()
     elif inverse_cdf == "gaussian":
         init_icdf_f = InitInverseGaussCDF()
     else:

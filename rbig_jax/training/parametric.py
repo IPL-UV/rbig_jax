@@ -1,236 +1,219 @@
 import itertools
-from typing import Callable, NamedTuple, Optional
+from typing import Callable, NamedTuple, Optional, Any, Tuple, Mapping
 
 import jax
 import jax.numpy as jnp
 import numpy as np
 import tqdm
-from chex import dataclass
+import optax
+from chex import dataclass, Array
 from distrax._src.distributions import distribution as dist_base
 from distrax._src.utils.math import sum_last
 from jax import scipy as jscipy
-from jax.experimental import optimizers
 
 DistributionLike = dist_base.DistributionLike
-JAXOptimizer = jax.experimental.optimizers.Optimizer
+
+OptState = Any
+Batch = Mapping[str, np.ndarray]
 
 
-class TrainingParams(NamedTuple):
-    train_op: Callable
-    opt_init: Callable
-    opt_state: Callable
-    get_params: Callable
+class TrainState(NamedTuple):
+    model: dataclass
+    opt_state: OptState
 
 
-def init_log_prob(base_dist: DistributionLike) -> Callable:
-    def log_prob(bijector, inputs):
+class StepOutput(NamedTuple):
+    loss: Array
+    model: dataclass
 
-        # forward transformation
-        outputs, log_det = bijector.forward_and_log_det(inputs)
 
-        # probability in the latent space
-        latent_prob = base_dist.log_prob(outputs)
+class GaussFlowTrainer:
+    def __init__(
+        self, model, optimizer, n_epochs: int = 5_000, prepare_data_fn: Callable = None
+    ):
+        self.model = model
+        self.n_epochs = n_epochs
+        self.prepare_data_fn = prepare_data_fn
 
-        # log probability
-        log_prob = sum_last(latent_prob, ndims=latent_prob.ndim - 1) + sum_last(
-            log_det, ndims=log_det.ndim - 1
+        opt_state = optimizer.init(model)
+        self.optimizer = optimizer
+        self.steps = 0.0
+        self.counter = itertools.count()
+
+        # init metrics
+        self.init_metrics()
+
+        self.train_state = TrainState(model=model, opt_state=opt_state)
+
+    def init_metrics(self):
+        self.train_epoch = []
+        self.train_loss = []
+        self.valid_epoch = []
+        self.valid_loss = []
+
+    @jax.partial(jax.jit, static_argnums=(0,))
+    def params_update(
+        self, params, opt_state, batch: Batch, rng=None
+    ) -> Tuple[dataclass, OptState]:
+        """Single SGD update step."""
+        # calculate the loss AND the gradients
+        loss, grads = jax.value_and_grad(self.loss_fn)(params, batch, rng)
+
+        # update the gradients
+        updates, new_opt_state = self.optimizer.update(grads, opt_state)
+
+        # update the parameters
+        new_model = optax.apply_updates(params, updates)
+
+        # return loss AND new opt_state
+
+        return new_model, new_opt_state, loss
+
+    def train_step(self, data, **kwargs):
+
+        # get params from train state
+        model = self.train_state.model
+        opt_state = self.train_state.opt_state
+
+        # do a gradient step
+        model, opt_state, train_loss = self.params_update(
+            model, opt_state, data, **kwargs
         )
 
-        # # log probability
-        # log_prob = sum_last(latent_prob, ndims=latent_prob.ndim) + sum_last(
-        #     log_det, ndims=latent_prob.ndim
-        # )
-        return log_prob
+        self.train_state = TrainState(model=model, opt_state=opt_state)
 
-    return log_prob
+        # append to loss
+        self.train_loss.append(train_loss)
+        self.step = next(self.counter)
+        self.train_epoch.append(self.step)
 
+        return StepOutput(model=model, loss=train_loss)
 
-def init_train_op(
-    params: dataclass,
-    loss_f: Callable,
-    optimizer,
-    lr: float = 1e-2,
-    jitted: bool = True,
-):
-    # unpack optimizer params
-    opt_init, opt_update, get_params = optimizer(step_size=lr)
+    def validation_step(self, data):
 
-    # initialize parameters
-    opt_state = opt_init(params)
+        # get params from train state
+        model = self.train_state.model
 
-    # create training loops
-    def train_op(i, opt_state, inputs):
-        # get the parameters from the state
-        params = get_params(opt_state)
+        # do a gradient step
+        valid_loss = self.eval_fn(model, data)
 
-        # calculate the loss AND the gradients
-        loss, gradients = jax.value_and_grad(loss_f)(params, inputs)
+        self.valid_loss.append(valid_loss)
+        self.valid_epoch.append(self.step)
 
-        # return loss AND new opt_state
-        return loss, opt_update(i, gradients, opt_state)
+        return StepOutput(model=model, loss=valid_loss)
 
-    if jitted:
-        train_op = jax.jit(train_op)
+    def train_loop(self, model, train_ds, val_ds=None):
 
-    return train_op, (opt_init, opt_state, get_params)
+        train_state = []
 
+        # initialize optimizer state
+        opt_state = self.optimizer.init(model)
 
-def init_gf_train_op(
-    gf_model: dataclass, optimizer, lr: float = 1e-2, jitted: bool = True,
-):
-    # unpack optimizer params
-    opt_init, opt_update, get_params = optimizer(step_size=lr)
+        with tqdm.trange(self.n_epochs) as pbar:
 
-    # initialize parameters
-    opt_state = opt_init(gf_model)
+            for step in pbar:
 
-    def loss_f(gf_model, inputs):
-        return gf_model.score(inputs)
+                model, opt_state, train_loss = self.update(model, opt_state, train_ds)
 
-    # create training loops
-    def train_op(i, opt_state, inputs):
-        # get the parameters from the state
-        params = get_params(opt_state)
-
-        # calculate the loss AND the gradients
-        loss, gradients = jax.value_and_grad(loss_f)(params, inputs)
-
-        # return loss AND new opt_state
-        return loss, opt_update(i, gradients, opt_state)
-
-    if jitted:
-        train_op = jax.jit(train_op)
-
-    return TrainingParams(
-        train_op=train_op, opt_init=opt_init, opt_state=opt_state, get_params=get_params
-    )
-
-
-def train_model(
-    gf_model: dataclass,
-    train_dl,
-    valid_dl=None,
-    epochs: int = 100,
-    optimizer: Optional[JAXOptimizer] = None,
-    lr: float = 0.01,
-    jitted: bool = True,
-    **kwargs,
-):
-
-    if optimizer is None:
-
-        optimizer = optimizers.adam(step_size=0.01)
-
-    # unpack optimizer params
-    opt_init, opt_update, get_params = optimizer
-
-    # initialize parameters
-    opt_state = opt_init(gf_model)
-
-    # define loss function
-    def loss_f(gf_model, inputs):
-        return gf_model.score(inputs)
-
-    # ================================
-    # Boilerplate Code for Training
-    # ================================
-
-    # create training loops
-    def train_op(i, opt_state, inputs):
-        # get the parameters from the state
-        params = get_params(opt_state)
-
-        # calculate the loss AND the gradients
-        loss, gradients = jax.value_and_grad(loss_f)(params, inputs)
-
-        # return loss AND new opt_state
-        return loss, opt_update(i, gradients, opt_state)
-
-    if jitted:
-        train_op = jax.jit(train_op)
-
-    # ================================
-    # TRAINING
-    # ================================
-    train_losses = list()
-    valid_losses = list()
-    itercount = itertools.count()
-    train_batch_loss = 0.0
-    valid_batch_loss = 0.0
-
-    pbar = tqdm.trange(epochs)
-
-    with pbar:
-        for _ in pbar:
-
-            # Train
-            avg_loss = []
-
-            for ix in train_dl:
-
-                # cast to jax array
-                ix = jnp.array(ix, dtype=jnp.float32)
-
-                # compute loss
-                loss, opt_state = train_op(next(itercount), opt_state, ix,)
-
-                # append batch
-                avg_loss.append(float(loss))
-
-            # average loss
-            train_batch_loss = jnp.mean(jnp.stack(avg_loss))
-
-            # Log losses
-            train_losses.append(np.array(train_batch_loss))
-            pbar.set_postfix(
-                {
-                    "Train Loss": f"{train_batch_loss:.4f}",
-                    "Valid Loss": f"{valid_batch_loss:.4f}",
-                }
-            )
-
-            if valid_dl is not None:
-
-                final_params = get_params(opt_state)
-
-                # Train
-                avg_loss = []
-
-                for ix in valid_dl:
-
-                    # cast to jax array
-                    ix = jnp.array(ix, dtype=jnp.float32)
-
-                    # compute loss
-                    loss = final_params.score(ix)
-
-                    # append batch
-                    avg_loss.append(float(loss))
-
-                # average loss
-                valid_batch_loss = jnp.mean(jnp.stack(avg_loss))
-
-                valid_losses.append(np.array(valid_batch_loss))
-
-                pbar.set_postfix(
-                    {
-                        "Train Loss": f"{train_batch_loss:.4f}",
-                        "Valid Loss": f"{valid_batch_loss:.4f}",
-                    }
+                pbar.set_description(
+                    f"Train Loss: {train_loss:.4f} | Valid Loss: {eval_loss:.4f}"
                 )
 
-            else:
-                continue
+                # save metrics
+                self.train_step.append(step)
+                self.train_loss.append(train_loss)
 
-    final_params = get_params(opt_state)
+                if step % self.eval_frequency == 0 and val_ds is not None:
 
-    train_losses = jnp.stack(train_losses)
-    if valid_dl is not None:
-        valid_losses = jnp.stack(valid_losses)
+                    eval_loss = self.eval_fn(model, next(val_ds))
+
+                    pbar.set_description(
+                        f"Train Loss: {train_loss:.4f} | Valid Loss: {eval_loss:.4f}"
+                    )
+
+                    # save metrics
+                    self.valid_step.append(step)
+                    self.valid_loss.append(eval_loss)
+
+        return model
+
+    def loss_fn(self, model, batch, rng=None):
+
+        if self.prepare_data_fn is not None:
+            batch = self.prepare_data_fn(batch, rng)
+
+        # negative log likelihood loss
+        nll_loss = model.score(batch)
+
+        return nll_loss
+
+    @jax.partial(jax.jit, static_argnums=(0,))
+    def eval_fn(self, model, batch):
+        if self.prepare_data_fn is not None:
+            batch = self.prepare_data_fn(batch)
+        # negative log likelihood loss
+        nll_loss = model.score(batch)
+
+        return nll_loss
+
+
+class ConditionalGaussFlowTrainer(GaussFlowTrainer):
+    def __init__(
+        self, model, optimizer, n_epochs: int = 5_000, eval_frequency: int = 50
+    ):
+        super().__init__(
+            model=model,
+            optimizer=optimizer,
+            n_epochs=n_epochs,
+            eval_frequency=eval_frequency,
+        )
+
+
+def init_optimizer(
+    name: str = "adam",
+    n_epochs: int = 5_000,
+    lr: float = 1e-3,
+    cosine_decay_steps: Optional[int] = None,
+    warmup: Optional[int] = None,
+    gradient_clip: Optional[float] = 15.0,
+    alpha: float = 1e-1,
+    one_cycle: bool = False,
+):
+
+    chain = []
+
+    # clip gradients
+    if gradient_clip is not None:
+        chain.append(optax.clip(gradient_clip))
+
+    # choose the optimizer
+    if name == "adam":
+        chain.append(optax.adam(lr, b1=0.9, b2=0.99, eps=1e-5),)
     else:
-        valid_losses = None
-    losses = {"train": train_losses, "valid": valid_losses}
-    return final_params, losses
+        raise ValueError(f"Unrecognized optimizer: {name}")
+
+    # cosine decay learning rate
+    if one_cycle:
+
+        one_cycle_cosine_lr = optax.cosine_onecycle_schedule(
+            transition_steps=cosine_decay_steps,
+            pct_start=0.3,
+            peak_value=lr,
+            div_factor=25.0,
+            final_div_factor=1e4,
+        )
+
+        chain.append(optax.scale_by_schedule(one_cycle_cosine_lr))
+
+    elif cosine_decay_steps is not None:
+        cosine_lr = optax.cosine_decay_schedule(
+            init_value=1.0, decay_steps=cosine_decay_steps, alpha=alpha
+        )
+        chain.append(optax.scale_by_schedule(cosine_lr))
+
+    # create optimizer
+
+    return optax.chain(*chain)
 
 
 def add_gf_train_args(parser):
@@ -258,5 +241,11 @@ def add_gf_train_args(parser):
     )
     parser.add_argument(
         "--batch_size", type=int, default=128, help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--val_batch_size",
+        type=int,
+        default=1_000,
+        help="Standardize Input Training Data",
     )
     return parser

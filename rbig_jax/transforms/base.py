@@ -8,6 +8,7 @@ from distrax._src.bijectors.bijector import Bijector as FixedBijector
 from distrax._src.utils import jittable
 from distrax._src.utils.math import sum_last
 from jax.random import PRNGKey
+from flax import struct
 
 
 @dataclass
@@ -23,7 +24,7 @@ class InitFunctions(NamedTuple):
     init_transform: Callable
 
 
-@dataclass
+@struct.dataclass
 class Bijector:
     def forward(self, inputs: Array) -> Array:
         """Computes y = f(x)."""
@@ -100,7 +101,7 @@ class HyperParams:
     params: dataclass
 
 
-@dataclass
+@struct.dataclass
 class InverseBijector:
     bijector: dataclass
 
@@ -135,7 +136,7 @@ class InverseBijector:
         return outputs, logdet
 
 
-@dataclass
+@struct.dataclass
 class BijectorChain:
     bijectors: Iterable[Bijector]
 

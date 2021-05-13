@@ -6,13 +6,13 @@ import numpy as np
 from chex import Array, dataclass
 from jax.lax import conv_general_dilated
 from jax.random import PRNGKey
-
+from flax import struct
 from rbig_jax.transforms.base import Bijector
 from rbig_jax.transforms.parametric.householder import (
     householder_inverse_transform, householder_transform)
 
 
-@dataclass
+@struct.dataclass
 class Conv1x1Householder(Bijector):
     weight: Array
 

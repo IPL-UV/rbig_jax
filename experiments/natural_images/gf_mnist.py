@@ -139,7 +139,7 @@ KEY = jax.random.PRNGKey(wandb_logger.config.seed)
 
 train_ds = load_dataset(tfds.Split.TRAIN, wandb_logger.config.batch_size)
 init_ds = load_dataset(tfds.Split.TRAIN, wandb_logger.config.n_init_samples)
-valid_ds = load_dataset(tfds.Split.TEST, wandb_logger.config.batch_size)
+valid_ds = load_dataset(tfds.Split.TEST, wandb_logger.config.val_batch_size)
 
 # demo batch
 init_batch = next(init_ds)
@@ -165,7 +165,7 @@ def prepare_data(batch: Batch, prng_key: Optional[PRNGKey] = None) -> Array:
     # dequantize pixels (training only)
     if prng_key is not None:
         # Dequantize pixel values {0, 1, ..., 255} with uniform noise [0, 1).
-        data += jax.random.uniform(prng_key, data.shape)
+        data += jax.random.uniform(prng_key, data.shape).astype(jnp.float32)
 
     # flatten image data
     data = rearrange(data, "B H W C -> B (H W C)")
@@ -195,7 +195,7 @@ from rbig_jax.models.gaussflow import init_default_gf_model
 init_ds = load_dataset(tfds.Split.TRAIN, wandb_logger.config.n_init_samples)
 init_ds = next(init_ds)
 init_data_prepped = prepare_data(init_ds, prng_key=prng_key)
-X_init = np.array(init_data_prepped)
+X_init = np.array(init_data_prepped, dtype=np.float64)
 
 
 if wandb_logger.config.model == "rqsplines":
@@ -235,22 +235,29 @@ else:
 # forward propagation for data
 X_demo_g = gf_model.forward(demo_data_prepped)
 
-# plot demo images
-fig, ax = plot_image_grid(X_demo_g, image_shape)
-wandb.log({"initial_latent_images": wandb.Image(plt)})
 
-fig = corner.corner(np.array(X_demo_g[:, :10]), color="red")
-wandb.log({"initial_latent_histogram": wandb.Image(plt)})
-plt.close(fig)
+try:
+    fig, ax = plot_image_grid(X_demo_g, image_shape)
+    wandb.log({"initial_latent_images": wandb.Image(plt)})
+    plt.close(fig)
+    fig = corner.corner(np.array(X_demo_g[:, :10]), color="red")
+    wandb.log({"initial_latent_histogram": wandb.Image(plt)})
+except ValueError:
+    pass
+finally:
+    plt.close(fig)
 
 # Demo - Inverse Propagation
-X_demo_approx = gf_model.inverse(X_demo_g[:1_000])
+X_demo_approx = gf_model.inverse(X_demo_g[:50])
 
 # plot image grid
-plot_image_grid(X_demo_approx, image_shape)
-wandb.log({"initial_inverse_images": wandb.Image(plt)})
-plt.close(fig)
-
+try:
+    plot_image_grid(X_demo_approx, image_shape)
+    wandb.log({"initial_inverse_images": wandb.Image(plt)})
+except ValueError:
+    pass
+finally:
+    plt.close(fig)
 
 # ===============================
 # %% LOSS FUNCTION
@@ -272,7 +279,7 @@ def loss_fn(model: dataclass, prng_key: PRNGKey, batch: Batch) -> Array:
     return jnp.mean(bpd)
 
 
-# @jax.jit
+@jax.jit
 def eval_fn(model: dataclass, batch: Batch) -> Array:
 
     # prepare data
@@ -396,10 +403,12 @@ with tqdm.trange(wandb_logger.config.epochs) as pbar:
             fig, ax = plot_image_grid(X_demo_g, image_shape)
 
             wandb.log({"training_latent_images": wandb.Image(plt)})
+            plt.close(fig)
 
             fig = corner.corner(np.array(X_demo_g[:, :10]), color="red")
-            plt.close(fig)
+
             wandb.log({"training_latent_histogram": wandb.Image(plt)})
+            plt.close(fig)
 
             n_gen_samples = 50
             X_samples = gf_model.sample(seed=42, n_samples=n_gen_samples)
@@ -487,23 +496,23 @@ plt.close(fig)
 # Plot Each Layer
 # --------------------
 
-print("Plotting Each Layer...")
-X_g = X_init.copy()
+# print("Plotting Each Layer...")
+# X_g = X_init.copy()
 
-fig = corner.corner(X_g, color="purple")
-fig.suptitle("Initial")
-plt.show()
+# fig = corner.corner(X_g, color="purple")
+# fig.suptitle("Initial")
+# plt.show()
 
-stopping = ""
+# stopping = ""
 
-for ilayer, ibijector in enumerate(gf_model.bijectors):
+# for ilayer, ibijector in enumerate(gf_model.bijectors):
 
-    X_g = ibijector.forward(X_g)
+#     X_g = ibijector.forward(X_g)
 
-    if ibijector.name == "HouseHolder":
-        fig = corner.corner(np.array(X_g[:, :10]), color="purple")
-        wandb.log({f"layer_{ilayer}_histogram": wandb.Image(plt)})
-        plt.close(fig)
+#     if ibijector.name == "HouseHolder":
+#         fig = corner.corner(np.array(X_g[:, :10]), color="purple")
+#         wandb.log({f"layer_{ilayer}_histogram": wandb.Image(plt)})
+#         plt.close(fig)
 
 
 # ====================================

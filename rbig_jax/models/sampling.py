@@ -8,9 +8,10 @@ from distrax._src.distributions.distribution import Distribution
 
 from rbig_jax.models.gaussflow import GaussianizationFlow
 from rbig_jax.transforms.base import Bijector
+from flax import struct
 
 
-@dataclass
+@struct.dataclass
 class GFSampling(GaussianizationFlow):
     bijectors: Iterable[Bijector]
     base_dist: Distribution

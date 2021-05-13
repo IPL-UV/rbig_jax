@@ -25,6 +25,7 @@ def init_mixture_weights(rng, n_features, n_components, method, X=None, **kwargs
             n_components=n_components,
             random_state=rng if isinstance(rng, int) else int(rng[0]),
             covariance_type="diag",
+            reg_covar=1e-5,
             **kwargs,
         )
         log_scales = tfp.math.softplus_inverse(jnp.sqrt(covariances))
