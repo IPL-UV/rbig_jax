@@ -41,15 +41,12 @@ class GaussFlowTrainer:
         self.counter = itertools.count()
 
         # init metrics
-        self.init_metrics()
-
-        self.train_state = TrainState(model=model, opt_state=opt_state)
-
-    def init_metrics(self):
         self.train_epoch = []
         self.train_loss = []
         self.valid_epoch = []
         self.valid_loss = []
+
+        self.train_state = TrainState(model=model, opt_state=opt_state)
 
     @jax.partial(jax.jit, static_argnums=(0,))
     def params_update(
@@ -159,14 +156,33 @@ class GaussFlowTrainer:
 
 class ConditionalGaussFlowTrainer(GaussFlowTrainer):
     def __init__(
-        self, model, optimizer, n_epochs: int = 5_000, eval_frequency: int = 50
+        self, cond_model, optimizer, prepare_data_fn: Callable, n_epochs: int = 5_000,
     ):
         super().__init__(
-            model=model,
+            model=cond_model,
             optimizer=optimizer,
             n_epochs=n_epochs,
-            eval_frequency=eval_frequency,
+            prepare_data_fn=prepare_data_fn,
         )
+
+    def loss_fn(self, model, batch, rng=None):
+
+        inputs, outputs = self.prepare_data_fn(batch, rng)
+
+        # negative log likelihood loss
+        nll_loss = model.score(inputs=inputs, outputs=outputs)
+
+        return nll_loss
+
+    @jax.partial(jax.jit, static_argnums=(0,))
+    def eval_fn(self, model, batch):
+
+        inputs, outputs = self.prepare_data_fn(batch)
+
+        # negative log likelihood loss
+        nll_loss = model.score(inputs=inputs, outputs=outputs)
+
+        return nll_loss
 
 
 def init_optimizer(
@@ -205,7 +221,7 @@ def init_optimizer(
 
         chain.append(optax.scale_by_schedule(one_cycle_cosine_lr))
 
-    elif cosine_decay_steps is not None:
+    elif cosine_decay_steps is not None and cosine_decay_steps > 0:
         cosine_lr = optax.cosine_decay_schedule(
             init_value=1.0, decay_steps=cosine_decay_steps, alpha=alpha
         )
@@ -236,8 +252,17 @@ def add_gf_train_args(parser):
     parser.add_argument(
         "--gradient_clip",
         type=float,
-        default=1.0,
+        default=15.0,
         help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--cosine_decay_steps",
+        type=int,
+        default=1_000,
+        help="Standardize Input Training Data",
+    )
+    parser.add_argument(
+        "--lr_alpha", type=float, default=1e-1, help="Standardize Input Training Data",
     )
     parser.add_argument(
         "--batch_size", type=int, default=128, help="Standardize Input Training Data",

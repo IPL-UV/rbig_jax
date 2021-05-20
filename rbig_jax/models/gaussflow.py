@@ -40,6 +40,18 @@ class GaussianizationFlow(BijectorChain):
 
         return log_prob
 
+    def score_kl(self, inputs):
+
+        # forward propagation
+        z = self.forward(inputs)
+
+        # calculate latent probability
+        loss = self.base_dist.kl_divergence(
+            Normal(loc=z.mean(axis=0), scale=z.std(axis=0))
+        )
+
+        return jnp.mean(loss)
+
     def score(self, inputs):
         return -jnp.mean(self.score_samples(inputs))
 
@@ -60,6 +72,7 @@ def init_default_gf_model(
     init_rotation: str = "pca",
     inverse_cdf: str = "logistic",
     n_reflections: int = 10,
+    return_transform: bool = False,
 ):
 
     n_features = shape[0]
@@ -160,7 +173,10 @@ def init_default_gf_model(
 
     # create flow model
     gf_model = GaussianizationFlow(base_dist=base_dist, bijectors=bijectors)
-    return gf_model
+    if return_transform:
+        return X_g, gf_model
+    else:
+        return gf_model
 
 
 def init_gf_spline_model(
@@ -170,10 +186,11 @@ def init_gf_spline_model(
     n_bins: int = 20,
     range_min: float = -10,
     range_max: float = 10,
-    init_rotation: str = "pca",
+    init_rotation: str = "random",
     n_reflections: int = 10,
     plot_layers: bool = False,
     plot_blocks: bool = False,
+    return_transform: bool = False,
     **kwargs,
 ):
 
@@ -257,7 +274,11 @@ def init_gf_spline_model(
 
     # create flow model
     gf_model = GaussianizationFlow(base_dist=base_dist, bijectors=bijectors)
-    return gf_model
+
+    if return_transform:
+        return X_g, gf_model
+    else:
+        return gf_model
 
 
 def init_gf_composite_spline_model(
@@ -270,6 +291,7 @@ def init_gf_composite_spline_model(
     init_rotation: str = "random",
     n_reflections: int = 10,
     squeeze: str = "sigmoid",
+    return_transform: bool = False,
     **kwargs,
 ):
 
@@ -361,7 +383,12 @@ def init_gf_composite_spline_model(
 
     # create flow model
     gf_model = GaussianizationFlow(base_dist=base_dist, bijectors=bijectors)
-    return gf_model
+
+    if return_transform:
+        return X_g, gf_model
+    else:
+
+        return gf_model
 
 
 def add_gf_model_args(parser):

@@ -238,3 +238,22 @@ class MultiScaleRBIGBlockInit:
         # unrescale data
         outputs = self.ms_reshape.inverse(outputs)
         return outputs
+
+
+def init_rescale_params(filter_shape, image_shape):
+
+    fh, fw = filter_shape
+    H = image_shape.H
+    W = image_shape.W
+    C = image_shape.C
+    # # do some checks!
+    # assert H / fh !% 0
+    # assert W / fw !% 0
+
+    Hn = H // fh
+    Wn = W // fw
+
+    rescale_params = RescaleParams(fh=fh, fw=fw, H=H, W=W, C=C, Hn=Hn, Wn=Wn,)
+
+    return rescale_params
+

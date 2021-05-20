@@ -22,6 +22,7 @@ from functools import partial
 
 
 # Plot utilities
+import tensorflow as tf
 from rbig_jax.custom_types import ImageShape
 from rbig_jax.plots import plot_image_grid
 from rbig_jax.training.parametric import add_gf_train_args
@@ -101,6 +102,11 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 from typing import Iterator, Mapping
 import numpy as np
+from typing import Optional
+from chex import Array
+from einops import rearrange
+
+PRNGKey = Array
 
 Batch = Mapping[str, np.ndarray]
 
@@ -116,19 +122,53 @@ if wandb_logger.config.dataset == "mnist":
         ds = ds.repeat()
         return iter(tfds.as_numpy(ds))
 
+    def prepare_data(batch: Batch, prng_key: Optional[PRNGKey] = None) -> Array:
+
+        # select image from tfds
+        data = batch["image"].astype(jnp.float32)
+
+        # dequantize pixels (training only)
+        if prng_key is not None:
+            # Dequantize pixel values {0, 1, ..., 255} with uniform noise [0, 1).
+            data += jax.random.uniform(prng_key, data.shape).astype(jnp.float32)
+
+        # flatten image data
+        data = rearrange(data, "B H W C -> B (H W C)")
+
+        return data / 256.0  # Normalize pixel values from [0, 256) to [0, 1).
+
 
 elif wandb_logger.config.dataset == "cifar10":
 
     image_shape = ImageShape(C=3, H=32, W=32)
 
     def load_dataset(split: tfds.Split, batch_size: int) -> Iterator[Batch]:
-        ds = tfds.load("cifar10", split=split, shuffle_files=True)
+        ((x_train_raw, _), (x_test_raw, _),) = tf.keras.datasets.cifar10.load_data()
+        if split == "train":
+            ds = tf.data.Dataset.from_tensor_slices(x_train_raw)
+        else:
+            ds = tf.data.Dataset.from_tensor_slices(x_test_raw)
         ds = ds.cache()
         ds = ds.shuffle(buffer_size=20 * batch_size)
         ds = ds.batch(batch_size)
         ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         ds = ds.repeat()
         return iter(tfds.as_numpy(ds))
+
+    def prepare_data(batch: Batch, prng_key: Optional[PRNGKey] = None) -> Array:
+
+        # select image from tfds
+        data = batch.astype(jnp.float32)
+
+        # dequantize pixels (training only)
+        if prng_key is not None:
+            # Dequantize pixel values {0, 1, ..., 255} with uniform noise [0, 1).
+            data += jax.random.uniform(prng_key, data.shape).astype(jnp.float32)
+
+        # flatten image data
+        data = rearrange(data, "B H W C -> B (H W C)")
+
+        return data / 256.0  # Normalize pixel values from [0, 256) to [0, 1).
 
 
 else:
@@ -145,32 +185,14 @@ valid_ds = load_dataset(tfds.Split.TEST, wandb_logger.config.val_batch_size)
 init_batch = next(init_ds)
 
 # plot batch of images
-fig, ax = plot_image_grid(init_batch["image"])
+if wandb_logger.config.dataset == "cifar10":
+    fig, ax = plot_image_grid(init_batch)
+else:
+    fig, ax = plot_image_grid(init_batch["image"])
 
 # ==============================
 # %% PREPROCESSING
 # ==============================
-from typing import Optional
-from chex import Array
-from einops import rearrange
-
-PRNGKey = Array
-
-
-def prepare_data(batch: Batch, prng_key: Optional[PRNGKey] = None) -> Array:
-
-    # select image from tfds
-    data = batch["image"].astype(jnp.float32)
-
-    # dequantize pixels (training only)
-    if prng_key is not None:
-        # Dequantize pixel values {0, 1, ..., 255} with uniform noise [0, 1).
-        data += jax.random.uniform(prng_key, data.shape).astype(jnp.float32)
-
-    # flatten image data
-    data = rearrange(data, "B H W C -> B (H W C)")
-
-    return data / 256.0  # Normalize pixel values from [0, 256) to [0, 1).
 
 
 # Demo
@@ -260,143 +282,84 @@ finally:
     plt.close(fig)
 
 # ===============================
-# %% LOSS FUNCTION
-# ===============================
-from chex import dataclass
-
-
-def loss_fn(model: dataclass, prng_key: PRNGKey, batch: Batch) -> Array:
-
-    # prepare data
-    data = prepare_data(batch, prng_key)
-
-    # negative log likelihood loss
-    log_px = model.score_samples(data)
-
-    # calculate bits per dimension
-    bpd = -log_px * jnp.log2(jnp.exp(1)) / data.shape[1]
-
-    return jnp.mean(bpd)
-
-
-@jax.jit
-def eval_fn(model: dataclass, batch: Batch) -> Array:
-
-    # prepare data
-    data = prepare_data(batch)
-
-    # negative log likelihood loss
-    log_px = model.score_samples(data)
-
-    # calculate bits per dimension
-    bpd = -log_px * jnp.log2(jnp.exp(1)) / data.shape[1]
-
-    return jnp.mean(bpd)
-
-
-# initial
-train_batch = next(train_ds)
-nll_loss = loss_fn(gf_model, prng_key, train_batch)
-print(f"Initial NLL Loss (Train): {nll_loss:.4f}")
-
-valid_batch = next(valid_ds)
-nll_loss_val = eval_fn(gf_model, valid_batch)
-
-print(f"Initial NLL Loss (Valid): {nll_loss_val:.4f}")
-
-# ===============================
 # %% OPTIMIZATION
 # ===============================
-import optax
 
-# TODO: do an epoch/batchsize calculation for the learning decay
+from rbig_jax.training.parametric import init_optimizer
 
-if wandb_logger.config.optimizer == "adam":
-    b1 = 0.9
-    b2 = 0.99
-    eps = 1e-5
-    # intialize optimizer
-    optimizer = optax.chain(
-        optax.clip(wandb_logger.config.gradient_clip),
-        optax.adam(wandb_logger.config.lr, b1=b1, b2=b2, eps=eps),
-    )
+optimizer = init_optimizer(
+    "adam",
+    n_epochs=wandb_logger.config.epochs,
+    lr=wandb_logger.config.lr,
+    cosine_decay_steps=wandb_logger.config.epochs,
+    warmup=None,
+    gradient_clip=wandb_logger.config.gradient_clip,
+    alpha=1e-1,
+)
 
-# intialize optimizer state
-opt_state = optimizer.init(gf_model)
 
 # ===============================
 # %% TRAIN STEP
 # ===============================
-from typing import Tuple, Any
-
-OptState = Any
+from rbig_jax.training.parametric import GaussFlowTrainer
 
 
-@jax.jit
-def update(
-    params: dataclass, prng_key: PRNGKey, opt_state: OptState, batch: Batch
-) -> Tuple[dataclass, OptState]:
-    """Single SGD update step."""
-    # calculate the loss AND the gradients
-    loss, grads = jax.value_and_grad(loss_fn)(params, prng_key, batch)
-
-    # update the gradients
-    updates, new_opt_state = optimizer.update(grads, opt_state)
-
-    # update the parameters
-    new_params = optax.apply_updates(params, updates)
-
-    # return loss AND new opt_state
-    return new_params, new_opt_state, loss
+# initial flow trainer
+nf_trainer = GaussFlowTrainer(
+    gf_model,
+    optimizer,
+    n_epochs=wandb_logger.config.epochs,
+    prepare_data_fn=prepare_data,
+)
 
 
 # ====================================
 # %% TRAINING
 # ====================================
+import tqdm
+from rbig_jax.losses import nll_2_bpd
+
+train_ds = load_dataset(tfds.Split.TRAIN, wandb_logger.config.batch_size)
+valid_ds = load_dataset(tfds.Split.TEST, wandb_logger.config.batch_size)
+
+
 # split the keys into a unique subset
 train_rng = jax.random.split(rng, num=wandb_logger.config.epochs)
 
 # create an iterator
 train_rng = iter(train_rng)
 
-import tqdm
-
-metrics = {
-    "train_step": list(),
-    "train_loss": list(),
-    "valid_step": list(),
-    "valid_loss": list(),
-}
-train_ds = load_dataset(tfds.Split.TRAIN, wandb_logger.config.batch_size)
-valid_ds = load_dataset(tfds.Split.TEST, wandb_logger.config.batch_size)
 
 eval_loss = 0.0
+img_shape = X_init.shape[1:]
+
 with tqdm.trange(wandb_logger.config.epochs) as pbar:
     for step in pbar:
-        gf_model, opt_state, loss = update(
-            gf_model, next(train_rng), opt_state, next(train_ds)
+
+        # Train Step
+        output = nf_trainer.train_step(next(train_ds), rng=next(train_rng))
+        train_loss = output.loss
+        train_loss = nll_2_bpd(train_loss, img_shape)
+        pbar.set_description(
+            f"Train Loss: {train_loss:.4f} | Valid Loss: {eval_loss:.4f}"
         )
+        wandb.log({"train_loss": float(train_loss), "training_step": step})
 
-        pbar.set_description(f"Train Loss: {loss:.4f} | Valid Loss: {eval_loss:.4f}")
-        wandb.log({"train_loss": float(loss), "training_step": step})
-        metrics["train_step"].append(step)
-        metrics["train_loss"].append(loss)
-
+        # Eval Step
         if step % wandb_logger.config.eval_freq == 0:
-            eval_loss = eval_fn(gf_model, next(valid_ds))
-
+            output = nf_trainer.validation_step(next(train_ds))
+            eval_loss = output.loss
+            eval_loss = nll_2_bpd(eval_loss, X_init.shape[1:])
             pbar.set_description(
-                f"Train Loss: {loss:.4f} | Valid Loss: {eval_loss:.4f}"
+                f"Train Loss: {train_loss:.4f} | Valid Loss: {eval_loss:.4f}"
             )
             wandb.log({"validation_loss": float(eval_loss), "training_step": step})
-            metrics["valid_step"].append(step)
-            metrics["valid_loss"].append(eval_loss)
 
             # --------------------
             # Latent Space (Images + Histogram)
             # --------------------
             # forward propagation for data
-            X_demo_g = gf_model.forward(X_init)
+            X_demo_g = output.model.forward(X_init)
 
             # plot demo images
             # plot image grid
@@ -411,7 +374,7 @@ with tqdm.trange(wandb_logger.config.epochs) as pbar:
             plt.close(fig)
 
             n_gen_samples = 50
-            X_samples = gf_model.sample(seed=42, n_samples=n_gen_samples)
+            X_samples = output.model.sample(seed=42, n_samples=n_gen_samples)
 
             # plot
             fig, ax = plot_image_grid(X_samples, image_shape)
@@ -419,6 +382,8 @@ with tqdm.trange(wandb_logger.config.epochs) as pbar:
             wandb.log({"training_generated_images": wandb.Image(plt)})
             plt.close(fig)
 
+
+gf_model = output.model
 
 # ====================================
 # PLOTTING
@@ -430,11 +395,11 @@ with tqdm.trange(wandb_logger.config.epochs) as pbar:
 print("Plotting Loss Function...")
 fig, ax = plt.subplots()
 ax.plot(
-    metrics["train_step"], metrics["train_loss"], label="Training Loss", color="blue"
+    nf_trainer.train_epoch, nf_trainer.train_loss, label="Training Loss", color="blue"
 )
 ax.plot(
-    metrics["valid_step"],
-    metrics["valid_loss"],
+    nf_trainer.valid_epoch,
+    nf_trainer.valid_loss,
     label="Validation Loss",
     color="orange",
 )
