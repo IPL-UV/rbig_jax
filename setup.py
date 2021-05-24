@@ -40,7 +40,7 @@ REQUIRED = [
     "chex>=0.0.7",
     "optax>=0.0.6",
     "distrax>=0.0.1",
-    "tfp-nightly",
+    "tensorflow-probability>=0.12.1",
     "tqdm>=4.60.0",
     "einops>=0.3.0",
     "ipykernel>=5.5.3",
