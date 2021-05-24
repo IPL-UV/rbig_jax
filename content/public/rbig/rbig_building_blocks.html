@@ -1,0 +1,1464 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Building Blocks 4 RBIG &#8212; Gaussianization</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Literature Review" href="../../literature.html" />
+    <link rel="prev" title="Demo - RBIG" href="rbig_demo_plane.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">Gaussianization</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../intro.html">
+   Iterative and Parametric Gaussianization with Jax
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Iterative Gaussianization
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="rbig_demo_plane.html">
+   Demo - RBIG
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Building Blocks 4 RBIG
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Exploration
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../literature.html">
+   Literature Review
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  See the project in <a href="https://github.com/IPL-UV/rbig_jax">GitHub</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../../_sources/content/public/rbig/rbig_building_blocks.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/IPL-UV/rbig_jax"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        
+        
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/main/jupyterbook/content/public/rbig/rbig_building_blocks.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../../../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#demo-data">
+   Demo Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model">
+   Model
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#layer-i-univariate-histogram">
+     Layer I - Univariate Histogram
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#init-function">
+       Init Function
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#transformations">
+       Transformations
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#layer-ii-inverse-gaussian-cdf">
+     Layer II - Inverse Gaussian CDF
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id1">
+       Transformations
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pca-transformation">
+     PCA Transformation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rbig-blocks">
+   RBIG Blocks
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#forward-and-inverse-transformations">
+   Forward and Inverse Transformations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multiple-layers">
+   Multiple Layers
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#check-transformation">
+     Check Transformation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#gaussianization-flow">
+   Gaussianization Flow
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#density-estimation">
+     Density Estimation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#score-negative-log-likelihood">
+     Score (Negative Log-Likelihood)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#sampling">
+     Sampling
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#better-training">
+   Better Training
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#loss-function">
+     Loss Function
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#training">
+     Training
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#information-reduction-evolution">
+     Information Reduction Evolution
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#negative-log-likelihood">
+     Negative Log-Likelihood
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#density-estimation-revisited">
+     Density Estimation (Revisited)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#sampling-revisited">
+     Sampling Revisited
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#saving-and-loading">
+   Saving and Loading
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#saving">
+     Saving
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#loading">
+     Loading
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#simple-test">
+     Simple Test
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="building-blocks-4-rbig">
+<h1>Building Blocks 4 RBIG<a class="headerlink" href="#building-blocks-4-rbig" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Install Packages</span>
+<span class="c1"># %%capture</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">pyprojroot</span> <span class="kn">import</span> <span class="n">here</span>
+
+    <span class="c1"># spyder up to find the root</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">here</span><span class="p">(</span><span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.here&quot;</span><span class="p">])</span>
+
+    <span class="c1"># append to path</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install chex&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install git+https://github.com/IPL-UV/rbig_jax.git#egg=rbig_jax&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># jax packages</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+
+<span class="c1"># import chex</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">chex</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="n">KEY</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+
+<span class="c1"># logging</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">import</span> <span class="nn">wandb</span>
+
+<span class="c1"># plot methods</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">corner</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">reset_defaults</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="s2">&quot;poster&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+<span class="o">%</span><span class="k">load_ext</span> lab_black
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING:absl:No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="demo-data">
+<h2>Demo Data<a class="headerlink" href="#demo-data" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="c1"># %%wandb</span>
+<span class="c1"># get data</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">123</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">5_000</span>
+<span class="n">n_features</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="mf">0.05</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">make_moons</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot data</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/rbig_building_blocks_5_0.png" src="../../../_images/rbig_building_blocks_5_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="model">
+<h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="layer-i-univariate-histogram">
+<h3>Layer I - Univariate Histogram<a class="headerlink" href="#layer-i-univariate-histogram" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.transforms.histogram</span> <span class="kn">import</span> <span class="n">InitUniHistTransform</span>
+
+<span class="c1"># histogram params</span>
+<span class="n">support_extension</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="n">precision</span> <span class="o">=</span> <span class="mi">1_000</span>
+<span class="n">nbins</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># init_bin_estimator(&quot;sqrt&quot;) #bins #cott&quot;#int(np.sqrt(X.shape[0]))</span>
+<span class="n">jitted</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="c1"># initialize</span>
+<span class="n">shape</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">init_hist_f</span> <span class="o">=</span> <span class="n">InitUniHistTransform</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">support_extension</span><span class="o">=</span><span class="n">support_extension</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="init-function">
+<h4>Init Function<a class="headerlink" href="#init-function" title="Permalink to this headline">¶</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initialize bijector</span>
+<span class="n">X_u</span><span class="p">,</span> <span class="n">hist_bijector</span> <span class="o">=</span> <span class="n">init_hist_f</span><span class="o">.</span><span class="n">transform_and_bijector</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># forward transformation</span>
+<span class="n">X_l1</span> <span class="o">=</span> <span class="n">hist_bijector</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># inverse transformation</span>
+<span class="n">X_approx</span> <span class="o">=</span> <span class="n">hist_bijector</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span><span class="n">X_l1</span><span class="p">)</span>
+
+<span class="c1"># gradient transformation</span>
+<span class="n">X_l1_ldj</span> <span class="o">=</span> <span class="n">hist_bijector</span><span class="o">.</span><span class="n">forward_log_det_jacobian</span><span class="p">(</span><span class="n">X_l1</span><span class="p">)</span>
+
+<span class="c1"># plot Transformations</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Forward Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_approx</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Inverse Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l1_ldj</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Gradient Transformation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.98, &#39;Gradient Transformation&#39;)
+</pre></div>
+</div>
+<img alt="../../../_images/rbig_building_blocks_11_1.png" src="../../../_images/rbig_building_blocks_11_1.png" />
+<img alt="../../../_images/rbig_building_blocks_11_2.png" src="../../../_images/rbig_building_blocks_11_2.png" />
+<img alt="../../../_images/rbig_building_blocks_11_3.png" src="../../../_images/rbig_building_blocks_11_3.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.transforms.histogram</span> <span class="kn">import</span> <span class="n">InitUniHistTransform</span><span class="p">,</span> <span class="n">init_bin_estimator</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.transforms.kde</span> <span class="kn">import</span> <span class="n">InitUniKDETransform</span><span class="p">,</span> <span class="n">estimate_bw</span>
+
+<span class="c1"># histogram params</span>
+<span class="n">support_extension</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="n">precision</span> <span class="o">=</span> <span class="mi">1_000</span>
+<span class="n">nbins</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># init_bin_estimator(&quot;sqrt&quot;) #bins #cott&quot;#int(np.sqrt(X.shape[0]))</span>
+<span class="n">jitted</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="c1"># KDE specific Transform</span>
+<span class="n">bw</span> <span class="o">=</span> <span class="s2">&quot;scott&quot;</span>  <span class="c1"># estimate_bw(X.shape[0], 1, &quot;scott&quot;)</span>
+
+<span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;kde&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initialize histogram transformation</span>
+<span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;histogram&quot;</span><span class="p">:</span>
+
+    <span class="n">init_hist_f</span> <span class="o">=</span> <span class="n">InitUniHistTransform</span><span class="p">(</span>
+        <span class="n">n_samples</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">nbins</span><span class="o">=</span><span class="n">nbins</span><span class="p">,</span>
+        <span class="n">support_extension</span><span class="o">=</span><span class="n">support_extension</span><span class="p">,</span>
+        <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+        <span class="n">jitted</span><span class="o">=</span><span class="n">jitted</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;kde&quot;</span><span class="p">:</span>
+
+    <span class="n">init_hist_f</span> <span class="o">=</span> <span class="n">InitUniKDETransform</span><span class="p">(</span>
+        <span class="n">shape</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">support_extension</span><span class="o">=</span><span class="n">support_extension</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">bw</span><span class="o">=</span><span class="n">bw</span>
+    <span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized transform: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="transformations">
+<h4>Transformations<a class="headerlink" href="#transformations" title="Permalink to this headline">¶</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initialize bijector</span>
+<span class="n">X_u</span><span class="p">,</span> <span class="n">hist_bijector</span> <span class="o">=</span> <span class="n">init_hist_f</span><span class="o">.</span><span class="n">transform_and_bijector</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># forward transformation</span>
+<span class="n">X_l1</span> <span class="o">=</span> <span class="n">hist_bijector</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># inverse transformation</span>
+<span class="n">X_approx</span> <span class="o">=</span> <span class="n">hist_bijector</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span><span class="n">X_l1</span><span class="p">)</span>
+
+<span class="c1"># gradient transformation</span>
+<span class="n">X_l1_ldj</span> <span class="o">=</span> <span class="n">hist_bijector</span><span class="o">.</span><span class="n">forward_log_det_jacobian</span><span class="p">(</span><span class="n">X_l1</span><span class="p">)</span>
+
+<span class="c1"># plot Transformations</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Forward Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_approx</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Inverse Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l1_ldj</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Gradient Transformation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.98, &#39;Gradient Transformation&#39;)
+</pre></div>
+</div>
+<img alt="../../../_images/rbig_building_blocks_15_1.png" src="../../../_images/rbig_building_blocks_15_1.png" />
+<img alt="../../../_images/rbig_building_blocks_15_2.png" src="../../../_images/rbig_building_blocks_15_2.png" />
+<img alt="../../../_images/rbig_building_blocks_15_3.png" src="../../../_images/rbig_building_blocks_15_3.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="layer-ii-inverse-gaussian-cdf">
+<h3>Layer II - Inverse Gaussian CDF<a class="headerlink" href="#layer-ii-inverse-gaussian-cdf" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.transforms.inversecdf</span> <span class="kn">import</span> <span class="n">InitInverseGaussCDF</span>
+
+<span class="c1"># univariate normalization Gaussianization parameters</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="n">jitted</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="c1"># initialize histogram transformation</span>
+<span class="n">init_icdf_f</span> <span class="o">=</span> <span class="n">InitInverseGaussCDF</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span> <span class="n">jitted</span><span class="o">=</span><span class="n">jitted</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id1">
+<h4>Transformations<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># forward with bijector</span>
+<span class="n">X_l2</span><span class="p">,</span> <span class="n">icdf_bijector</span> <span class="o">=</span> <span class="n">init_icdf_f</span><span class="o">.</span><span class="n">transform_and_bijector</span><span class="p">(</span><span class="n">X_l1</span><span class="p">)</span>
+
+<span class="c1"># alternatively - forward with no bijector</span>
+<span class="n">X_l2_</span> <span class="o">=</span> <span class="n">icdf_bijector</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X_l1</span><span class="p">)</span>
+
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_l2_</span><span class="p">,</span> <span class="n">X_l2</span><span class="p">)</span>
+
+<span class="c1"># inverse transformation</span>
+<span class="n">X_l1_approx</span> <span class="o">=</span> <span class="n">icdf_bijector</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span><span class="n">X_l2</span><span class="p">)</span>
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_l1_approx</span><span class="p">,</span> <span class="n">X_l1</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+
+<span class="c1"># gradient transformation</span>
+<span class="n">X_l2_ldj</span> <span class="o">=</span> <span class="n">icdf_bijector</span><span class="o">.</span><span class="n">forward_log_det_jacobian</span><span class="p">(</span><span class="n">X_l1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot Transformations</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Forward Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l1_approx</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Inverse Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l2_ldj</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Gradient Transformation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.98, &#39;Gradient Transformation&#39;)
+</pre></div>
+</div>
+<img alt="../../../_images/rbig_building_blocks_20_1.png" src="../../../_images/rbig_building_blocks_20_1.png" />
+<img alt="../../../_images/rbig_building_blocks_20_2.png" src="../../../_images/rbig_building_blocks_20_2.png" />
+<img alt="../../../_images/rbig_building_blocks_20_3.png" src="../../../_images/rbig_building_blocks_20_3.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="pca-transformation">
+<h3>PCA Transformation<a class="headerlink" href="#pca-transformation" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.transforms.rotation</span> <span class="kn">import</span> <span class="n">InitPCARotation</span>
+
+<span class="c1"># initialize histogram transformation</span>
+<span class="n">init_pca_f</span> <span class="o">=</span> <span class="n">InitPCARotation</span><span class="p">(</span><span class="n">jitted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># forward with bijector</span>
+<span class="n">X_l3</span><span class="p">,</span> <span class="n">pca_bijector</span> <span class="o">=</span> <span class="n">init_pca_f</span><span class="o">.</span><span class="n">transform_and_bijector</span><span class="p">(</span><span class="n">X_l2</span><span class="p">)</span>
+
+<span class="c1"># alternatively - forward with no bijector</span>
+<span class="n">X_l3_</span> <span class="o">=</span> <span class="n">pca_bijector</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X_l2</span><span class="p">)</span>
+
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_l3_</span><span class="p">,</span> <span class="n">X_l3</span><span class="p">)</span>
+
+<span class="c1"># inverse transformation</span>
+<span class="n">X_l2_approx</span> <span class="o">=</span> <span class="n">pca_bijector</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span><span class="n">X_l3</span><span class="p">)</span>
+
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_l2_approx</span><span class="p">,</span> <span class="n">X_l2</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+
+<span class="c1"># gradient transformation</span>
+<span class="n">X_l3_ldj</span> <span class="o">=</span> <span class="n">pca_bijector</span><span class="o">.</span><span class="n">forward_log_det_jacobian</span><span class="p">(</span><span class="n">X_l2</span><span class="p">)</span>
+
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_l3_ldj</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">X_l3_ldj</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot Transformations</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Forward Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l2_approx</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Inverse Transformation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.98, &#39;Inverse Transformation&#39;)
+</pre></div>
+</div>
+<img alt="../../../_images/rbig_building_blocks_24_1.png" src="../../../_images/rbig_building_blocks_24_1.png" />
+<img alt="../../../_images/rbig_building_blocks_24_2.png" src="../../../_images/rbig_building_blocks_24_2.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="rbig-blocks">
+<h2>RBIG Blocks<a class="headerlink" href="#rbig-blocks" title="Permalink to this headline">¶</a></h2>
+<ol class="simple">
+<li><p>Marginal Gaussianization</p></li>
+<li><p>Random Rotation</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.transforms.block</span> <span class="kn">import</span> <span class="n">RBIGBlockInit</span>
+
+<span class="c1"># create a list of transformations</span>
+<span class="n">init_functions</span> <span class="o">=</span> <span class="p">[</span><span class="n">init_hist_f</span><span class="p">,</span> <span class="n">init_icdf_f</span><span class="p">,</span> <span class="n">init_pca_f</span><span class="p">]</span>
+
+<span class="c1"># create an RBIG &quot;block&quot; init</span>
+<span class="n">rbig_block_init</span> <span class="o">=</span> <span class="n">RBIGBlockInit</span><span class="p">(</span><span class="n">init_functions</span><span class="o">=</span><span class="n">init_functions</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># forward and params</span>
+<span class="n">X_g</span><span class="p">,</span> <span class="n">bijectors</span> <span class="o">=</span> <span class="n">rbig_block_init</span><span class="o">.</span><span class="n">forward_and_bijector</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># alternatively just the forward</span>
+<span class="n">X_g</span> <span class="o">=</span> <span class="n">rbig_block_init</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_g</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Forward Transformation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.98, &#39;Forward Transformation&#39;)
+</pre></div>
+</div>
+<img alt="../../../_images/rbig_building_blocks_28_1.png" src="../../../_images/rbig_building_blocks_28_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="forward-and-inverse-transformations">
+<h2>Forward and Inverse Transformations<a class="headerlink" href="#forward-and-inverse-transformations" title="Permalink to this headline">¶</a></h2>
+<p>So here we want to be able to chain the transformations together. We have initialized our bijectors but it would be nice to have a convenient way to loop through them calculating all of the quanties, e.g. <code class="docutils literal notranslate"><span class="pre">forward</span></code>, <code class="docutils literal notranslate"><span class="pre">inverse</span></code>, <code class="docutils literal notranslate"><span class="pre">log_det_jacobian</span></code> and some combination of them.</p>
+<p>In this package, we have the <code class="docutils literal notranslate"><span class="pre">BijectorChain</span></code> class which gives us that flexibility.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.transforms.base</span> <span class="kn">import</span> <span class="n">BijectorChain</span>
+
+<span class="c1"># create a list of BIJECTORS (not init functions)</span>
+<span class="n">bijectors</span> <span class="o">=</span> <span class="p">[</span><span class="n">hist_bijector</span><span class="p">,</span> <span class="n">icdf_bijector</span><span class="p">,</span> <span class="n">pca_bijector</span><span class="p">]</span>
+
+<span class="c1"># create rbig_block</span>
+<span class="n">rbig_block</span> <span class="o">=</span> <span class="n">BijectorChain</span><span class="p">(</span><span class="n">bijectors</span><span class="o">=</span><span class="n">bijectors</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># forward with bijector</span>
+<span class="n">X_l3</span> <span class="o">=</span> <span class="n">rbig_block</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># inverse transformation</span>
+<span class="n">X_approx</span> <span class="o">=</span> <span class="n">rbig_block</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span><span class="n">X_l3</span><span class="p">)</span>
+
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_approx</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+
+<span class="c1"># gradient transformation</span>
+<span class="n">X_l3_ldj</span> <span class="o">=</span> <span class="n">rbig_block</span><span class="o">.</span><span class="n">forward_log_det_jacobian</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># forward and gradient transformation</span>
+<span class="n">X_l3_</span><span class="p">,</span> <span class="n">X_l3_ldj_</span> <span class="o">=</span> <span class="n">rbig_block</span><span class="o">.</span><span class="n">forward_and_log_det</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_l3_</span><span class="p">,</span> <span class="n">X_l3</span><span class="p">)</span>
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_l3_ldj</span><span class="p">,</span> <span class="n">X_l3_ldj_</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot Transformations</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Forward Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_approx</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Inverse Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_l3_ldj</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Gradient Transformation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.98, &#39;Gradient Transformation&#39;)
+</pre></div>
+</div>
+<img alt="../../../_images/rbig_building_blocks_32_1.png" src="../../../_images/rbig_building_blocks_32_1.png" />
+<img alt="../../../_images/rbig_building_blocks_32_2.png" src="../../../_images/rbig_building_blocks_32_2.png" />
+<img alt="../../../_images/rbig_building_blocks_32_3.png" src="../../../_images/rbig_building_blocks_32_3.png" />
+</div>
+</div>
+</div>
+<div class="section" id="multiple-layers">
+<h2>Multiple Layers<a class="headerlink" href="#multiple-layers" title="Permalink to this headline">¶</a></h2>
+<p>So it’s very evident that a single RBIG block isn’t enough. We need multiple layers. So all we need to do is loop through the <code class="docutils literal notranslate"><span class="pre">init_</span></code> methods until we are satisfied. Then once we’re done, we can create another chain and check how good is our transformation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="n">itercount</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">n_blocks</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># initialize rbig block</span>
+<span class="n">init_functions</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">init_hist_f</span><span class="p">,</span>
+    <span class="n">init_icdf_f</span><span class="p">,</span>
+    <span class="n">init_pca_f</span>
+<span class="p">]</span>
+
+<span class="c1"># initialize RBIG Init Block</span>
+<span class="n">rbig_block_init</span> <span class="o">=</span> <span class="n">RBIGBlockInit</span><span class="p">(</span><span class="n">init_functions</span><span class="o">=</span><span class="n">init_functions</span><span class="p">)</span>
+
+<span class="c1"># initialize list of bijectors</span>
+<span class="n">bijectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+<span class="c1"># initialize transform</span>
+<span class="n">X_g</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="n">plot_steps</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">while</span> <span class="nb">next</span><span class="p">(</span><span class="n">itercount</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_blocks</span><span class="p">:</span>
+    
+    <span class="c1"># fit RBIG block</span>
+    <span class="n">X_g</span><span class="p">,</span> <span class="n">ibijector</span> <span class="o">=</span> <span class="n">rbig_block_init</span><span class="o">.</span><span class="n">forward_and_bijector</span><span class="p">(</span><span class="n">X_g</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">plot_steps</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_g</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="c1"># append bijectors </span>
+    <span class="n">bijectors</span> <span class="o">+=</span> <span class="n">ibijector</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 1min 4s, sys: 1min 4s, total: 2min 9s
+Wall time: 11.7 s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="check-transformation">
+<h3>Check Transformation<a class="headerlink" href="#check-transformation" title="Permalink to this headline">¶</a></h3>
+<p>Now let’s check the Gaussianized data to see how well we did.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_g</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/rbig_building_blocks_36_0.png" src="../../../_images/rbig_building_blocks_36_0.png" />
+</div>
+</div>
+<p>This looks pretty good. So let’s see how good the inverse transformation. Again, we create a <code class="docutils literal notranslate"><span class="pre">bijectorchain</span></code> which will loop through all of the transformations</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create rbig_model</span>
+<span class="n">rbig_model</span> <span class="o">=</span> <span class="n">BijectorChain</span><span class="p">(</span><span class="n">bijectors</span><span class="o">=</span><span class="n">bijectors</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="c1"># forward with bijector</span>
+<span class="n">X_g_</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_g_</span><span class="p">,</span> <span class="n">X_g</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+
+<span class="c1"># inverse transformation</span>
+<span class="n">X_approx</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span><span class="n">X_g</span><span class="p">)</span>
+
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_approx</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">)</span>
+
+<span class="c1"># gradient transformation</span>
+<span class="n">X_g_ldj</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">forward_log_det_jacobian</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># forward and gradient transformation</span>
+<span class="n">X_g__</span><span class="p">,</span> <span class="n">X_g_ldj_</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">forward_and_log_det</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_g__</span><span class="p">,</span> <span class="n">X_g_</span><span class="p">)</span>
+<span class="n">chex</span><span class="o">.</span><span class="n">assert_tree_all_close</span><span class="p">(</span><span class="n">X_g_ldj</span><span class="p">,</span> <span class="n">X_g_ldj_</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 12 s, sys: 864 ms, total: 12.9 s
+Wall time: 12.8 s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot Transformations</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_g</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Forward Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_approx</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Inverse Transformation&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_g_ldj</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Gradient Transformation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.98, &#39;Gradient Transformation&#39;)
+</pre></div>
+</div>
+<img alt="../../../_images/rbig_building_blocks_40_1.png" src="../../../_images/rbig_building_blocks_40_1.png" />
+<img alt="../../../_images/rbig_building_blocks_40_2.png" src="../../../_images/rbig_building_blocks_40_2.png" />
+<img alt="../../../_images/rbig_building_blocks_40_3.png" src="../../../_images/rbig_building_blocks_40_3.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="gaussianization-flow">
+<h2>Gaussianization Flow<a class="headerlink" href="#gaussianization-flow" title="Permalink to this headline">¶</a></h2>
+<p>The bijector chains allow us to do some extra things like density estimation or sampling. So we can also use the <code class="docutils literal notranslate"><span class="pre">GaussianizationFlow</span></code> class which is exactly like the <code class="docutils literal notranslate"><span class="pre">BijectorChain</span></code> class but with some additional benefits like calculating log probabilities. This may seem very redundant for the iterative method, but it is very helpful for fully parameterized Gaussianization; i.e. the end result is the same but the way to find the parameters are different.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.models</span> <span class="kn">import</span> <span class="n">GaussianizationFlow</span>
+<span class="kn">from</span> <span class="nn">distrax._src.distributions.normal</span> <span class="kn">import</span> <span class="n">Normal</span>
+
+<span class="c1"># initialize base distribution</span>
+<span class="n">base_dist</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,)),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,)))</span>
+
+<span class="c1"># initialize flow model</span>
+<span class="n">rbig_model</span> <span class="o">=</span> <span class="n">GaussianizationFlow</span><span class="p">(</span><span class="n">base_dist</span><span class="o">=</span><span class="n">base_dist</span><span class="p">,</span> <span class="n">bijectors</span><span class="o">=</span><span class="n">bijectors</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="density-estimation">
+<h3>Density Estimation<a class="headerlink" href="#density-estimation" title="Permalink to this headline">¶</a></h3>
+<p>Here we will do an example of density estimation. In this example,</p>
+<p>So here we will do an example of density estimation.
+The same pythn code below is equivalent.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># propagate through the chain</span>
+<span class="n">X_g_grid</span><span class="p">,</span> <span class="n">X_ldj_grid</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">forward_and_log_det</span><span class="p">(</span><span class="n">xyinput</span><span class="p">)</span>
+
+<span class="c1"># calculate log prob</span>
+<span class="n">base_dist</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,)),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,)))</span>
+
+<span class="n">latent_prob</span> <span class="o">=</span> <span class="n">base_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">X_g_grid</span><span class="p">)</span>
+
+<span class="c1"># calculate log probability</span>
+<span class="n">X_log_prob</span> <span class="o">=</span> <span class="n">latent_prob</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">X_ldj_grid</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, using the <code class="docutils literal notranslate"><span class="pre">score_samples</span></code> method is a lot more convenient.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Original Density</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">1_000_000</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">X_plot</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">make_moons</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="n">n_grid</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">buffer</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">xline</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">n_grid</span><span class="p">)</span>
+<span class="n">yline</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">n_grid</span><span class="p">)</span>
+<span class="n">xgrid</span><span class="p">,</span> <span class="n">ygrid</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xline</span><span class="p">,</span> <span class="n">yline</span><span class="p">)</span>
+<span class="n">xyinput</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">xgrid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">ygrid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="n">X_log_prob</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">xyinput</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 6.91 s, sys: 384 ms, total: 7.29 s
+Wall time: 5.96 s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Original Density</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+
+
+<span class="c1"># Estimated Density</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">magma</span>  <span class="c1"># &quot;Reds&quot;</span>
+<span class="n">probs</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">X_log_prob</span><span class="p">)</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span>
+    <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.0</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;True Density&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+<span class="p">)</span>
+
+<span class="n">h1</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">probs</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.0</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+<span class="p">)</span>
+<span class="c1"># plt.colorbar(h1)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Estimated Density&quot;</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/rbig_building_blocks_46_0.png" src="../../../_images/rbig_building_blocks_46_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="score-negative-log-likelihood">
+<h3>Score (Negative Log-Likelihood)<a class="headerlink" href="#score-negative-log-likelihood" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nll</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NLL Score: </span><span class="si">{</span><span class="n">nll</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NLL Score: 0.6803
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="sampling">
+<h3>Sampling<a class="headerlink" href="#sampling" title="Permalink to this headline">¶</a></h3>
+<p>This is another useful application.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="c1"># number of samples</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100_000</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="n">X_samples</span> <span class="o">=</span> <span class="n">rbig_model</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 5.96 s, sys: 487 ms, total: 6.44 s
+Wall time: 3.79 s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original Data&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Original Data&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">fig2</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_samples</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+<span class="n">fig2</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Generated Samples&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/rbig_building_blocks_51_0.png" src="../../../_images/rbig_building_blocks_51_0.png" />
+<img alt="../../../_images/rbig_building_blocks_51_1.png" src="../../../_images/rbig_building_blocks_51_1.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="better-training">
+<h2>Better Training<a class="headerlink" href="#better-training" title="Permalink to this headline">¶</a></h2>
+<p>So we assumed that there would be <span class="math notranslate nohighlight">\(20\)</span> layers necessary in order to train the model. But how do we know that it’s the best model? This would require some <em>stopping criteria</em> instead of just an ad-hoc procedure.</p>
+<p>In RBIG, we use the <strong>information reduction</strong> loss which essentially checks how much information content is being removed with each iteration. We are effectively creating a more and more independent distribution with every marginal Gaussianization + rotation. So naturally, we can simply check how much the information is being reduced between iterations. If there are no changes, we can stop.</p>
+<div class="section" id="loss-function">
+<h3>Loss Function<a class="headerlink" href="#loss-function" title="Permalink to this headline">¶</a></h3>
+<p>We can initialize the info loss function here.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.losses</span> <span class="kn">import</span> <span class="n">init_info_loss</span>
+
+<span class="c1"># define loss parameters</span>
+<span class="n">max_layers</span> <span class="o">=</span> <span class="mi">1_000</span>
+<span class="n">zero_tolerance</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">jitted</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="c1"># initialize info loss function</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">init_info_loss</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">max_layers</span><span class="o">=</span><span class="n">max_layers</span><span class="p">,</span>
+    <span class="n">zero_tolerance</span><span class="o">=</span><span class="n">zero_tolerance</span><span class="p">,</span>
+    <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+    <span class="n">jitted</span><span class="o">=</span><span class="n">jitted</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="training">
+<h3>Training<a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbig_jax.training.iterative</span> <span class="kn">import</span> <span class="n">train_info_loss_model</span>
+
+<span class="c1"># define training params</span>
+<span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">n_layers_remove</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">interval</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># run iterative training</span>
+<span class="n">X_g</span><span class="p">,</span> <span class="n">rbig_model_info</span> <span class="o">=</span> <span class="n">train_info_loss_model</span><span class="p">(</span>
+    <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+    <span class="n">rbig_block_init</span><span class="o">=</span><span class="n">rbig_block_init</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span>
+    <span class="n">n_layers_remove</span><span class="o">=</span><span class="n">n_layers_remove</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Layer 10 - Cum. Info Reduction: 2.700 - Elapsed Time: 6.2950 secs
+Layer 20 - Cum. Info Reduction: 2.850 - Elapsed Time: 11.0626 secs
+Layer 30 - Cum. Info Reduction: 3.058 - Elapsed Time: 15.9575 secs
+Layer 40 - Cum. Info Reduction: 3.216 - Elapsed Time: 20.8868 secs
+Layer 50 - Cum. Info Reduction: 3.263 - Elapsed Time: 25.7276 secs
+Layer 60 - Cum. Info Reduction: 3.263 - Elapsed Time: 30.5382 secs
+Layer 70 - Cum. Info Reduction: 3.263 - Elapsed Time: 35.3184 secs
+Layer 80 - Cum. Info Reduction: 3.277 - Elapsed Time: 40.2019 secs
+Layer 90 - Cum. Info Reduction: 3.277 - Elapsed Time: 44.9938 secs
+Layer 100 - Cum. Info Reduction: 3.277 - Elapsed Time: 49.7303 secs
+Layer 110 - Cum. Info Reduction: 3.277 - Elapsed Time: 54.5568 secs
+Layer 120 - Cum. Info Reduction: 3.320 - Elapsed Time: 59.2062 secs
+Layer 130 - Cum. Info Reduction: 3.320 - Elapsed Time: 64.0455 secs
+Layer 140 - Cum. Info Reduction: 3.367 - Elapsed Time: 68.8304 secs
+Layer 150 - Cum. Info Reduction: 3.367 - Elapsed Time: 73.6238 secs
+Layer 160 - Cum. Info Reduction: 3.367 - Elapsed Time: 78.3725 secs
+Layer 170 - Cum. Info Reduction: 3.367 - Elapsed Time: 83.1724 secs
+Layer 180 - Cum. Info Reduction: 3.367 - Elapsed Time: 87.9750 secs
+Layer 190 - Cum. Info Reduction: 3.367 - Elapsed Time: 92.6474 secs
+Converged at Layer: 192
+Final Number of layers: 142 (Blocks: 47)
+Total Time: 93.7292 secs
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="information-reduction-evolution">
+<h3>Information Reduction Evolution<a class="headerlink" href="#information-reduction-evolution" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rbig_model_info</span><span class="o">.</span><span class="n">info_loss</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Iterations&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$\Delta$ Info. Reduction&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/rbig_building_blocks_58_0.png" src="../../../_images/rbig_building_blocks_58_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="negative-log-likelihood">
+<h3>Negative Log-Likelihood<a class="headerlink" href="#negative-log-likelihood" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nll</span> <span class="o">=</span> <span class="n">rbig_model_info</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NLL Score: </span><span class="si">{</span><span class="n">nll</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NLL Score: 0.5901
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="density-estimation-revisited">
+<h3>Density Estimation (Revisited)<a class="headerlink" href="#density-estimation-revisited" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="n">X_log_prob</span> <span class="o">=</span> <span class="n">rbig_model_info</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">xyinput</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 32.5 s, sys: 2.57 s, total: 35.1 s
+Wall time: 19.4 s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Estimated Density</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">magma</span>  <span class="c1"># &quot;Reds&quot;</span>
+<span class="n">probs</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">X_log_prob</span><span class="p">)</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span>
+    <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.0</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;True Density&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+<span class="p">)</span>
+
+<span class="n">h1</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">probs</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.0</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+<span class="p">)</span>
+<span class="c1"># plt.colorbar(h1)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Estimated Density&quot;</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/rbig_building_blocks_63_0.png" src="../../../_images/rbig_building_blocks_63_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="sampling-revisited">
+<h3>Sampling Revisited<a class="headerlink" href="#sampling-revisited" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+
+<span class="c1"># number of samples</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100_000</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="n">X_samples</span> <span class="o">=</span> <span class="n">rbig_model_info</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 30.6 s, sys: 2.11 s, total: 32.7 s
+Wall time: 8.93 s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original Data&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Original Data&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">fig2</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_samples</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+<span class="n">fig2</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Generated Samples&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/rbig_building_blocks_66_0.png" src="../../../_images/rbig_building_blocks_66_0.png" />
+<img alt="../../../_images/rbig_building_blocks_66_1.png" src="../../../_images/rbig_building_blocks_66_1.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="saving-and-loading">
+<h2>Saving and Loading<a class="headerlink" href="#saving-and-loading" title="Permalink to this headline">¶</a></h2>
+<p>Often times it would be nice to save and load models. This is useful for checkpointing (during training) and also for convenience if you’re doing research on google colab.</p>
+<p>Fortunately, everything here are python objects, so we can easily save and load our models via <code class="docutils literal notranslate"><span class="pre">pickle</span></code>.</p>
+<div class="section" id="saving">
+<h3>Saving<a class="headerlink" href="#saving" title="Permalink to this headline">¶</a></h3>
+<p>Do to the internals of python (and design choices within this library), one can only store <code class="docutils literal notranslate"><span class="pre">objects</span></code>. So that includes the <code class="docutils literal notranslate"><span class="pre">rbig_block</span></code>, the <code class="docutils literal notranslate"><span class="pre">bijectors</span></code> and also the <code class="docutils literal notranslate"><span class="pre">rbig_model</span></code>. This does not include the <code class="docutils literal notranslate"><span class="pre">rbig_block_init</span></code> for example because that isn’t an object, it’s a function with some local params.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">joblib</span>
+
+<span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rbig_model_info</span><span class="p">,</span> <span class="s2">&quot;rbig_model_test.pickle&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;rbig_model_test.pickle&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="loading">
+<h3>Loading<a class="headerlink" href="#loading" title="Permalink to this headline">¶</a></h3>
+<p>Loading is straight forward!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rbig_model_loaded</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;rbig_model_test.pickle&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="simple-test">
+<h3>Simple Test<a class="headerlink" href="#simple-test" title="Permalink to this headline">¶</a></h3>
+<p>They won’t be the <strong>exact same</strong> byte-for-byte encoding. But they should give the same results either way :).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># nll for the old model</span>
+<span class="n">nll</span> <span class="o">=</span> <span class="n">rbig_model_info</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Negative Log-Likelihood: </span><span class="si">{</span><span class="n">nll</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># nll for the loaded model</span>
+<span class="n">nll</span> <span class="o">=</span> <span class="n">rbig_model_loaded</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Negative Log-Likelihood: </span><span class="si">{</span><span class="n">nll</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Negative Log-Likelihood: 0.5880
+Negative Log-Likelihood: 0.5880
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-.conda-jax_py38-py"
+        },
+        kernelOptions: {
+            kernelName: "conda-env-.conda-jax_py38-py",
+            path: "./content/public/rbig"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-.conda-jax_py38-py'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="rbig_demo_plane.html" title="previous page">Demo - RBIG</a>
+    <a class='right-next' id="next-link" href="../../literature.html" title="next page">Literature Review</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By IPL-UV<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

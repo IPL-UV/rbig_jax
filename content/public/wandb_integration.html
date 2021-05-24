@@ -1,0 +1,1112 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weights and Biases Integration &#8212; Gaussianization</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">Gaussianization</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro.html">
+   Iterative and Parametric Gaussianization with Jax
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Iterative Gaussianization
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="rbig/rbig_demo_plane.html">
+   Demo - RBIG
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="rbig/rbig_building_blocks.html">
+   Building Blocks 4 RBIG
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Exploration
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../literature.html">
+   Literature Review
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  See the project in <a href="https://github.com/IPL-UV/rbig_jax">GitHub</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/content/public/wandb_integration.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/IPL-UV/rbig_jax"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        
+        
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/IPL-UV/rbig_jax/blob/main/jupyterbook/content/public/wandb_integration.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="weights-and-biases-integration">
+<h1>Weights and Biases Integration<a class="headerlink" href="#weights-and-biases-integration" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Install Packages</span>
+<span class="c1"># %%capture</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">pyprojroot</span> <span class="kn">import</span> <span class="n">here</span>
+
+    <span class="c1"># spyder up to find the root</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">here</span><span class="p">(</span><span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.here&quot;</span><span class="p">])</span>
+
+    <span class="c1"># append to path</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install objax chex&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install git+https://github.com/IPL-UV/rbig_jax.git#egg=rbig_jax&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># jax packages</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span> <span class="nn">chex</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># plot methods</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">corner</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="n">sns</span><span class="o">.</span><span class="n">reset_defaults</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="s2">&quot;poster&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+<span class="c1"># logging</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">import</span> <span class="nn">wandb</span>
+<span class="kn">from</span> <span class="nn">celluloid</span> <span class="kn">import</span> <span class="n">Camera</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">device_put</span><span class="p">,</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">pyprojroot</span> <span class="kn">import</span> <span class="n">here</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">wandb.sdk</span> <span class="kn">import</span> <span class="n">wandb_config</span>
+
+<span class="c1"># library functions</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.models.gaussflow</span> <span class="kn">import</span> <span class="n">GaussianizationFlow</span><span class="p">,</span> <span class="n">init_default_gf_model</span>
+
+<span class="c1"># import chex</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+
+<span class="n">sns</span><span class="o">.</span><span class="n">reset_defaults</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>INFO:tensorflow:Enabling eager execution
+INFO:tensorflow:Enabling v2 tensorshape
+INFO:tensorflow:Enabling resource variables
+INFO:tensorflow:Enabling tensor equality
+INFO:tensorflow:Enabling control flow v2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ==========================</span>
+<span class="c1"># PARAMETERS</span>
+<span class="c1"># ==========================</span>
+
+<span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;2D Data Demo with Iterative Gaussianization method&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># ======================</span>
+<span class="c1"># Dataset</span>
+<span class="c1"># ======================</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">add_dataset_args</span>
+
+<span class="n">parser</span> <span class="o">=</span> <span class="n">add_dataset_args</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+
+
+<span class="c1"># ======================</span>
+<span class="c1"># Preprocessing</span>
+<span class="c1"># ======================</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+    <span class="s2">&quot;--standardize&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Standardize Input Training Data&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># ======================</span>
+<span class="c1"># Model</span>
+<span class="c1"># ======================</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.models.gaussflow</span> <span class="kn">import</span> <span class="n">add_gf_model_args</span>
+
+<span class="n">parser</span> <span class="o">=</span> <span class="n">add_gf_model_args</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+
+<span class="c1"># ======================</span>
+<span class="c1"># Model Training</span>
+<span class="c1"># ======================</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.training.parametric</span> <span class="kn">import</span> <span class="n">add_gf_train_args</span>
+
+<span class="n">parser</span> <span class="o">=</span> <span class="n">add_gf_train_args</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+
+<span class="c1"># ======================</span>
+<span class="c1"># Logger Parameters</span>
+<span class="c1"># ======================</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--wandb-entity&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ipl_uv&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--wandb-project&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;gf_2d_data&quot;</span><span class="p">)</span>
+<span class="c1"># =====================</span>
+<span class="c1"># Testing</span>
+<span class="c1"># =====================</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+    <span class="s2">&quot;-sm&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--smoke-test&quot;</span><span class="p">,</span>
+    <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;to do a smoke test without logging&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>_StoreTrueAction(option_strings=[&#39;-sm&#39;, &#39;--smoke-test&#39;], dest=&#39;smoke_test&#39;, nargs=0, const=True, default=False, type=None, choices=None, help=&#39;to do a smoke test without logging&#39;, metavar=None)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># args = parser.parse_args()</span>
+<span class="n">args</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">()</span>
+
+<span class="n">args</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="s2">&quot;checkerboard&quot;</span>
+<span class="n">args</span><span class="o">.</span><span class="n">smoke_test</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="c1"># change this so we don&#39;t bug wandb with our BS</span>
+<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">smoke_test</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;WANDB_MODE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;dryrun&quot;</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">1_000</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ==========================</span>
+<span class="c1"># INITIALIZE LOGGER</span>
+<span class="c1"># ==========================</span>
+
+<span class="n">wandb_logger</span> <span class="o">=</span> <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">wandb_project</span><span class="p">,</span> <span class="n">entity</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">wandb_entity</span><span class="p">)</span>
+<span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">seed</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Failed to detect the name of this notebook, you can set it manually with the WANDB_NOTEBOOK_NAME environment variable to enable code saving.
+<span class=" -Color -Color-Bold -Color-Bold-Blue">wandb</span>: Currently logged in as: <span class=" -Color -Color-Yellow">ml4floods</span> (use `wandb login --relogin` to force relogin)
+<span class=" -Color -Color-Bold -Color-Bold-Blue">wandb</span>: wandb version 0.10.27 is available!  To upgrade, please run:
+<span class=" -Color -Color-Bold -Color-Bold-Blue">wandb</span>:  $ pip install wandb --upgrade
+</pre></div>
+</div>
+<div class="output text_html">
+Tracking run with wandb version 0.10.21<br/>
+Syncing run <strong style="color:#cdcd00">toasty-forest-2017</strong> to <a href="https://wandb.ai" target="_blank">Weights & Biases</a> <a href="https://docs.wandb.com/integrations/jupyter.html" target="_blank">(Documentation)</a>.<br/>
+Project page: <a href="https://wandb.ai/ipl_uv/gf_2d_data" target="_blank">https://wandb.ai/ipl_uv/gf_2d_data</a><br/>
+Run page: <a href="https://wandb.ai/ipl_uv/gf_2d_data/runs/3t7f36ft" target="_blank">https://wandb.ai/ipl_uv/gf_2d_data/runs/3t7f36ft</a><br/>
+Run data is saved locally in <code>/home/emmanuel/code/rbig_jax/jupyterbook/content/experimental/plane/wandb/run-20210427_174859-3t7f36ft</code><br/><br/>
+</div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ==========================</span>
+<span class="c1">#  LOAD DATA</span>
+<span class="c1"># ==========================</span>
+
+<span class="c1"># get data</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">n_samples</span>
+<span class="n">n_features</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="k">if</span> <span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;noisysine&quot;</span><span class="p">]:</span>
+    <span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">NoisySineDataset</span> <span class="k">as</span> <span class="n">PlaneDataset</span>
+
+<span class="k">elif</span> <span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;s_curve&quot;</span><span class="p">]:</span>
+    <span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">SCurveDataset</span> <span class="k">as</span> <span class="n">PlaneDataset</span>
+
+<span class="k">elif</span> <span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;moons&quot;</span><span class="p">]:</span>
+    <span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">MoonsDataset</span> <span class="k">as</span> <span class="n">PlaneDataset</span>
+
+<span class="k">elif</span> <span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;swiss_roll&quot;</span><span class="p">]:</span>
+    <span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">SwissRollDataset</span> <span class="k">as</span> <span class="n">PlaneDataset</span>
+
+<span class="k">elif</span> <span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;blobs&quot;</span><span class="p">]:</span>
+    <span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">BlobsDataset</span> <span class="k">as</span> <span class="n">PlaneDataset</span>
+<span class="k">elif</span> <span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;checkerboard&quot;</span><span class="p">]:</span>
+    <span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">CheckBoard</span> <span class="k">as</span> <span class="n">PlaneDataset</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized dataset: </span><span class="si">{</span><span class="n">wandb_logger</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_train</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">n_train</span>
+<span class="n">n_train</span> <span class="o">=</span> <span class="mi">5_000</span>
+<span class="n">n_valid</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">n_valid</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">noise</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">seed</span>
+
+<span class="c1"># initialize dataset</span>
+<span class="n">ds_train</span> <span class="o">=</span> <span class="n">PlaneDataset</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_train</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">ds_valid</span> <span class="o">=</span> <span class="n">PlaneDataset</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_valid</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ds_plot</span> <span class="o">=</span> <span class="n">PlaneDataset</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1_000_000</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># ==========================</span>
+<span class="c1"># Train-Test Split</span>
+<span class="c1"># ==========================</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="c1"># initialize dataloader</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">shuffle</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="n">train_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">ds_train</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+<span class="n">valid_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">ds_valid</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ==========================</span>
+<span class="c1">#  PLOTTING</span>
+<span class="c1"># ==========================</span>
+
+<span class="c1"># plot data</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">ds_train</span><span class="p">[:],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># wandb.log({&quot;original_data&quot;: wandb.Image(plt)})</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wandb_integration_8_0.png" src="../../_images/wandb_integration_8_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ==========================</span>
+<span class="c1">#  BUILD MODEL</span>
+<span class="c1"># ==========================</span>
+<span class="n">n_init_samples</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">n_init_samples</span>
+<span class="n">n_init_samples</span> <span class="o">=</span> <span class="mi">5_000</span>
+<span class="k">if</span> <span class="n">n_init_samples</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds_train</span><span class="p">):</span>
+    <span class="n">X_init</span> <span class="o">=</span> <span class="n">ds_train</span><span class="p">[:</span> <span class="n">n_init_samples</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">X_init</span> <span class="o">=</span> <span class="n">ds_train</span><span class="p">[:]</span>
+
+<span class="c1"># n_blocks = args.n_blocks</span>
+<span class="n">n_blocks</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">n_components</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">n_components</span>
+<span class="n">n_components</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">n_reflections</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">n_reflections</span>
+<span class="n">n_reflections</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">mixture</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">mixture</span>
+<span class="n">mixture</span> <span class="o">=</span> <span class="s2">&quot;logistic&quot;</span>
+<span class="n">inverse_cdf</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">inverse_cdf</span>
+<span class="n">inverse_cdf</span> <span class="o">=</span> <span class="s2">&quot;logistic&quot;</span>
+<span class="n">init_mixcdf</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">init_mixcdf</span>
+<span class="n">init_mixcdf</span> <span class="o">=</span> <span class="s2">&quot;kmeans&quot;</span>
+
+<span class="c1"># initialize Model</span>
+<span class="n">gf_model</span> <span class="o">=</span> <span class="n">init_default_gf_model</span><span class="p">(</span>
+    <span class="n">shape</span><span class="o">=</span><span class="n">X_init</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">X</span><span class="o">=</span><span class="n">X_init</span><span class="p">,</span>
+    <span class="n">n_blocks</span><span class="o">=</span><span class="n">n_blocks</span><span class="p">,</span>
+    <span class="n">mixture</span><span class="o">=</span><span class="n">mixture</span><span class="p">,</span>
+    <span class="n">n_components</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_components</span><span class="p">,</span>
+    <span class="n">init_mixcdf</span><span class="o">=</span><span class="n">init_mixcdf</span><span class="p">,</span>
+    <span class="n">inverse_cdf</span><span class="o">=</span><span class="n">inverse_cdf</span><span class="p">,</span>
+    <span class="n">init_rotation</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">init_rotation</span><span class="p">,</span>
+    <span class="n">n_reflections</span><span class="o">=</span><span class="n">n_reflections</span><span class="p">,</span>
+    <span class="n">plot_layers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">plot_blocks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING:absl:No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
+Initializing - Block: 10 | Layer 29: 100%|██████████| 10/10 [00:13&lt;00:00,  1.37s/it]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_g</span> <span class="o">=</span> <span class="n">ds_train</span><span class="p">[:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">ibijector</span> <span class="ow">in</span> <span class="n">gf_model</span><span class="o">.</span><span class="n">bijectors</span><span class="p">:</span>
+
+    <span class="n">X_g</span> <span class="o">=</span> <span class="n">ibijector</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X_g</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ibijector</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;HouseHolder&quot;</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_g</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wandb_integration_10_0.png" src="../../_images/wandb_integration_10_0.png" />
+<img alt="../../_images/wandb_integration_10_1.png" src="../../_images/wandb_integration_10_1.png" />
+<img alt="../../_images/wandb_integration_10_2.png" src="../../_images/wandb_integration_10_2.png" />
+<img alt="../../_images/wandb_integration_10_3.png" src="../../_images/wandb_integration_10_3.png" />
+<img alt="../../_images/wandb_integration_10_4.png" src="../../_images/wandb_integration_10_4.png" />
+<img alt="../../_images/wandb_integration_10_5.png" src="../../_images/wandb_integration_10_5.png" />
+<img alt="../../_images/wandb_integration_10_6.png" src="../../_images/wandb_integration_10_6.png" />
+<img alt="../../_images/wandb_integration_10_7.png" src="../../_images/wandb_integration_10_7.png" />
+<img alt="../../_images/wandb_integration_10_8.png" src="../../_images/wandb_integration_10_8.png" />
+<img alt="../../_images/wandb_integration_10_9.png" src="../../_images/wandb_integration_10_9.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ==========================</span>
+<span class="c1">#  PLOTTING</span>
+<span class="c1"># ==========================</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">gf_model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X_init</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">hist_bin_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># wandb.log({&quot;initial_latent&quot;: wandb.Image(plt)})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wandb_integration_11_0.png" src="../../_images/wandb_integration_11_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ==========================</span>
+<span class="c1">#  TRAINING</span>
+<span class="c1"># ==========================</span>
+
+<span class="kn">from</span> <span class="nn">jax.experimental</span> <span class="kn">import</span> <span class="n">optimizers</span>
+
+<span class="n">lr</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">lr</span>
+
+<span class="n">lr</span> <span class="o">=</span> <span class="mf">0.05</span>
+
+<span class="kn">import</span> <span class="nn">optax</span>
+<span class="n">schedule_fn</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">cosine_onecycle_schedule</span><span class="p">(</span><span class="n">transition_steps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">peak_value</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span> <span class="n">pct_start</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">opt_init</span><span class="p">,</span> <span class="n">opt_update</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
+    <span class="c1"># Set the parameters of Adam. Note the learning_rate is not here.</span>
+    <span class="n">optax</span><span class="o">.</span><span class="n">scale_by_adam</span><span class="p">(</span><span class="n">b1</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="mf">0.999</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">),</span>
+    <span class="n">optax</span><span class="o">.</span><span class="n">scale_by_schedule</span><span class="p">(</span><span class="n">schedule_fn</span><span class="p">),</span>
+    <span class="c1"># Put a minus sign to *minimise* the loss.</span>
+<span class="c1">#     optax.scale(-lr),</span>
+    <span class="c1"># cosine onecyle schedule</span>
+    
+<span class="p">)</span>
+<span class="c1"># if args.optimizer == &quot;adam&quot;:</span>
+
+<span class="c1">#     optimizer = optimizers.adam(step_size=lr)</span>
+<span class="c1"># elif args.optimizer == &quot;sgd&quot;:</span>
+<span class="c1">#     optimizer = optimizers.adam(step_size=lr)</span>
+<span class="c1"># else:</span>
+<span class="c1">#     raise ValueError(f&quot;Unrecognized optimizer: {args.optimizer}&quot;)</span>
+
+<span class="c1"># unpack optimizer params</span>
+<span class="c1"># opt_init, opt_update, get_params = optimizer</span>
+
+<span class="c1"># initialize parameters</span>
+<span class="n">opt_state</span> <span class="o">=</span> <span class="n">opt_init</span><span class="p">(</span><span class="n">gf_model</span><span class="p">)</span>
+
+<span class="c1"># define loss function</span>
+<span class="k">def</span> <span class="nf">loss_f</span><span class="p">(</span><span class="n">gf_model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">gf_model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ================================</span>
+<span class="c1"># Boilerplate Code for Training</span>
+<span class="c1"># ================================</span>
+
+<span class="c1"># # create training loops</span>
+<span class="c1"># def train_op(i, opt_state, inputs):</span>
+<span class="c1">#     # get the parameters from the state</span>
+<span class="c1">#     params = get_params(opt_state)</span>
+
+<span class="c1">#     # calculate the loss AND the gradients</span>
+<span class="c1">#     loss, gradients = jax.value_and_grad(loss_f)(params, inputs)</span>
+
+<span class="c1">#     # return loss AND new opt_state</span>
+<span class="c1">#     return loss, opt_update(i, gradients, opt_state)</span>
+
+<span class="k">def</span> <span class="nf">train_op</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">opt_state</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+    
+    <span class="c1"># Compute gradient and loss.</span>
+    <span class="n">loss</span><span class="p">,</span> <span class="n">gradients</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">loss_f</span><span class="p">)(</span><span class="n">params</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+    
+    <span class="c1"># Transform the gradients using the optimiser.</span>
+    <span class="n">updates</span><span class="p">,</span> <span class="n">opt_state</span> <span class="o">=</span> <span class="n">opt_update</span><span class="p">(</span><span class="n">gradients</span><span class="p">,</span> <span class="n">opt_state</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    
+    <span class="c1"># update parameters</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">apply_updates</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">updates</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">opt_state</span>
+
+
+<span class="n">train_op</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">train_op</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">wandb</span>
+
+
+
+# ================================
+# TRAINING
+# ================================
+import jax.numpy as jnp
+
+train_losses = list()
+valid_losses = list()
+itercount = itertools.count()
+train_batch_loss = 0.0
+valid_batch_loss = 0.0
+interval = 5
+
+pbar = tqdm.trange(args.epochs)
+
+with pbar:
+    for i_epoch in pbar:
+
+        # Train
+        avg_loss = []
+
+        for ix in train_dl:
+
+            # cast to jax array
+            ix = jnp.array(ix, dtype=jnp.float32)
+
+            # compute loss
+            loss, gf_model, opt_state = train_op(gf_model, opt_state, ix)
+
+            # append batch
+            wandb.log({&quot;train_loss_batch&quot;: float(loss), &quot;epoch&quot;: i_epoch})
+            avg_loss.append(float(loss))
+
+        # average loss
+        train_batch_loss = jnp.mean(jnp.stack(avg_loss))
+        wandb.log({&quot;train_loss&quot;: float(train_batch_loss), &quot;epoch&quot;: i_epoch})
+
+        # Log losses
+        train_losses.append(np.array(train_batch_loss))
+        pbar.set_postfix(
+            {
+                &quot;Train Loss&quot;: f&quot;{train_batch_loss:.4f}&quot;,
+                &quot;Valid Loss&quot;: f&quot;{valid_batch_loss:.4f}&quot;,
+            }
+        )
+
+        if valid_dl is not None:
+
+#             final_params = get_params(opt_state)
+
+            # Train
+            avg_loss = []
+
+            for ix in valid_dl:
+
+                # cast to jax array
+                ix = jnp.array(ix, dtype=jnp.float32)
+
+                # compute loss
+                loss = gf_model.score(ix)
+
+                # append batch
+                wandb.log({&quot;valid_loss_batch&quot;: float(loss), &quot;epoch&quot;: i_epoch})
+                avg_loss.append(float(loss))
+
+            # average loss
+            valid_batch_loss = jnp.mean(jnp.stack(avg_loss))
+            wandb.log({&quot;valid_loss&quot;: float(valid_batch_loss), &quot;epoch&quot;: i_epoch})
+
+            valid_losses.append(np.array(valid_batch_loss))
+
+            pbar.set_postfix(
+                {
+                    &quot;Train Loss&quot;: f&quot;{train_batch_loss:.4f}&quot;,
+                    &quot;Valid Loss&quot;: f&quot;{valid_batch_loss:.4f}&quot;,
+                }
+            )
+
+        else:
+            continue
+
+        if i_epoch % interval == 0:
+            X_trans = []
+            for ix in train_dl:
+
+                # cast to jax array
+                ix = jnp.array(ix, dtype=jnp.float32)
+
+                ix = gf_model.forward(ix)
+
+                X_trans.append(ix)
+
+            X_trans = jnp.concatenate(X_trans, axis=0)
+            fig = corner.corner(np.array(X_trans), color=&quot;Red&quot;)
+            wandb.log({&quot;training_latent_space&quot;: wandb.Image(plt), &quot;epoch&quot;: i_epoch})
+            plt.close(&#39;all&#39;)
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><iframe src="https://wandb.ai/ipl_uv/gf_2d_data/runs/3t7f36ft?jupyter=true" style="border:none;width:100%;height:420px">
+                </iframe></div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/100 [01:32&lt;?, ?it/s, Train Loss=nan, Valid Loss=0.0000]
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">15</span><span class="o">-</span><span class="mf">3e2</span><span class="n">c44b36550</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">57</span> 
+<span class="g g-Whitespace">     </span><span class="mi">58</span>                 <span class="c1"># compute loss</span>
+<span class="ne">---&gt; </span><span class="mi">59</span>                 <span class="n">loss</span> <span class="o">=</span> <span class="n">gf_model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">60</span> 
+<span class="g g-Whitespace">     </span><span class="mi">61</span>                 <span class="c1"># append batch</span>
+
+<span class="nn">~/code/rbig_jax/rbig_jax/models/gaussflow.py</span> in <span class="ni">score</span><span class="nt">(self, inputs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">36</span> 
+<span class="g g-Whitespace">     </span><span class="mi">37</span>     <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+<span class="ne">---&gt; </span><span class="mi">38</span>         <span class="k">return</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
+<span class="g g-Whitespace">     </span><span class="mi">39</span> 
+<span class="g g-Whitespace">     </span><span class="mi">40</span>     <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+<span class="nn">~/code/rbig_jax/rbig_jax/models/gaussflow.py</span> in <span class="ni">score_samples</span><span class="nt">(self, inputs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span> 
+<span class="g g-Whitespace">     </span><span class="mi">26</span>         <span class="c1"># forward propagation</span>
+<span class="ne">---&gt; </span><span class="mi">27</span>         <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_and_log_det</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">28</span> 
+<span class="g g-Whitespace">     </span><span class="mi">29</span>         <span class="c1"># calculate latent probability</span>
+
+<span class="nn">~/code/rbig_jax/rbig_jax/transforms/base.py</span> in <span class="ni">forward_and_log_det</span><span class="nt">(self, inputs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="c1"># total_logabsdet = jnp.expand_dims(total_logabsdet, axis=1)</span>
+<span class="g g-Whitespace">    </span><span class="mi">157</span>         <span class="k">for</span> <span class="n">ibijector</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bijectors</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">158</span>             <span class="n">outputs</span><span class="p">,</span> <span class="n">logabsdet</span> <span class="o">=</span> <span class="n">ibijector</span><span class="o">.</span><span class="n">forward_and_log_det</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">159</span>             <span class="n">total_logabsdet</span> <span class="o">+=</span> <span class="n">logabsdet</span>  <span class="c1"># sum_last(logabsdet, ndims=logabsdet.ndim)</span>
+<span class="g g-Whitespace">    </span><span class="mi">160</span> 
+
+<span class="nn">~/code/rbig_jax/rbig_jax/transforms/parametric/mixture/logistic.py</span> in <span class="ni">forward_and_log_det</span><span class="nt">(self, inputs, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span>         <span class="c1"># )</span>
+<span class="g g-Whitespace">     </span><span class="mi">28</span> 
+<span class="ne">---&gt; </span><span class="mi">29</span>         <span class="n">outputs</span> <span class="o">=</span> <span class="n">mixture_logistic_cdf</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">30</span>             <span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_logits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">means</span><span class="p">,</span> <span class="n">softplus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_scales</span><span class="p">),</span>
+<span class="g g-Whitespace">     </span><span class="mi">31</span>         <span class="p">)</span>
+
+<span class="nn">~/code/rbig_jax/rbig_jax/transforms/parametric/mixture/logistic.py</span> in <span class="ni">mixture_logistic_cdf</span><span class="nt">(x, prior_logits, means, scales)</span>
+<span class="g g-Whitespace">    </span><span class="mi">173</span> 
+<span class="g g-Whitespace">    </span><span class="mi">174</span>     <span class="c1"># normalize distribution for components, (D,K)-&gt;(D,)</span>
+<span class="ne">--&gt; </span><span class="mi">175</span>     <span class="n">log_cdf</span> <span class="o">=</span> <span class="n">logsumexp</span><span class="p">(</span><span class="n">log_cdfs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">176</span> 
+<span class="g g-Whitespace">    </span><span class="mi">177</span>     <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_cdf</span><span class="p">)</span>
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/_src/scipy/special.py</span> in <span class="ni">logsumexp</span><span class="nt">(a, axis, b, keepdims, return_sign)</span>
+<span class="g g-Whitespace">    </span><span class="mi">111</span>   <span class="n">amax_with_dims</span> <span class="o">=</span> <span class="n">amax</span> <span class="k">if</span> <span class="n">keepdims</span> <span class="k">else</span> <span class="n">lax</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">amax</span><span class="p">,</span> <span class="n">pos_dims</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">112</span>   <span class="k">if</span> <span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">113</span>     <span class="n">out</span> <span class="o">=</span> <span class="n">lax</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">lax</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">lax</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lax</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">amax_with_dims</span><span class="p">)),</span>
+<span class="g g-Whitespace">    </span><span class="mi">114</span>                                   <span class="n">axis</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="n">keepdims</span><span class="p">)),</span>
+<span class="g g-Whitespace">    </span><span class="mi">115</span>                   <span class="n">amax</span><span class="p">)</span>
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/_src/lax/lax.py</span> in <span class="ni">log</span><span class="nt">(x)</span>
+<span class="g g-Whitespace">    </span><span class="mi">195</span> <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">196</span>   <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Elementwise natural logarithm: :math:`\mathrm{log}(x)`.&quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">197</span>   <span class="k">return</span> <span class="n">log_p</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">198</span> 
+<span class="g g-Whitespace">    </span><span class="mi">199</span> <span class="k">def</span> <span class="nf">log1p</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/core.py</span> in <span class="ni">bind</span><span class="nt">(self, *args, **params)</span>
+<span class="g g-Whitespace">    </span><span class="mi">257</span>     <span class="n">top_trace</span> <span class="o">=</span> <span class="n">find_top_trace</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="n">tracers</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">top_trace</span><span class="o">.</span><span class="n">full_raise</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">259</span>     <span class="n">out</span> <span class="o">=</span> <span class="n">top_trace</span><span class="o">.</span><span class="n">process_primitive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tracers</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">260</span>     <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="n">full_lower</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiple_results</span> <span class="k">else</span> <span class="n">full_lower</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">261</span> 
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/core.py</span> in <span class="ni">process_primitive</span><span class="nt">(self, primitive, tracers, params)</span>
+<span class="g g-Whitespace">    </span><span class="mi">595</span> 
+<span class="g g-Whitespace">    </span><span class="mi">596</span>   <span class="k">def</span> <span class="nf">process_primitive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">primitive</span><span class="p">,</span> <span class="n">tracers</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">597</span>     <span class="k">return</span> <span class="n">primitive</span><span class="o">.</span><span class="n">impl</span><span class="p">(</span><span class="o">*</span><span class="n">tracers</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">598</span> 
+<span class="g g-Whitespace">    </span><span class="mi">599</span>   <span class="k">def</span> <span class="nf">process_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">primitive</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">tracers</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/interpreters/xla.py</span> in <span class="ni">apply_primitive</span><span class="nt">(prim, *args, **params)</span>
+<span class="g g-Whitespace">    </span><span class="mi">228</span> <span class="k">def</span> <span class="nf">apply_primitive</span><span class="p">(</span><span class="n">prim</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">229</span>   <span class="sd">&quot;&quot;&quot;Impl rule that compiles and runs a single primitive &#39;prim&#39; using XLA.&quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">230</span>   <span class="n">compiled_fun</span> <span class="o">=</span> <span class="n">xla_primitive_callable</span><span class="p">(</span><span class="n">prim</span><span class="p">,</span> <span class="o">*</span><span class="n">unsafe_map</span><span class="p">(</span><span class="n">arg_spec</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">231</span>   <span class="k">return</span> <span class="n">compiled_fun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">232</span> 
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/_src/util.py</span> in <span class="ni">wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">195</span>         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">196</span>       <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">197</span>         <span class="k">return</span> <span class="n">cached</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">x64_enabled</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">198</span> 
+<span class="g g-Whitespace">    </span><span class="mi">199</span>     <span class="n">wrapper</span><span class="o">.</span><span class="n">cache_clear</span> <span class="o">=</span> <span class="n">cached</span><span class="o">.</span><span class="n">cache_clear</span>
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/_src/util.py</span> in <span class="ni">cached</span><span class="nt">(_, *args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">188</span>     <span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">max_size</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">189</span>     <span class="k">def</span> <span class="nf">cached</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">190</span>       <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">191</span> 
+<span class="g g-Whitespace">    </span><span class="mi">192</span>     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/interpreters/xla.py</span> in <span class="ni">xla_primitive_callable</span><span class="nt">(prim, *arg_specs, **params)</span>
+<span class="g g-Whitespace">    </span><span class="mi">278</span>       <span class="n">device_assignment</span><span class="o">=</span><span class="n">device</span> <span class="ow">and</span> <span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">id</span><span class="p">,))</span>
+<span class="g g-Whitespace">    </span><span class="mi">279</span>   <span class="n">options</span><span class="o">.</span><span class="n">parameter_is_tupled_arguments</span> <span class="o">=</span> <span class="n">tuple_args</span>
+<span class="ne">--&gt; </span><span class="mi">280</span>   <span class="n">compiled</span> <span class="o">=</span> <span class="n">backend_compile</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">built_c</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">281</span>   <span class="k">if</span> <span class="n">nreps</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">282</span>     <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">_execute_compiled_primitive</span><span class="p">,</span> <span class="n">prim</span><span class="p">,</span> <span class="n">compiled</span><span class="p">,</span> <span class="n">handle_result</span><span class="p">)</span>
+
+<span class="nn">~/.conda/envs/jax_py38/lib/python3.8/site-packages/jax/interpreters/xla.py</span> in <span class="ni">backend_compile</span><span class="nt">(backend, built_c, options)</span>
+<span class="g g-Whitespace">    </span><span class="mi">342</span>   <span class="c1"># we use a separate function call to ensure that XLA compilation appears</span>
+<span class="g g-Whitespace">    </span><span class="mi">343</span>   <span class="c1"># separately in Python profiling results</span>
+<span class="ne">--&gt; </span><span class="mi">344</span>   <span class="k">return</span> <span class="n">backend</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">built_c</span><span class="p">,</span> <span class="n">compile_options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">345</span> 
+<span class="g g-Whitespace">    </span><span class="mi">346</span> <span class="k">def</span> <span class="nf">_execute_compiled_primitive</span><span class="p">(</span><span class="n">prim</span><span class="p">,</span> <span class="n">compiled</span><span class="p">,</span> <span class="n">result_handler</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+
+<span class="ne">KeyboardInterrupt</span>: 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># final_bijector = get_params(opt_state)</span>
+
+
+<span class="c1"># ==========================</span>
+<span class="c1">#  Score</span>
+<span class="c1"># ==========================</span>
+<span class="n">nll_loss</span> <span class="o">=</span> <span class="n">gf_model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">ds_train</span><span class="p">[:])</span>
+
+<span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">({</span><span class="s2">&quot;nll_loss&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nll_loss</span><span class="p">)})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nll_loss</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DeviceArray(1.4613056, dtype=float32)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ==========================</span>
+<span class="c1">#  PLOTTING</span>
+<span class="c1"># ==========================</span>
+<span class="n">train_losses</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">train_losses</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">valid_dl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">valid_losses</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">valid_losses</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">valid_losses</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">train_losses</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">:</span> <span class="n">valid_losses</span><span class="p">}</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">losses</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Training Loss&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">losses</span><span class="p">[</span><span class="s2">&quot;valid&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Validation Loss&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Iterations&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Negative Log-Likelihood&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># wandb.log({&quot;final_losses&quot;: wandb.Image(plt)})</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wandb_integration_18_0.png" src="../../_images/wandb_integration_18_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># =========================</span>
+<span class="c1"># PLOTS</span>
+<span class="c1"># =========================</span>
+
+<span class="c1"># LATENT SPACE</span>
+<span class="n">X_trans</span> <span class="o">=</span> <span class="n">gf_model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">ds_train</span><span class="p">[:])</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_trans</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;Red&quot;</span><span class="p">)</span>
+<span class="c1"># wandb.log({&quot;final_latent_space&quot;: wandb.Image(plt)})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wandb_integration_20_0.png" src="../../_images/wandb_integration_20_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># INVERSE TRANSFORM</span>
+<span class="n">X_approx</span> <span class="o">=</span> <span class="n">gf_model</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span><span class="n">X_trans</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">X_approx</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">)</span>
+<span class="c1"># wandb.log({&quot;inverse_space&quot;: wandb.Image(plt)})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wandb_integration_21_0.png" src="../../_images/wandb_integration_21_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># LOG PROBABILITY</span>
+<span class="kn">from</span> <span class="nn">rbig_jax.data</span> <span class="kn">import</span> <span class="n">generate_2d_grid</span>
+
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">magma</span>  <span class="c1"># &quot;Reds&quot;</span>
+<span class="n">X_plot</span> <span class="o">=</span> <span class="n">ds_plot</span><span class="p">[:]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span>
+    <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.0</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X_plot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+    <span class="n">xticklabels</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">yticklabels</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="c1"># wandb.log({&quot;original_density&quot;: wandb.Image(plt)})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wandb_integration_22_0.png" src="../../_images/wandb_integration_22_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate grid points</span>
+<span class="n">xyinput</span> <span class="o">=</span> <span class="n">generate_2d_grid</span><span class="p">(</span><span class="n">ds_train</span><span class="p">[:],</span> <span class="mi">500</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="c1"># calculate log probability</span>
+<span class="n">X_log_prob</span> <span class="o">=</span> <span class="n">gf_model</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">xyinput</span><span class="p">)</span>
+
+<span class="n">X_plot</span> <span class="o">=</span> <span class="n">ds_plot</span><span class="p">[:]</span>
+
+<span class="c1"># Estimated Density</span>
+
+<span class="n">probs</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">X_log_prob</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">probs</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.0</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xyinput</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span>
+    <span class="n">xticklabels</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">yticklabels</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="c1"># wandb.log({&quot;estimated_density&quot;: wandb.Image(plt)})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wandb_integration_23_0.png" src="../../_images/wandb_integration_23_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># =======================</span>
+<span class="c1"># Save Model</span>
+<span class="c1"># =======================</span>
+<span class="kn">import</span> <span class="nn">joblib</span>
+
+<span class="n">model_save_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wandb</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">dir</span><span class="p">,</span> <span class="s2">&quot;trained_model.pckl&quot;</span><span class="p">)</span>
+<span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">gf_model</span><span class="p">,</span> <span class="n">model_save_name</span><span class="p">)</span>
+<span class="n">wandb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model_save_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Bold -Color-Bold-Blue">wandb</span>: <span class=" -Color -Color-Yellow">WARNING</span> Saving files without folders. If you want to preserve sub directories pass base_path to wandb.save, i.e. wandb.save(&quot;/mnt/folder/file.h5&quot;, base_path=&quot;/mnt&quot;)
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;/home/emmanuel/code/rbig_jax/jupyterbook/content/experimental/plane/wandb/run-20210427_140431-wtzdttvr/files/trained_model.pckl&#39;,
+ &#39;/home/emmanuel/code/rbig_jax/jupyterbook/content/experimental/plane/wandb/run-20210427_140431-wtzdttvr/files/trained_model.pckl&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-.conda-jax_py38-py"
+        },
+        kernelOptions: {
+            kernelName: "conda-env-.conda-jax_py38-py",
+            path: "./content/public"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-.conda-jax_py38-py'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By IPL-UV<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>
