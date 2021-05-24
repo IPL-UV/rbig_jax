@@ -7,8 +7,8 @@ import numpy as np
 import tqdm
 from chex import dataclass
 from distrax._src.distributions import distribution as dist_base
-from jax import scipy as jscipy
 from distrax._src.utils.math import sum_last
+from jax import scipy as jscipy
 
 DistributionLike = dist_base.DistributionLike
 
@@ -140,4 +140,3 @@ def train_model(
         valid_losses = None
     losses = {"train": train_losses, "valid": valid_losses}
     return final_params, losses
-

@@ -1,8 +1,10 @@
-from sklearn.mixture import GaussianMixture
-import numpy as np
-import jax.numpy as jnp
 import jax
+import jax.numpy as jnp
+import numpy as np
 import tensorflow_probability.substrates.jax as tfp
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+
 from rbig_jax.transforms.kde import scotts_method
 
 
@@ -10,39 +12,47 @@ def init_mixture_weights(rng, n_features, n_components, method, X=None, **kwargs
 
     if method == "random":
         # initialize mixture
-        prior_logits = jnp.ones((n_features, n_components)) / n_components
-        means = jax.random.normal(key=rng, shape=(n_features, n_components))
+        prior_logits = jnp.zeros((n_features, n_components))
+        means = jax.random.normal(
+            key=jax.random.PRNGKey(rng) if isinstance(rng, int) else rng,
+            shape=(n_features, n_components),
+        )
         log_scales = jnp.zeros((n_features, n_components))
 
     elif method == "gmm":
         prior_logits, means, covariances = init_means_GMM_marginal(
             X,
             n_components=n_components,
-            random_state=int(rng[0]),
+            random_state=rng if isinstance(rng, int) else int(rng[0]),
             covariance_type="diag",
+            reg_covar=1e-5,
             **kwargs,
         )
         log_scales = tfp.math.softplus_inverse(jnp.sqrt(covariances))
-        # log_scales = jnp.array(covariances)
-        # log_scales = jnp.zeros((n_features, n_components))
+
         prior_logits = jnp.array(prior_logits)
+        prior_logits = jnp.log(prior_logits)
+
         means = jnp.array(means)
 
     elif method == "kmeans":
 
         # initialize means
         clusters = init_means_kmeans_marginal(
-            X=X, n_components=n_components, random_state=int(rng[0]), **kwargs,
+            X=X,
+            n_components=n_components,
+            random_state=rng if isinstance(rng, int) else int(rng[0]),
+            **kwargs,
         )
         means = jnp.array(clusters)
 
         # initialize mixture distribution (uniform)
-        prior_logits = jnp.ones((n_features, n_components)) / n_components
+        prior_logits = jnp.ones((n_features, n_components))
 
         # initialize bandwith (rule of thumb estimator)
-        bandwith = scotts_method(n_samples=X.shape[0], n_features=n_features)
-        log_scales = tfp.math.softplus_inverse(jnp.sqrt(bandwith))
-        log_scales *= jnp.ones((n_features, n_components))
+        # bandwith = scotts_method(n_samples=X.shape[0], n_features=n_features)
+        log_scales = tfp.math.softplus_inverse(jnp.std(X, axis=0))
+        log_scales = log_scales @ jnp.ones((n_features, n_components))
 
     else:
         raise ValueError(f"Unrecognized init method: {method}")
@@ -51,10 +61,6 @@ def init_mixture_weights(rng, n_features, n_components, method, X=None, **kwargs
 
 def softplus_inverse(x):
     return jnp.log(jnp.exp(x) - 1.0)
-
-
-from sklearn.cluster import KMeans
-import numpy as np
 
 
 def init_means_kmeans_marginal(X: np.ndarray, n_components: int, **kwargs):

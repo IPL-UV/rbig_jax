@@ -1,47 +1,61 @@
-from typing import Callable, Optional, Tuple, List
+from typing import Callable, List, Optional, Tuple
+
 import jax.numpy as jnp
 from chex import Array, dataclass
+from flax import struct
+
 from rbig_jax.transforms.histogram import InitUniHistTransform
-from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
+from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.rotation import InitPCARotation
 
-# from rbig_jax.transforms.histogram import InitUniHistUniformize
-# from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
-# from rbig_jax.transforms.marginal import (
-#     marginal_fit_transform,
-#     marginal_gradient_transform,
-#     marginal_transform,
-# )
 
-
-@dataclass
+@struct.dataclass
 class RBIGBlockInit:
     init_functions: List[dataclass]
 
-    def forward_and_params(self, inputs: Array) -> Tuple[Array, Array]:
-        outputs = inputs
-        params = []
-
-        # loop through bijectors
-        for ibijector in self.init_functions:
-
-            # transform and params
-            outputs, iparams = ibijector.bijector_and_transform(outputs)
-
-            # accumulate params
-            params.append(iparams)
-
-        return outputs, params
-
     def forward(self, inputs: Array) -> Array:
         outputs = inputs
-        for ibijector in self.init_functions:
-            outputs = ibijector.transform(outputs)
+        for i_init_f in self.init_functions:
+            outputs = i_init_f.transform(outputs)
         return outputs
 
+    def forward_gradient_bijector(self, inputs: Array) -> Tuple[Array, Array]:
+        outputs = inputs
+        bijectors = []
+        total_logabsdet = jnp.zeros_like(outputs)
 
-@dataclass
+        # loop through bijectors
+        for i_init_f in self.init_functions:
+
+            # transform and params
+            outputs, logabsdet, ibijector = i_init_f.transform_gradient_bijector(
+                outputs
+            )
+
+            # accumulate params
+            bijectors.append(ibijector)
+            total_logabsdet += logabsdet
+
+        return outputs, total_logabsdet, bijectors
+
+    def forward_and_bijector(self, inputs: Array) -> Tuple[Array, Array]:
+        outputs = inputs
+        bijectors = []
+
+        # loop through bijectors
+        for i_init_f in self.init_functions:
+
+            # transform and params
+            outputs, ibijector = i_init_f.transform_and_bijector(outputs)
+
+            # accumulate params
+            bijectors.append(ibijector)
+
+        return outputs, bijectors
+
+
+@struct.dataclass
 class RBIGBlockParams:
     support: Array
     quantiles: Array

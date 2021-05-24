@@ -1,11 +1,13 @@
+import math
 from typing import Callable, Optional, Tuple
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
-from jax.random import PRNGKey
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
-from rbig_jax.transforms.base import InitFunctionsPlus, InitLayersFunctions
+from jax.random import PRNGKey
+
+from rbig_jax.transforms.base import InitLayersFunctions
 
 
 class InverseGaussCDF(distaxBijector):
@@ -66,8 +68,6 @@ class GaussCDF(distaxBijector):
         return outputs, logabsdet
 
 
-import math
-
 _half_log2pi = 0.5 * math.log(2 * math.pi)
 # _half_log2pi = jnp.log(jnp.sqrt(2 * jnp.pi))
 
@@ -90,31 +90,32 @@ def InitInverseGaussCDF(eps: float = 1e-5, jitted=False):
     else:
         f = bijector.forward
 
-    def init_bijector(inputs, **kwargs):
+    def transform(inputs, **kwargs):
+
+        outputs = f(inputs)
+
+        return outputs
+
+    def bijector(inputs=None, **kwargs):
 
         return InverseGaussCDF(eps=eps)
 
-    def bijector_and_transform(inputs, **kwargs):
+    def transform_and_bijector(inputs, **kwargs):
         outputs = f(inputs)
         return outputs, InverseGaussCDF(eps=eps)
 
-    def transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs
+    def transform_gradient_bijector(inputs, **kwargs):
+        bijector = InverseGaussCDF(eps=eps)
 
-    def params(inputs, **kwargs):
-        return ()
+        outputs, logabsdet = bijector.forward_and_log_det(inputs)
 
-    def params_and_transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs, ()
+        return outputs, logabsdet, bijector
 
     return InitLayersFunctions(
-        bijector=init_bijector,
-        bijector_and_transform=bijector_and_transform,
         transform=transform,
-        params=params,
-        params_and_transform=params_and_transform,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
     )
 
 
@@ -128,31 +129,32 @@ def InitGaussCDF(eps: float = 1e-5, jitted=False):
     else:
         f = bijector.forward
 
-    def init_bijector(inputs, **kwargs):
+    def transform(inputs, **kwargs):
+
+        outputs = f(inputs)
+
+        return outputs
+
+    def bijector(inputs=None, **kwargs):
 
         return GaussCDF(eps=eps)
 
-    def bijector_and_transform(inputs, **kwargs):
+    def transform_and_bijector(inputs, **kwargs):
         outputs = f(inputs)
         return outputs, GaussCDF(eps=eps)
 
-    def transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs
+    def transform_gradient_bijector(inputs, **kwargs):
+        bijector = GaussCDF(eps=eps)
 
-    def params(inputs, **kwargs):
-        return ()
+        outputs, logabsdet = bijector.forward_and_log_det(inputs)
 
-    def params_and_transform(inputs, **kwargs):
-        outputs = f(inputs)
-        return outputs, ()
+        return outputs, logabsdet, bijector
 
     return InitLayersFunctions(
-        bijector=init_bijector,
-        bijector_and_transform=bijector_and_transform,
         transform=transform,
-        params=params,
-        params_and_transform=params_and_transform,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
     )
 
 

@@ -1,30 +1,17 @@
 import abc
-from typing import Callable, Iterable, List, Optional, Sequence, Tuple, NamedTuple
+from typing import Callable, Iterable, List, NamedTuple, Optional, Sequence, Tuple
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
-from jax.random import PRNGKey
-from distrax._src.utils.math import sum_last
 from distrax._src.bijectors.bijector import Bijector as FixedBijector
 from distrax._src.utils import jittable
-import abc
+from distrax._src.utils.math import sum_last
+from flax import struct
+from jax.random import PRNGKey
 
 
-@dataclass
-class TransformInfo:
-    name: str
-    input_shape: Tuple
-    output_shape: Tuple
-
-
-class InitFunctions(NamedTuple):
-    init_params: Callable
-    init_bijector: Callable
-    init_transform: Callable
-
-
-@dataclass
+@struct.dataclass
 class Bijector:
     def forward(self, inputs: Array) -> Array:
         """Computes y = f(x)."""
@@ -91,17 +78,9 @@ class NonTrainableBijector(jittable.Jittable, metaclass=abc.ABCMeta):
 
 class InitLayersFunctions(NamedTuple):
     bijector: Optional[Callable]
-    bijector_and_transform: Optional[Callable]
+    transform_and_bijector: Optional[Callable]
     transform: Optional[Callable]
-    params: Optional[Callable]
-    params_and_transform: Optional[Callable]
-
-
-class InitFunctionsPlus(NamedTuple):
-    init_params: Callable
-    init_bijector: Callable
-    init_transform: Callable
-    init_layer: Callable
+    transform_gradient_bijector: Optional[Callable]
 
 
 @dataclass(frozen=True)
@@ -109,7 +88,7 @@ class HyperParams:
     params: dataclass
 
 
-@dataclass
+@struct.dataclass
 class InverseBijector:
     bijector: dataclass
 
@@ -144,7 +123,7 @@ class InverseBijector:
         return outputs, logdet
 
 
-@dataclass
+@struct.dataclass
 class BijectorChain:
     bijectors: Iterable[Bijector]
 

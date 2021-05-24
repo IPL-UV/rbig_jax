@@ -1,18 +1,17 @@
 import collections
-from rbig_jax.transforms.rotation import compute_projection
 from typing import Callable, Optional, Tuple
 
 import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
+from flax import struct
 from jax.random import PRNGKey
 
 from rbig_jax.transforms.base import Bijector, InitLayersFunctions
+from rbig_jax.transforms.rotation import compute_projection
 
-# RotParams = collections.namedtuple("Params", ["projection"])
 
-
-@dataclass
+@struct.dataclass
 class HouseHolder(Bijector):
     V: Array
 
@@ -73,8 +72,8 @@ def InitHouseHolder(n_reflections: int, method: str = "random") -> Callable:
         the number of householder reflections
     """
 
-    def init_bijector(
-        inputs: Array = None, rng: PRNGKey = None, n_features: int = None, **kwargs
+    def bijector(
+        inputs: Array, n_features: int, rng: PRNGKey = None, **kwargs
     ) -> HouseHolder:
 
         # initialize weight matrix
@@ -91,14 +90,21 @@ def InitHouseHolder(n_reflections: int, method: str = "random") -> Callable:
 
         return bijector
 
-    def bijector_and_transform(
-        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+    def transform_and_bijector(
+        inputs: Array, n_features: int, rng: PRNGKey = None, **kwargs
     ) -> Tuple[Array, HouseHolder]:
 
-        # init bijector
-        bijector = init_bijector(
-            rng=rng, n_features=n_features, inputs=inputs, **kwargs,
+        # initialize weight matrix
+        V = init_householder_weights(
+            rng=rng,
+            n_features=n_features,
+            n_reflections=n_reflections,
+            method=method,
+            X=inputs,
         )
+
+        # initialize bijector
+        bijector = HouseHolder(V=V)
 
         # forward transform
         outputs = bijector.forward(inputs=inputs)
@@ -106,22 +112,52 @@ def InitHouseHolder(n_reflections: int, method: str = "random") -> Callable:
         return outputs, bijector
 
     def transform(
-        inputs: Array, rng: PRNGKey = None, n_features: int = None, **kwargs
+        inputs: Array, n_features: int, rng: PRNGKey = None, **kwargs
     ) -> Array:
 
-        # init bijector
-        outputs = init_bijector(
-            rng=rng, n_features=n_features, inputs=inputs, **kwargs,
-        ).forward(inputs=inputs)
+        # initialize weight matrix
+        V = init_householder_weights(
+            rng=rng,
+            n_features=n_features,
+            n_reflections=n_reflections,
+            method=method,
+            X=inputs,
+        )
+
+        # initialize bijector
+        bijector = HouseHolder(V=V)
+
+        # forward transform
+        outputs = bijector.forward(inputs=inputs)
 
         return outputs
 
+    def transform_gradient_bijector(
+        inputs: Array, n_features: int, rng: PRNGKey = None, **kwargs
+    ) -> Tuple[Array, HouseHolder]:
+
+        # initialize weight matrix
+        V = init_householder_weights(
+            rng=rng,
+            n_features=n_features,
+            n_reflections=n_reflections,
+            method=method,
+            X=inputs,
+        )
+
+        # initialize bijector
+        bijector = HouseHolder(V=V)
+
+        # forward transform
+        outputs, logabsdet = bijector.forward_and_log_det(inputs=inputs)
+
+        return outputs, logabsdet, bijector
+
     return InitLayersFunctions(
-        bijector=init_bijector,
-        bijector_and_transform=bijector_and_transform,
         transform=transform,
-        params=None,
-        params_and_transform=None,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
     )
 
 

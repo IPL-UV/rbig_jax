@@ -1,8 +1,11 @@
-from chex import Array, dataclass
+from typing import Callable, NamedTuple, Optional, Tuple
+
 import jax
 import jax.numpy as jnp
+import numpy as np
+from chex import Array, dataclass
+
 from rbig_jax.information.total_corr import init_information_reduction_loss
-from typing import Callable, NamedTuple, Optional
 
 
 class IterativeLoss(NamedTuple):
@@ -82,3 +85,21 @@ def init_info_loss(
     return IterativeInfoLoss(
         loss_f=info_loss_f, condition=info_loss_condition, state=info_loss_state,
     )
+
+
+def nll_2_bpd(nll_loss: Array, img_shape: Tuple):
+    """Converts negative log-likelihood to bits-per-dim
+
+    Parameters
+    ----------
+    nll_loss : Array
+        The negative log likelihood loss
+    img_shape : Tuple
+        A tuple for the image dimensions
+
+    Returns
+    -------
+    nll_bpd : Array
+        The negative log-likelihood with the bits per dimension
+    """
+    return nll_loss / np.prod(img_shape) / jnp.log(2)
