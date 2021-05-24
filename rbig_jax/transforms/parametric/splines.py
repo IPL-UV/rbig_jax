@@ -8,18 +8,15 @@ from typing import Callable, Tuple
 import jax.numpy as jnp
 import jax.random as jr
 from chex import Array, dataclass
+from distrax._src.bijectors.rational_quadratic_spline import \
+    RationalQuadraticSpline as distrax_rqs
 from distrax._src.bijectors.rational_quadratic_spline import (
-    RationalQuadraticSpline as distrax_rqs,
-)
-from distrax._src.bijectors.rational_quadratic_spline import (
-    _rational_quadratic_spline_fwd,
-    _rational_quadratic_spline_inv,
-)
+    _rational_quadratic_spline_fwd, _rational_quadratic_spline_inv)
+from flax import struct
 from jax.nn import softmax, softplus
 from jax.random import PRNGKey
 
 from rbig_jax.transforms.base import Bijector, InitLayersFunctions
-from flax import struct
 
 
 @struct.dataclass

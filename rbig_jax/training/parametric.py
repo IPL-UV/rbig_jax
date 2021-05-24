@@ -1,12 +1,12 @@
 import itertools
-from typing import Callable, NamedTuple, Optional, Any, Tuple, Mapping
+from typing import Any, Callable, Mapping, NamedTuple, Optional, Tuple
 
 import jax
 import jax.numpy as jnp
 import numpy as np
-import tqdm
 import optax
-from chex import dataclass, Array
+import tqdm
+from chex import Array, dataclass
 from distrax._src.distributions import distribution as dist_base
 from distrax._src.utils.math import sum_last
 from jax import scipy as jscipy

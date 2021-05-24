@@ -46,7 +46,7 @@ black:  ## Format code in-place using black.
 format: ## Code styling - black, isort
 		black --check --diff ${PKGROOT} tests
 		@printf "\033[1;34mBlack passes!\033[0m\n\n"
-		isort ${PKGROOT}/ tests/
+		isort -rc ${PKGROOT}/ tests/
 		@printf "\033[1;34misort passes!\033[0m\n\n"
 
 style:  ## Code lying - pylint

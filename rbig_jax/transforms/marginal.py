@@ -6,6 +6,7 @@ import jax.numpy as jnp
 from chex import Array, dataclass
 from distrax._src.bijectors.bijector import Bijector as NonTrainableBijector
 from flax import struct
+
 from rbig_jax.transforms.base import Bijector
 
 

@@ -4,14 +4,13 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from chex import Array, dataclass
+from flax import struct
 from jax.lax import conv_general_dilated
 from jax.random import PRNGKey
-from flax import struct
+
 from rbig_jax.transforms.base import Bijector, InitLayersFunctions
 from rbig_jax.transforms.parametric.householder import (
-    householder_inverse_transform,
-    householder_transform,
-)
+    householder_inverse_transform, householder_transform)
 
 
 @struct.dataclass

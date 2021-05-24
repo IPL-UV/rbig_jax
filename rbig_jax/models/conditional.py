@@ -1,11 +1,13 @@
-from rbig_jax.transforms.base import Bijector, BijectorChain
-from typing import Iterable, Callable, Tuple, Sequence
+from typing import Callable, Iterable, Sequence, Tuple
+
+import jax.numpy as jnp
+from chex import Array
 from distrax._src.distributions.distribution import Distribution
 from distrax._src.distributions.log_stddev_normal import LogStddevNormal
-import jax.numpy as jnp
-from flax import struct
 from flax import linen as nn
-from chex import Array
+from flax import struct
+
+from rbig_jax.transforms.base import Bijector, BijectorChain
 
 
 @struct.dataclass
@@ -96,4 +98,3 @@ class DualHeadProbNet(nn.Module):
         stds_preds = self.std_net(x)
 
         return jnp.concatenate([loc_preds, stds_preds], axis=1)
-

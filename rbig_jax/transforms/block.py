@@ -2,12 +2,12 @@ from typing import Callable, List, Optional, Tuple
 
 import jax.numpy as jnp
 from chex import Array, dataclass
+from flax import struct
 
 from rbig_jax.transforms.histogram import InitUniHistTransform
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
 from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.rotation import InitPCARotation
-from flax import struct
 
 
 @struct.dataclass

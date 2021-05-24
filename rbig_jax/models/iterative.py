@@ -3,16 +3,17 @@ from typing import Iterable, Optional, Tuple
 import jax.numpy as jnp
 from chex import Array, dataclass
 from distrax._src.distributions.distribution import Distribution
+from flax import struct
 
 from rbig_jax.models.gaussflow import GaussianizationFlow
 from rbig_jax.transforms.base import Bijector
 from rbig_jax.transforms.block import RBIGBlockInit
 from rbig_jax.transforms.histogram import InitUniHistTransform
-from rbig_jax.transforms.parametric.mixture.gaussian import InitMixtureGaussianCDF
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
 from rbig_jax.transforms.kde import InitUniKDETransform
+from rbig_jax.transforms.parametric.mixture.gaussian import \
+    InitMixtureGaussianCDF
 from rbig_jax.transforms.rotation import InitPCARotation
-from flax import struct
 
 
 @struct.dataclass

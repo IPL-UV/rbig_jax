@@ -4,14 +4,11 @@ import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
 from distrax._src.bijectors.inverse import Inverse
-from distrax._src.bijectors.sigmoid import (
-    Sigmoid,
-    _more_stable_sigmoid,
-    _more_stable_softplus,
-)
+from distrax._src.bijectors.sigmoid import (Sigmoid, _more_stable_sigmoid,
+                                            _more_stable_softplus)
+from flax import struct
 from jax.nn import sigmoid, softplus
 from jax.random import PRNGKey
-from flax import struct
 
 from rbig_jax.transforms.base import Bijector, InitLayersFunctions
 

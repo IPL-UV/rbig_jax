@@ -5,7 +5,7 @@ import jax
 import jax.numpy as jnp
 from chex import Array, dataclass
 
-from rbig_jax.transforms.base import InitFunctions, InitLayersFunctions
+from rbig_jax.transforms.base import InitLayersFunctions
 from rbig_jax.transforms.marginal import MarginalUniformizeTransform
 from rbig_jax.utils import get_domain_extension
 

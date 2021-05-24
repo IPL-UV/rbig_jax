@@ -2,8 +2,8 @@ from typing import Callable, NamedTuple, Optional, Tuple
 
 import jax
 import jax.numpy as jnp
-from chex import Array, dataclass
 import numpy as np
+from chex import Array, dataclass
 
 from rbig_jax.information.total_corr import init_information_reduction_loss
 

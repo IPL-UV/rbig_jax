@@ -1,14 +1,14 @@
 from copy import deepcopy
-from typing import Callable, Iterable, Tuple, List
+from typing import Callable, Iterable, List, Tuple
 
 import jax.numpy as jnp
 import tqdm
 from chex import Array, dataclass
 from distrax._src.distributions.distribution import Distribution
+from flax import struct
 
 from rbig_jax.models.gaussflow import GaussianizationFlow
 from rbig_jax.transforms.base import Bijector
-from flax import struct
 
 
 @struct.dataclass

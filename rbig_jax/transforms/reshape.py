@@ -1,12 +1,10 @@
 from typing import Callable, NamedTuple, Optional, Tuple, Union
 
 import jax.numpy as jnp
-
 from chex import Array, dataclass
+from distrax._src.bijectors.bijector import Bijector as distaxBijector
 from einops import rearrange
 from jax.random import PRNGKey
-
-from distrax._src.bijectors.bijector import Bijector as distaxBijector
 
 
 class RescaleParams(NamedTuple):

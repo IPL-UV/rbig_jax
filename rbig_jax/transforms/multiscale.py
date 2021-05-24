@@ -1,12 +1,15 @@
+import abc
 from dataclasses import field
 from typing import Callable, Iterable, List, NamedTuple, Optional, Tuple
 
 import jax.numpy as jnp
 from chex import Array, dataclass
+from distrax._src.utils import jittable
+from einops import rearrange
+from flax import struct
 
 from rbig_jax.transforms.base import Bijector, BijectorChain
 from rbig_jax.transforms.reshape import init_scale_function
-from einops import rearrange
 
 
 class RescaleParams(NamedTuple):
@@ -25,10 +28,7 @@ class RescaleFunctions(NamedTuple):
     params: RescaleParams
 
 
-from distrax._src.utils import jittable
-import abc
 
-from flax import struct
 
 
 @struct.dataclass
@@ -181,4 +181,3 @@ def init_rescale_params(filter_shape, image_shape):
     rescale_params = RescaleParams(fh=fh, fw=fw, H=H, W=W, C=C, Hn=Hn, Wn=Wn,)
 
     return rescale_params
-

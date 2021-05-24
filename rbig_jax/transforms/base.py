@@ -1,5 +1,6 @@
 import abc
-from typing import Callable, Iterable, List, NamedTuple, Optional, Sequence, Tuple
+from typing import (Callable, Iterable, List, NamedTuple, Optional, Sequence,
+                    Tuple)
 
 import jax
 import jax.numpy as jnp
@@ -7,8 +8,8 @@ from chex import Array, dataclass
 from distrax._src.bijectors.bijector import Bijector as FixedBijector
 from distrax._src.utils import jittable
 from distrax._src.utils.math import sum_last
-from jax.random import PRNGKey
 from flax import struct
+from jax.random import PRNGKey
 
 
 @struct.dataclass

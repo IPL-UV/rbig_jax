@@ -7,10 +7,10 @@ import numpy as np
 from chex import Array, dataclass
 from chex._src.pytypes import PRNGKey
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
-from sklearn.decomposition import FastICA
 from scipy.linalg import sqrtm
+from sklearn.decomposition import FastICA
 
-from rbig_jax.transforms.base import InitFunctions, InitLayersFunctions
+from rbig_jax.transforms.base import InitLayersFunctions
 
 RotParams = collections.namedtuple("Params", ["rotation"])
 

@@ -9,18 +9,19 @@ import tqdm
 from chex import Array, dataclass
 from distrax._src.distributions.distribution import Distribution
 from distrax._src.distributions.normal import Normal
+from flax import struct
 
 from rbig_jax.transforms.base import Bijector, BijectorChain
-from rbig_jax.transforms.inversecdf import InitInverseGaussCDF, InitGaussCDF
-from rbig_jax.transforms.logit import (
-    InitLogitTempTransform,
-    InitLogitTransform,
-)
+from rbig_jax.transforms.inversecdf import InitGaussCDF, InitInverseGaussCDF
+from rbig_jax.transforms.logit import (InitLogitTempTransform,
+                                       InitLogitTransform)
 from rbig_jax.transforms.parametric.householder import InitHouseHolder
-from rbig_jax.transforms.parametric.mixture.gaussian import InitMixtureGaussianCDF
-from rbig_jax.transforms.parametric.mixture.logistic import InitMixtureLogisticCDF
-from rbig_jax.transforms.parametric.splines import InitPiecewiseRationalQuadraticCDF
-from flax import struct
+from rbig_jax.transforms.parametric.mixture.gaussian import \
+    InitMixtureGaussianCDF
+from rbig_jax.transforms.parametric.mixture.logistic import \
+    InitMixtureLogisticCDF
+from rbig_jax.transforms.parametric.splines import \
+    InitPiecewiseRationalQuadraticCDF
 
 
 @struct.dataclass
