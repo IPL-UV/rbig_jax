@@ -8,9 +8,18 @@ from rbig_jax.models.gaussflow import GaussianizationFlow
 from rbig_jax.transforms.base import Bijector
 from rbig_jax.transforms.block import RBIGBlockInit
 from rbig_jax.transforms.histogram import InitUniHistTransform
+from rbig_jax.transforms.parametric.mixture.gaussian import InitMixtureGaussianCDF
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
 from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.rotation import InitPCARotation
+from flax import struct
+
+
+@struct.dataclass
+class RBIGFlow(GaussianizationFlow):
+    bijectors: Iterable[Bijector]
+    base_dist: Distribution = struct.field(pytree_node=False)
+    info_loss: Array = struct.field(pytree_node=False)
 
 
 def init_default_rbig_block(
@@ -21,6 +30,7 @@ def init_default_rbig_block(
     precision: int = 100,
     nbins: Optional[int] = None,
     bw: str = "scott",
+    n_components: int = 15,
     jitted: bool = True,
     eps: float = 1e-5,
 ) -> RBIGBlockInit:
@@ -47,6 +57,10 @@ def init_default_rbig_block(
             precision=precision,
             bw=bw,
             jitted=jitted,
+        )
+    elif method == "gmm":
+        init_hist_f = InitMixtureGaussianCDF(
+            n_components=n_components, init_method="gmm",
         )
     else:
         raise ValueError(f"Unrecognzed Method : {method}")

@@ -187,10 +187,9 @@ class ConditionalGaussFlowTrainer(GaussFlowTrainer):
 
 def init_optimizer(
     name: str = "adam",
-    n_epochs: int = 5_000,
     lr: float = 1e-3,
     cosine_decay_steps: Optional[int] = None,
-    warmup: Optional[int] = None,
+    gradient_norm_clip: Optional[float] = 1.0,
     gradient_clip: Optional[float] = 15.0,
     alpha: float = 1e-1,
     one_cycle: bool = False,
@@ -200,6 +199,8 @@ def init_optimizer(
 
     # clip gradients
     if gradient_clip is not None:
+        chain.append(optax.clip_by_global_norm(gradient_norm_clip))
+    elif gradient_clip is not None:
         chain.append(optax.clip(gradient_clip))
 
     # choose the optimizer

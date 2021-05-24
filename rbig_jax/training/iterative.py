@@ -8,6 +8,7 @@ from distrax._src.distributions.normal import Normal
 
 from rbig_jax.losses import IterativeInfoLoss, init_info_loss
 from rbig_jax.models import GaussianizationFlow
+from rbig_jax.models.iterative import RBIGFlow
 from rbig_jax.transforms.block import RBIGBlockInit
 
 
@@ -92,7 +93,7 @@ def train_info_loss_model(
     verbose: bool = True,
     interval: int = 5,
     p: float = 0.25,
-    n_layers_remove: Optional[int] = 10,
+    n_layers_remove: Optional[int] = None,
     jitted: bool = True,
 ) -> Tuple[List[dataclass], Array]:
     """Simple training procedure using the iterative scheme
@@ -174,13 +175,15 @@ def train_info_loss_model(
     # ================================
     # remove excess layers and loss
     # ================================
-    if n_layers_remove is not None:
-        final_loss, bijectors = _remove_layers(
-            info_loss=final_loss,
-            bijectors=bijectors,
-            n_bijectors=n_bijectors,
-            n_layers_remove=n_layers_remove,
-        )
+    if n_layers_remove is None:
+        n_layers_remove = zero_tolerance
+
+    final_loss, bijectors = _remove_layers(
+        info_loss=final_loss,
+        bijectors=bijectors,
+        n_bijectors=n_bijectors,
+        n_layers_remove=n_layers_remove,
+    )
 
     t1 = time.time()
 
@@ -192,9 +195,9 @@ def train_info_loss_model(
     base_dist = Normal(jnp.zeros((n_features,)), jnp.ones((n_features,)))
 
     # create gaussianization flow model
-    rbig_model = GaussianizationFlow(base_dist=base_dist, bijectors=bijectors)
-
-    rbig_model.info_loss = final_loss
+    rbig_model = RBIGFlow(
+        base_dist=base_dist, bijectors=bijectors, info_loss=final_loss
+    )
 
     if verbose:
         print(
