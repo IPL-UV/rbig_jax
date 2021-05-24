@@ -38,7 +38,7 @@ REQUIRED = [
     "flax>=0.3.4",
     "numpyro>=0.6.0",
     "chex>=0.0.7",
-    "optax>=0.0.7",
+    "optax>=0.0.6",
     "distrax>=0.0.1",
     "tfp-nightly",
     "tqdm>=4.60.0",
