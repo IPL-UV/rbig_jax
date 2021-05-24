@@ -15,7 +15,6 @@ Variance = Union[jnp.float64, jnp.ndarray]
 Lengthscales = Union[jnp.float64, jnp.ndarray]
 
 
-
 class ImageShape(NamedTuple):
     H: int
     W: int

@@ -7,8 +7,7 @@ from chex import Array
 from distrax._src.distributions.normal import Normal
 
 from rbig_jax.models import GaussianizationFlow
-from rbig_jax.models.gaussflow import (init_default_gf_model,
-                                       init_gf_spline_model)
+from rbig_jax.models.gaussflow import init_default_gf_model, init_gf_spline_model
 from rbig_jax.transforms.base import BijectorChain
 from rbig_jax.transforms.multiscale import MultiScaleBijector
 from rbig_jax.transforms.reshape import init_scale_function

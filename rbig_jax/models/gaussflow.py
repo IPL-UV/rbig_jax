@@ -13,15 +13,11 @@ from flax import struct
 
 from rbig_jax.transforms.base import Bijector, BijectorChain
 from rbig_jax.transforms.inversecdf import InitGaussCDF, InitInverseGaussCDF
-from rbig_jax.transforms.logit import (InitLogitTempTransform,
-                                       InitLogitTransform)
+from rbig_jax.transforms.logit import InitLogitTempTransform, InitLogitTransform
 from rbig_jax.transforms.parametric.householder import InitHouseHolder
-from rbig_jax.transforms.parametric.mixture.gaussian import \
-    InitMixtureGaussianCDF
-from rbig_jax.transforms.parametric.mixture.logistic import \
-    InitMixtureLogisticCDF
-from rbig_jax.transforms.parametric.splines import \
-    InitPiecewiseRationalQuadraticCDF
+from rbig_jax.transforms.parametric.mixture.gaussian import InitMixtureGaussianCDF
+from rbig_jax.transforms.parametric.mixture.logistic import InitMixtureLogisticCDF
+from rbig_jax.transforms.parametric.splines import InitPiecewiseRationalQuadraticCDF
 
 
 @struct.dataclass

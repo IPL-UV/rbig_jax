@@ -11,8 +11,7 @@ from rbig_jax.transforms.block import RBIGBlockInit
 from rbig_jax.transforms.histogram import InitUniHistTransform
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
 from rbig_jax.transforms.kde import InitUniKDETransform
-from rbig_jax.transforms.parametric.mixture.gaussian import \
-    InitMixtureGaussianCDF
+from rbig_jax.transforms.parametric.mixture.gaussian import InitMixtureGaussianCDF
 from rbig_jax.transforms.rotation import InitPCARotation
 
 

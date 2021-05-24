@@ -28,9 +28,6 @@ class RescaleFunctions(NamedTuple):
     params: RescaleParams
 
 
-
-
-
 @struct.dataclass
 class MultiScaleBijector:
     bijectors: List[dataclass]

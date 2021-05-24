@@ -1,6 +1,5 @@
 import abc
-from typing import (Callable, Iterable, List, NamedTuple, Optional, Sequence,
-                    Tuple)
+from typing import Callable, Iterable, List, NamedTuple, Optional, Sequence, Tuple
 
 import jax
 import jax.numpy as jnp

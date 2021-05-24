@@ -10,7 +10,9 @@ from jax.random import PRNGKey
 
 from rbig_jax.transforms.base import Bijector
 from rbig_jax.transforms.parametric.householder import (
-    householder_inverse_transform, householder_transform)
+    householder_inverse_transform,
+    householder_transform,
+)
 
 
 @struct.dataclass
