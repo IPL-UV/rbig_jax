@@ -9,8 +9,6 @@ from flax import struct
 from rbig_jax.transforms.base import Bijector, InitLayersFunctions
 from rbig_jax.transforms.rotation import compute_projection
 
-# RotParams = collections.namedtuple("Params", ["projection"])
-
 
 @struct.dataclass
 class HouseHolder(Bijector):

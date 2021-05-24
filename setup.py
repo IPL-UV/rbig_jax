@@ -35,6 +35,7 @@ REQUIRED = [
     "scikit-image>=0.18.1",
     "jax>=0.2.11",
     "jaxlib>=0.1.62",
+    "flax>=0.3.4",
     "numpyro>=0.6.0",
     "chex>=0.0.7",
     "optax>=0.0.7",

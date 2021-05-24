@@ -25,26 +25,6 @@ class RescaleFunctions(NamedTuple):
     params: RescaleParams
 
 
-# @dataclass
-# class MultiScaleRBIGBlockInit:
-#     init_functions: List[dataclass]
-#     filter_shape: Tuple[int, int]
-#     image_shape: Tuple
-
-#     def __post_init__(self, init_functions: List[dataclass], filter_shape: Tuple[int,int], image_shape: Tuple):
-#         self.ms_reshape = init_scale_function(self.filter_shape, self.image_shape)
-#         self.ms_reshape = init_scale_function(
-#             self.filter_shape, self.image_shape, batch=False
-#         )
-
-
-# @dataclass
-# class MultiScaleBijector:
-#     bijectors: List[dataclass]
-#     filter_shape: Tuple[int, int]
-#     image_shape: Tuple
-#     rescale_params: NamedTuple = field(default=None)
-
 from distrax._src.utils import jittable
 import abc
 
@@ -56,14 +36,6 @@ class MultiScaleBijector:
     bijectors: List[dataclass]
     squeeze: Callable = struct.field(pytree_node=False)
     unsqueeze: Callable = struct.field(pytree_node=False)
-    # # class MultiScaleBijector(jittable.Jittable, metaclass=abc.ABCMeta):
-    # def __init__(self, bijectors: List[dataclass], filter_shape, image_shape, batch):
-    #     self.bijectors = bijectors
-    #     squeeze_params = init_scale_function(
-    #         filter=filter_shape, image_shape=image_shape, batch=batch
-    #     )
-    #     self.squeeze = squeeze_params.forward
-    #     self.unsqueeze = squeeze_params.inverse
 
     def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
 
@@ -140,59 +112,12 @@ class MultiScaleBijector:
 
         return logabsdet
 
-    # # @staticmethod
-    # def squeeze(
-    #     self, inputs: Array,
-    # ):
-    #     return rearrange(
-    #         inputs,
-    #         "B (Hn fh Wn fw C) -> (B Hn Wn) (fh fw C)",
-    #         fh=self.rescale_params.fh,
-    #         fw=self.rescale_params.fw,
-    #         C=self.rescale_params.C,
-    #         Wn=self.rescale_params.Wn,
-    #         Hn=self.rescale_params.Hn,
-    #     )
 
-    # # @staticmethod
-    # def unsqueeze(
-    #     self, inputs: Array,
-    # ):
-
-    #     temp = rearrange(
-    #         inputs,
-    #         "(B Hn Wn) (fh fw C) -> B Hn Wn fh fw C",
-    #         #             B=inputs.shape[0],
-    #         C=self.rescale_params.C,
-    #         Hn=self.rescale_params.Hn,
-    #         Wn=self.rescale_params.Wn,
-    #         fh=self.rescale_params.fh,
-    #         fw=self.rescale_params.fw,
-    #     )
-    #     return rearrange(
-    #         temp,
-    #         "B Hn Wn fh fw C -> B (Hn fh Wn fw C)",
-    #         #             B=inputs.shape[0],
-    #         C=self.rescale_params.C,
-    #         Hn=self.rescale_params.Hn,
-    #         Wn=self.rescale_params.Wn,
-    #         fh=self.rescale_params.fh,
-    #         fw=self.rescale_params.fw,
-    #     )
-
-
-# @dataclass
-# class MultiScaleRBIGBlockInit:
-#     init_functions: List[dataclass]
-#     filter_shape: Tuple[int, int]
-#     image_shape: Tuple
-
-#     def __post_init__(self):
-@dataclass
+@struct.dataclass
 class MultiScaleRBIGBlockInit:
     init_functions: List[dataclass]
-    filter_shape: Tuple[int, int]
-    image_shape: Tuple
+    filter_shape: Tuple[int, int] = struct.field(pytree_node=False)
+    image_shape: Tuple = struct.field(pytree_node=False)
 
     def __post_init__(self):
         self.ms_reshape = init_scale_function(self.filter_shape, self.image_shape)

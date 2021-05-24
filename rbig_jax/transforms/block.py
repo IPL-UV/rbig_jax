@@ -7,17 +7,10 @@ from rbig_jax.transforms.histogram import InitUniHistTransform
 from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
 from rbig_jax.transforms.kde import InitUniKDETransform
 from rbig_jax.transforms.rotation import InitPCARotation
-
-# from rbig_jax.transforms.histogram import InitUniHistUniformize
-# from rbig_jax.transforms.inversecdf import InitInverseGaussCDF
-# from rbig_jax.transforms.marginal import (
-#     marginal_fit_transform,
-#     marginal_gradient_transform,
-#     marginal_transform,
-# )
+from flax import struct
 
 
-@dataclass
+@struct.dataclass
 class RBIGBlockInit:
     init_functions: List[dataclass]
 
@@ -62,7 +55,7 @@ class RBIGBlockInit:
         return outputs, bijectors
 
 
-@dataclass
+@struct.dataclass
 class RBIGBlockParams:
     support: Array
     quantiles: Array

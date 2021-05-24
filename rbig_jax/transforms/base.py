@@ -11,19 +11,6 @@ from jax.random import PRNGKey
 from flax import struct
 
 
-@dataclass
-class TransformInfo:
-    name: str
-    input_shape: Tuple
-    output_shape: Tuple
-
-
-class InitFunctions(NamedTuple):
-    init_params: Callable
-    init_bijector: Callable
-    init_transform: Callable
-
-
 @struct.dataclass
 class Bijector:
     def forward(self, inputs: Array) -> Array:
