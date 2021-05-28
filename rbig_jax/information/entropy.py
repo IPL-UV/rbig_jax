@@ -41,7 +41,7 @@ def histogram_entropy(data, nbins: int = 10):
     # Miller Maddow Correction
     correction = 0.5 * (np.sum(counts > 0) - 1) / counts.sum()
 
-    return S + correction + np.log2(delta)
+    return S + correction + np.log(delta)
 
 
 def init_marginal_histogram_entropy(nbins: int = 10):
@@ -61,7 +61,7 @@ def init_marginal_histogram_entropy(nbins: int = 10):
     f : callable
         a function to be called
     """
-    return jax.vmap(jax.partial(histogram_entropy, nbins=nbins))
+    return jax.vmap(jax.partial(histogram_entropy, nbins=nbins), in_axes=1)
 
 
 def univariate_entropy(pk: np.ndarray) -> float:

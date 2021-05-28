@@ -2,9 +2,11 @@ from typing import Callable, NamedTuple, Optional, Tuple, Union
 
 import jax.numpy as jnp
 from chex import Array, dataclass
+from rbig_jax.transforms.base import Bijector
 from distrax._src.bijectors.bijector import Bijector as distaxBijector
 from einops import rearrange
 from jax.random import PRNGKey
+from flax import struct
 
 
 class RescaleParams(NamedTuple):
@@ -21,6 +23,88 @@ class RescaleFunctions(NamedTuple):
     forward: Callable
     inverse: Callable
     params: RescaleParams
+
+
+@struct.dataclass
+class ReshapeTransform:
+    bijector: Bijector
+    squeeze: Callable = struct.field(pytree_node=False)
+    unsqueeze: Callable = struct.field(pytree_node=False)
+
+    def forward_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+
+        # rescale data
+        inputs = self.squeeze(inputs)
+
+        # bijector chain transform
+        outputs, logabsdet = self.bijector.forward_and_log_det(inputs)
+
+        # unrescale data
+        outputs = self.unsqueeze(outputs)
+        logabsdet = self.unsqueeze(logabsdet)
+
+        return outputs, logabsdet.sum(axis=1).reshape(-1, 1)
+
+    def inverse_and_log_det(self, inputs: Array) -> Tuple[Array, Array]:
+
+        # rescale data
+        inputs = self.squeeze(inputs)
+
+        # bijector chain transform
+        outputs, logabsdet = self.bijector.inverse_and_log_det(inputs)
+
+        # unrescale data
+        outputs = self.unsqueeze(outputs)
+        logabsdet = self.unsqueeze(logabsdet)
+
+        return outputs, logabsdet.sum(axis=1).reshape(-1, 1)
+
+    def forward(self, inputs: Array) -> Array:
+
+        # rescale data
+        inputs = self.squeeze(inputs)
+        # bijector chain transform
+        outputs = self.bijector.forward(inputs)
+
+        # unrescale data
+        outputs = self.unsqueeze(outputs)
+
+        return outputs
+
+    def inverse(self, inputs: Array) -> Array:
+        # rescale data
+        inputs = self.squeeze(inputs)
+
+        # bijector chain transform
+        outputs = self.bijector.inverse(inputs)
+
+        # unrescale data
+        outputs = self.unsqueeze(outputs)
+        return outputs
+
+    def forward_log_det_jacobian(self, inputs: Array) -> Array:
+        # rescale data
+        inputs = self.squeeze(inputs)
+
+        # bijector chain transform
+        logabsdet = self.bijector.forward_log_det_jacobian(inputs)
+
+        # unrescale data
+        logabsdet = self.unsqueeze(logabsdet)
+        return logabsdet.sum(axis=1).reshape(-1, 1)
+
+    def inverse_log_det_jacobian(self, inputs: Array) -> Tuple[Array, Array]:
+
+        # rescale data
+        inputs = self.squeeze(inputs)
+
+        # bijector chain transform
+        logabsdet = self.bijector.inverse_log_det_jacobian(inputs)
+
+        # unrescale data
+        logabsdet = self.unsqueeze(logabsdet)
+
+        return logabsdet.sum(axis=1).reshape(-1, 1)
 
 
 def init_scale_function(filter, image_shape, batch: bool = True):
@@ -43,9 +127,19 @@ def init_scale_function(filter, image_shape, batch: bool = True):
 
         def forward(inputs):
 
-            return rearrange(
+            temp = rearrange(
                 inputs,
-                "B (Hn fh Wn fw C) -> B Hn Wn (fh fw C)",
+                "B (Hn fh Wn fw C) -> B Hn fh Wn fw C",
+                C=C,
+                Hn=Hn,
+                Wn=Wn,
+                fh=fh,
+                fw=fw,
+            )
+
+            return rearrange(
+                temp,
+                "B Hn fh Wn fw C -> B Hn Wn (fh fw C)",
                 fh=fh,
                 fw=fw,
                 C=C,

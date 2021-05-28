@@ -168,15 +168,15 @@ def train_info_loss_model(
                 )
 
     if verbose:
-        print(f"Converged at Layer: {state.ilayer}")
+        print(f"Converged at Layer: {state.ilayer-1}")
     # extract final loss
-    final_loss = state.info_loss[: state.ilayer]
+    final_loss = state.info_loss[: state.ilayer - 1]
 
     # ================================
     # remove excess layers and loss
     # ================================
-    if n_layers_remove is None:
-        n_layers_remove = zero_tolerance
+    # if n_layers_remove is None or n_layers_remove == 0:
+    #     n_layers_remove = zero_tolerance
 
     final_loss, bijectors = _remove_layers(
         info_loss=final_loss,
@@ -212,8 +212,10 @@ def train_info_loss_model(
 def _remove_layers(
     info_loss, bijectors, n_bijectors, n_layers_remove, buffer: int = 10
 ):
-
-    if n_layers_remove + buffer < len(info_loss):
+    print(len(info_loss), n_bijectors, n_layers_remove)
+    if n_layers_remove is None or n_layers_remove == 0:
+        pass
+    elif n_layers_remove < len(info_loss):
 
         # get total number of bijectors to remove
         n_bijectors_removed = n_bijectors * n_layers_remove

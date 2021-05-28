@@ -85,10 +85,10 @@ def RBIG(
     jitted: bool = False,
     eps: float = 1e-5,
     max_layers: int = 1_000,
-    zero_tolerance: int = 30,
+    zero_tolerance: int = 10,
     p: float = 0.25,
     verbose: bool = True,
-    n_layers_remove: int = 40,
+    n_layers_remove: int = 0,
     interval: int = 5,
 ):
 
@@ -128,5 +128,6 @@ def RBIG(
         verbose=verbose,
         interval=interval,
         n_layers_remove=n_layers_remove,
+        zero_tolerance=zero_tolerance,
     )
     return X_g, rbig_model

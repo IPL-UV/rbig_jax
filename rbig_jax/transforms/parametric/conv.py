@@ -7,17 +7,17 @@ from chex import Array, dataclass
 from flax import struct
 from jax.lax import conv_general_dilated
 from jax.random import PRNGKey
-
-from rbig_jax.transforms.base import Bijector
+from rbig_jax.transforms.base import Bijector, InitLayersFunctions
 from rbig_jax.transforms.parametric.householder import (
     householder_inverse_transform,
     householder_transform,
+    init_householder_weights,
 )
 
 
 @struct.dataclass
 class Conv1x1Householder(Bijector):
-    weight: Array
+    V: Array
 
     def forward_and_log_det(self, inputs: Array, **kwargs) -> Tuple[Array, Array]:
         """Forward transformation with the logabsdet.
@@ -36,11 +36,12 @@ class Conv1x1Householder(Bijector):
         logabsdet : Array
             the log absolute determinant of size (n_samples,)
         """
+
         *_, C = inputs.shape
         weight_init = jnp.eye(C)
 
         # weight matrix, householder product
-        kernel = householder_transform(weight_init, self.weight)
+        kernel = householder_transform(weight_init, self.V)
 
         # forward transformation
         outputs = convolutions_1x1(x=inputs, kernel=kernel)
@@ -65,7 +66,7 @@ class Conv1x1Householder(Bijector):
         """
         *_, C = inputs.shape
         weight_init = jnp.eye(C)
-        kernel = householder_inverse_transform(weight_init, self.weight)
+        kernel = householder_inverse_transform(weight_init, self.V)
 
         outputs = convolutions_1x1(x=inputs, kernel=kernel)
 
@@ -75,7 +76,7 @@ class Conv1x1Householder(Bijector):
         return outputs, log_abs_det
 
 
-def InitConv1x1Householder(n_reflections: int):
+def InitConv1x1Householder(n_reflections: int, method: str = "random") -> Callable:
     """1x1 Convolution w/ Orthogonal Constraint
     This class will perform a 1x1 convolutions given an input
     array and a kernel. The output will be the same size as the input
@@ -90,18 +91,93 @@ def InitConv1x1Householder(n_reflections: int):
 
     """
 
-    def init_func(rng: PRNGKey, shape: Tuple, **kwargs) -> Conv1x1Householder:
+    def bijector(
+        inputs: Array, n_channels: int, rng: PRNGKey = None, **kwargs
+    ) -> Conv1x1Householder:
 
-        # extract shape
-        *_, C = shape
+        # initialize weight matrix
+        V = init_householder_weights(
+            rng=rng,
+            n_features=n_channels,
+            n_reflections=n_reflections,
+            method=method,
+            X=inputs,
+        )
 
-        # initialize the householder rotation matrix
-        V = jax.nn.initializers.orthogonal()(key=rng, shape=(n_reflections, C))
+        # initialize bijector
+        bijector = Conv1x1Householder(V=V)
 
-        # create bijector
-        return Conv1x1Householder(weight=V)
+        return bijector
 
-    return init_func
+    def transform_and_bijector(
+        inputs: Array, n_channels: int, rng: PRNGKey = None, **kwargs
+    ) -> Tuple[Array, Conv1x1Householder]:
+
+        # initialize weight matrix
+        V = init_householder_weights(
+            rng=rng,
+            n_features=n_channels,
+            n_reflections=n_reflections,
+            method=method,
+            X=inputs,
+        )
+
+        # initialize bijector
+        bijector = Conv1x1Householder(V=V)
+
+        # forward transform
+        outputs = bijector.forward(inputs=inputs)
+
+        return outputs, bijector
+
+    def transform(
+        inputs: Array, n_channels: int, rng: PRNGKey = None, **kwargs
+    ) -> Array:
+
+        # initialize weight matrix
+        V = init_householder_weights(
+            rng=rng,
+            n_features=n_channels,
+            n_reflections=n_reflections,
+            method=method,
+            X=inputs,
+        )
+
+        # initialize bijector
+        bijector = Conv1x1Householder(V=V)
+
+        # forward transform
+        outputs = bijector.forward(inputs=inputs)
+
+        return outputs
+
+    def transform_gradient_bijector(
+        inputs: Array, n_channels: int, rng: PRNGKey = None, **kwargs
+    ) -> Tuple[Array, Conv1x1Householder]:
+
+        # initialize weight matrix
+        V = init_householder_weights(
+            rng=rng,
+            n_features=n_channels,
+            n_reflections=n_reflections,
+            method=method,
+            X=inputs,
+        )
+
+        # initialize bijector
+        bijector = Conv1x1Householder(V=V)
+
+        # forward transform
+        outputs, logabsdet = bijector.forward_and_log_det(inputs=inputs)
+
+        return outputs, logabsdet, bijector
+
+    return InitLayersFunctions(
+        transform=transform,
+        bijector=bijector,
+        transform_and_bijector=transform_and_bijector,
+        transform_gradient_bijector=transform_gradient_bijector,
+    )
 
 
 def convolutions_1x1(x: Array, kernel: Array) -> Array:

@@ -6,19 +6,23 @@ import jax.numpy as jnp
 from chex import Array, dataclass
 from distrax._src.bijectors.bijector import Bijector as NonTrainableBijector
 from flax import struct
-
+from chex import Array
 from rbig_jax.transforms.base import Bijector
 
 
 @struct.dataclass
 class MarginalUniformizeTransform(Bijector):
-    def __init__(
-        self, support: Array, quantiles: Array, support_pdf: Array, empirical_pdf: Array
-    ):
-        self.support = support
-        self.quantiles = quantiles
-        self.support_pdf = support_pdf
-        self.empirical_pdf = empirical_pdf
+    support: Array
+    quantiles: Array
+    support_pdf: Array
+    empirical_pdf: Array
+    # def __init__(
+    #     self, support: Array, quantiles: Array, support_pdf: Array, empirical_pdf: Array
+    # ):
+    #     self.support = support
+    #     self.quantiles = quantiles
+    #     self.support_pdf = support_pdf
+    #     self.empirical_pdf = empirical_pdf
 
     def forward(self, inputs: Array) -> Array:
         """Marginal transform given a dataset, function and params
