@@ -22,7 +22,7 @@ dependencies:
 - pip
 - pip:
   # Jax framework
-  - jaxlib
+  - "https://storage.googleapis.com/jax-releases/mac/jaxlib-0.1.73-cp39-none-macosx_10_9_x86_64.whl"
   - jax
   - distrax
   - chex
