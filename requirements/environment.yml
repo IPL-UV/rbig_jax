@@ -17,13 +17,11 @@ dependencies:
 - conda-forge::ipywidgets
 - ipykernel
 - conda-forge::tqdm
-# - conda-forge::jaxlib>=0.1.74
-# - conda-forge::jax
+- conda-forge::jaxlib
+- conda-forge::jax
 - pip
 - pip:
   # Jax framework
-  - jaxlib
-  - jax
   - distrax
   - chex
   - optax
