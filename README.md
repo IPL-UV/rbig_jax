@@ -68,3 +68,6 @@ conda env update --file environment.yml
 * Original MATLAB Code - [webpage](http://isp.uv.es/code/featureextraction/RBIG_toolbox.zip)
 * Original Python Code - [github](https://github.com/spencerkent/pyRBIG)
 * [Paper](https://arxiv.org/abs/1602.00229) - Iterative Gaussianization: from ICA to Random Rotations
+
+## Acknowledgements
+This work was supported by the European Research Council (ERC) Synergy Grant “Understanding and Modelling the Earth System with Machine Learning (USMILE)” under Grant Agreement No 855187.
